@@ -28,14 +28,21 @@ defmodule Api.Accounts do
 
   ## Examples
 
-      iex> get_user!(123)
+      iex> get_user(123)
       %User{}
 
-      iex> get_user!(456)
+      iex> get_user(456)
       ** (Ecto.NoResultsError)
 
   """
-  def get_user!(id), do: Repo.get!(User, id)
+  def get_user(id) do
+    case Repo.get(User, id) do
+      nil -> {:error, :not_found}
+      user -> {:ok, user}
+    end
+  end
+
+  # def get_user!(id), do: Repo.get!(User, id)
 
   @doc """
   Creates a user.
@@ -161,14 +168,14 @@ defmodule Api.Accounts do
   end
 
   @doc """
-  Gets current user from a token.
+  Gets the current user from a token.
   """
   def get_current_user(token) do
-    with {:ok, claims} <- Guardian.decode_and_verify(token, %{}),
-         {:ok, user} <- Guardian.resource_from_claims(claims, %{}) do
+    with {:ok, claims} <- Api.Accounts.Guardian.decode_and_verify(token, %{}),
+         {:ok, user} <- Api.Accounts.Guardian.resource_from_claims(claims) do
       {:ok, user}
     else
-      _ -> {:error, :unauthorized}
+      _error -> {:error, :unauthorized}
     end
   end
 end

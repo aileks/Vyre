@@ -1,5 +1,6 @@
 defmodule ApiWeb.Router do
   use ApiWeb, :router
+  use Plug.ErrorHandler
 
   pipeline :api do
     plug(:accepts, ["json"])
@@ -24,20 +25,19 @@ defmodule ApiWeb.Router do
     get("/me", AuthController, :me)
   end
 
-  # Enable LiveDashboard and Swoosh mailbox preview in development
-  # if Application.compile_env(:api, :dev_routes) do
-  #   # If you want to use the LiveDashboard in production, you should put
-  #   # it behind authentication and allow only admins to access it.
-  #   # If your application does not have an admins-only section yet,
-  #   # you can use Plug.BasicAuth to set up some basic authentication
-  #   # as long as you are also using SSL (which you should anyway).
-  #   import Phoenix.LiveDashboard.Router
+  def handle_errors(conn, %{reason: %Ecto.NoResultsError{} = _reason}) do
+    conn
+    |> put_status(:not_found)
+    |> put_view(json: ApiWeb.ErrorJSON)
+    |> render("404.json", %{message: "Resource not found"})
+    |> halt()
+  end
 
-  #   scope "/dev" do
-  #     pipe_through([:fetch_session, :protect_from_forgery])
-
-  #     live_dashboard("/dashboard", metrics: ApiWeb.Telemetry)
-  #     forward("/mailbox", Plug.Swoosh.MailboxPreview)
-  #   end
-  # end
+  def handle_errors(conn, _) do
+    conn
+    |> put_status(:internal_server_error)
+    |> put_view(json: ApiWeb.ErrorJSON)
+    |> render("500.json")
+    |> halt()
+  end
 end

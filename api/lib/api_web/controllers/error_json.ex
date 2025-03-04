@@ -4,6 +4,9 @@ defmodule ApiWeb.ErrorJSON do
 
   See config/config.exs.
   """
+  def render("404.json", %{message: message}) do
+    %{errors: %{detail: message}}
+  end
 
   def render("401.json", %{message: message}) do
     %{errors: %{detail: message}}
@@ -11,6 +14,12 @@ defmodule ApiWeb.ErrorJSON do
 
   def render("403.json", _assigns) do
     %{errors: %{detail: "Forbidden"}}
+  end
+
+  def render("422.json", %{changeset: changeset}) do
+    %{
+      errors: Ecto.Changeset.traverse_errors(changeset, &translate_error/1)
+    }
   end
 
   # By default, Phoenix returns the status message from
