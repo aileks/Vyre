@@ -1,0 +1,131 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Liter&display=swap');
+@import 'tailwindcss';
+
+@theme extend {
+  /* Fonts */
+  --font-sans: 'Liter', 'sans-serif';
+  --font-mono: 'IBM Plex Mono', 'monospace';
+
+  /* Accent Color */
+  --color-accent-50: oklch(0.98 0.01 285);
+  --color-accent-100: oklch(0.95 0.03 285);
+  --color-accent-200: oklch(0.9 0.06 285);
+  --color-accent-300: oklch(0.8 0.12 285);
+  --color-accent-400: oklch(0.7 0.18 285);
+  --color-accent-500: oklch(0.6 0.22 285);
+  --color-accent-600: oklch(0.5 0.24 285);
+  --color-accent-700: oklch(0.4 0.2 285);
+  --color-accent-800: oklch(0.3 0.15 285);
+  --color-accent-900: oklch(0.2 0.1 285);
+
+  /* For Dark Background */
+  --color-navy-50: oklch(0.95 0.01 270);
+  --color-navy-100: oklch(0.9 0.01 270);
+  --color-navy-200: oklch(0.8 0.01 270);
+  --color-navy-300: oklch(0.7 0.02 270);
+  --color-navy-400: oklch(0.6 0.02 270);
+  --color-navy-500: oklch(0.5 0.02 270);
+  --color-navy-600: oklch(0.3 0.02 270);
+  --color-navy-700: oklch(0.2 0.02 270);
+  --color-navy-800: oklch(0.15 0.02 270);
+  --color-navy-900: oklch(0.1 0.01 270);
+
+  /* For Light Background */
+  --color-cream-50: oklch(0.98 0.01 95);
+  --color-cream-100: oklch(0.97 0.01 95);
+  --color-cream-200: oklch(0.95 0.02 95);
+  --color-cream-300: oklch(0.93 0.02 95);
+  --color-cream-400: oklch(0.9 0.02 95);
+  --color-cream-500: oklch(0.85 0.03 95);
+  --color-cream-600: oklch(0.8 0.03 95);
+  --color-cream-700: oklch(0.75 0.04 95);
+  --color-cream-800: oklch(0.7 0.05 95);
+  --color-cream-900: oklch(0.65 0.06 95);
+
+  /* Color Overrides */
+  --color-green-300: oklch(0.8 0.15 140);
+  --color-green-500: oklch(0.7 0.2 140);
+  --color-green-700: oklch(0.5 0.15 140);
+
+  --color-amber-300: oklch(0.85 0.15 85);
+  --color-amber-500: oklch(0.75 0.18 85);
+  --color-amber-700: oklch(0.6 0.15 85);
+
+  --color-red-300: oklch(0.8 0.15 20);
+  --color-red-500: oklch(0.7 0.2 20);
+  --color-red-700: oklch(0.5 0.15 20);
+}
+
+@custom-variant theme-dark (&:where([data-theme="dark"] *))
+
+body {
+  @apply font-mono;
+  @apply bg-white;
+  @apply theme-dark:bg-black;
+}
+
+/* Chat-specific utilities */
+/* @utility chat-bubble {
+  background-color: var(--bg-secondary);
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-message);
+  max-width: 80%;
+}
+
+@utility chat-bubble-own {
+  background-color: var(--accent-primary);
+  color: var(--text-inverse);
+}
+
+@utility chat-username {
+  font-weight: var(--font-weight-semibold);
+  color: var(--accent-secondary);
+}
+
+@utility chat-timestamp {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
+@utility status-indicator {
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+}
+
+@utility channel-item {
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-md);
+  transition: background-color var(--transition-fast);
+}
+
+@utility channel-item-active {
+  background-color: var(--bg-tertiary);
+  font-weight: 600;
+}
+
+@utility server-item {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+@utility server-item-active {
+  border-radius: var(--radius-sm);
+  background-color: var(--accent-primary);
+  color: var(--text-inverse);
+}
+
+@utility chat-input {
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 0.75rem 1rem;
+  color: var(--text-primary);
+  transition: border-color var(--transition-fast);
+} */
