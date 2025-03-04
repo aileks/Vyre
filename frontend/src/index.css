@@ -1,12 +1,12 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Liter&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Liter&family=PT+Mono&display=swap');
 @import 'tailwindcss';
 
 @theme extend {
   /* Fonts */
   --font-sans: 'Liter', 'sans-serif';
-  --font-mono: 'IBM Plex Mono', 'monospace';
+  --font-mono: 'PT Mono', 'monospace';
 
-  /* Accent Color */
+  /* Primary Accent */
   --color-accent-50: oklch(0.98 0.01 285);
   --color-accent-100: oklch(0.95 0.03 285);
   --color-accent-200: oklch(0.9 0.06 285);
@@ -18,7 +18,31 @@
   --color-accent-800: oklch(0.3 0.15 285);
   --color-accent-900: oklch(0.2 0.1 285);
 
-  /* For Dark Background */
+  /* Secondary Accent */
+  --color-turquois-50: oklch(0.98 0.01 195);
+  --color-turquois-100: oklch(0.95 0.03 195);
+  --color-turquois-200: oklch(0.9 0.06 195);
+  --color-turquois-300: oklch(0.8 0.1 195);
+  --color-turquois-400: oklch(0.7 0.15 195);
+  --color-turquois-500: oklch(0.6 0.18 195);
+  --color-turquois-600: oklch(0.5 0.2 195);
+  --color-turquois-700: oklch(0.4 0.18 195);
+  --color-turquois-800: oklch(0.3 0.12 195);
+  --color-turquois-900: oklch(0.2 0.08 195);
+
+  /* Tertiary Accent */
+  --color-mustard-50: oklch(0.98 0.01 85);
+  --color-mustard-100: oklch(0.96 0.03 85);
+  --color-mustard-200: oklch(0.92 0.06 85);
+  --color-mustard-300: oklch(0.88 0.1 85);
+  --color-mustard-400: oklch(0.83 0.13 85);
+  --color-mustard-500: oklch(0.78 0.15 85);
+  --color-mustard-600: oklch(0.7 0.17 85);
+  --color-mustard-700: oklch(0.6 0.18 85);
+  --color-mustard-800: oklch(0.5 0.16 85);
+  --color-mustard-900: oklch(0.4 0.12 85);
+
+  /* For Dark Theme */
   --color-navy-50: oklch(0.95 0.01 270);
   --color-navy-100: oklch(0.9 0.01 270);
   --color-navy-200: oklch(0.8 0.01 270);
@@ -30,7 +54,7 @@
   --color-navy-800: oklch(0.15 0.02 270);
   --color-navy-900: oklch(0.1 0.01 270);
 
-  /* For Light Background */
+  /* For Light Theme */
   --color-cream-50: oklch(0.98 0.01 95);
   --color-cream-100: oklch(0.97 0.01 95);
   --color-cream-200: oklch(0.95 0.02 95);
@@ -42,90 +66,99 @@
   --color-cream-800: oklch(0.7 0.05 95);
   --color-cream-900: oklch(0.65 0.06 95);
 
-  /* Color Overrides */
-  --color-green-300: oklch(0.8 0.15 140);
-  --color-green-500: oklch(0.7 0.2 140);
-  --color-green-700: oklch(0.5 0.15 140);
+  /* Success Colors */
+  --color-success-50: oklch(0.97 0.02 145);
+  --color-success-100: oklch(0.94 0.04 145);
+  --color-success-200: oklch(0.89 0.07 145);
+  --color-success-300: oklch(0.8 0.12 145);
+  --color-success-400: oklch(0.7 0.15 145);
+  --color-success-500: oklch(0.65 0.18 145);
+  --color-success-600: oklch(0.55 0.2 145);
+  --color-success-700: oklch(0.45 0.18 145);
+  --color-success-800: oklch(0.35 0.15 145);
+  --color-success-900: oklch(0.25 0.1 145);
 
-  --color-amber-300: oklch(0.85 0.15 85);
-  --color-amber-500: oklch(0.75 0.18 85);
-  --color-amber-700: oklch(0.6 0.15 85);
+  /* Error Colors */
+  --color-error-50: oklch(0.98 0.01 25);
+  --color-error-100: oklch(0.96 0.03 25);
+  --color-error-200: oklch(0.93 0.06 25);
+  --color-error-300: oklch(0.85 0.12 25);
+  --color-error-400: oklch(0.75 0.18 25);
+  --color-error-500: oklch(0.65 0.22 25);
+  --color-error-600: oklch(0.55 0.25 25);
+  --color-error-700: oklch(0.45 0.22 25);
+  --color-error-800: oklch(0.35 0.18 25);
+  --color-error-900: oklch(0.25 0.12 25);
 
-  --color-red-300: oklch(0.8 0.15 20);
-  --color-red-500: oklch(0.7 0.2 20);
-  --color-red-700: oklch(0.5 0.15 20);
+  /* Chat Specific Colors */
+  --color-chat-sender-bubble: var(--color-accent-600);
+  --color-chat-sender-text: white;
+  --color-chat-recipient-bubble: var(--color-cream-200);
+  --color-chat-recipient-text: var(--color-navy-800);
+  --color-chat-system-bubble: var(--color-gray-200);
+  --color-chat-system-text: var(--color-gray-800);
+
+  /* Status Indicators */
+  --color-status-online: var(--color-success-500);
+  --color-status-offline: var(--color-gray-400);
+  --color-status-away: var(--color-amber-500);
+  --color-status-busy: var(--color-error-500);
+
+  /* Gray Overrides */
+  --color-gray-50: oklch(0.98 0.005 270);
+  --color-gray-100: oklch(0.93 0.005 270);
+  --color-gray-200: oklch(0.85 0.005 270);
+  --color-gray-300: oklch(0.75 0.005 270);
+  --color-gray-400: oklch(0.65 0.01 270);
+  --color-gray-500: oklch(0.55 0.01 270);
+  --color-gray-600: oklch(0.45 0.01 270);
+  --color-gray-700: oklch(0.35 0.01 270);
+  --color-gray-800: oklch(0.25 0.005 270);
+  --color-gray-900: oklch(0.15 0.005 270);
 }
 
-@custom-variant theme-dark (&:where([data-theme="dark"] *))
+/* @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *)); */
 
-body {
-  @apply font-mono;
-  @apply bg-white;
-  @apply theme-dark:bg-black;
-}
-
-/* Chat-specific utilities */
-/* @utility chat-bubble {
-  background-color: var(--bg-secondary);
+/* Chat Utilities */
+@utility chat-bubble-sender {
+  background-color: var(--color-chat-sender-bubble);
+  color: var(--color-chat-sender-text);
+  border-radius: 1rem 1rem 0 1rem;
   padding: 0.75rem 1rem;
-  border-radius: var(--radius-message);
   max-width: 80%;
+  margin-left: auto;
 }
 
-@utility chat-bubble-own {
-  background-color: var(--accent-primary);
-  color: var(--text-inverse);
+@utility chat-bubble-recipient {
+  background-color: var(--color-chat-recipient-bubble);
+  color: var(--color-chat-recipient-text);
+  border-radius: 1rem 1rem 1rem 0;
+  padding: 0.75rem 1rem;
+  max-width: 80%;
+  margin-right: auto;
 }
 
-@utility chat-username {
-  font-weight: var(--font-weight-semibold);
-  color: var(--accent-secondary);
+@utility chat-bubble-system {
+  background-color: var(--color-chat-system-bubble);
+  color: var(--color-chat-system-text);
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  max-width: 90%;
+  margin: 0 auto;
+  font-style: italic;
+  text-align: center;
 }
 
-@utility chat-timestamp {
-  font-size: 0.75rem;
-  color: var(--text-tertiary);
-}
-
+/* Status Utilities */
 @utility status-indicator {
   display: inline-block;
-  width: 0.5rem;
-  height: 0.5rem;
+  width: 0.75rem;
+  height: 0.75rem;
   border-radius: 9999px;
 }
 
-@utility channel-item {
-  padding: 0.5rem 0.75rem;
-  border-radius: var(--radius-md);
-  transition: background-color var(--transition-fast);
+body {
+  @apply font-sans;
+  @apply bg-cream-50;
+  @apply text-navy-900;
 }
-
-@utility channel-item-active {
-  background-color: var(--bg-tertiary);
-  font-weight: 600;
-}
-
-@utility server-item {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: var(--radius-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all var(--transition-fast);
-}
-
-@utility server-item-active {
-  border-radius: var(--radius-sm);
-  background-color: var(--accent-primary);
-  color: var(--text-inverse);
-}
-
-@utility chat-input {
-  background-color: var(--bg-tertiary);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  padding: 0.75rem 1rem;
-  color: var(--text-primary);
-  transition: border-color var(--transition-fast);
-} */

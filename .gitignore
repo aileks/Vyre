@@ -10,3 +10,4 @@ vyre-*.tar
 .idea/
 .elixir_ls/
 node_modules/
+.zed/
