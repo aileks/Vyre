@@ -35,7 +35,7 @@ config :cors_plug,
 #
 # For production it's recommended to configure a different adapter
 # at the `config/runtime.exs`.
-config :api, Api.Mailer, adapter: Swoosh.Adapters.Local
+# config :api, Api.Mailer, adapter: Swoosh.Adapters.Local
 
 # Configures Elixir's Logger
 config :logger, :console,

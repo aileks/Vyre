@@ -50,7 +50,7 @@ config :api, ApiWeb.Endpoint,
 # different ports.
 
 # Enable dev routes for dashboard and mailbox
-config :api, dev_routes: true
+# config :api, dev_routes: true
 config :api, :ecto_repos, [Api.Repo]
 config :api, Api.Repo, adapter: Ecto.Adapters.SQLite3
 
@@ -65,4 +65,4 @@ config :phoenix, :stacktrace_depth, 20
 config :phoenix, :plug_init_mode, :runtime
 
 # Disable swoosh api client as it is only required for production adapters.
-config :swoosh, :api_client, false
+# config :swoosh, :api_client, false

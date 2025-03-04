@@ -38,14 +38,20 @@ defmodule ApiWeb do
   def controller do
     quote do
       use Phoenix.Controller,
-        formats: [:html, :json],
-        layouts: [html: ApiWeb.Layouts]
+        formats: [:json]
 
       use Gettext, backend: ApiWeb.Gettext
 
       import Plug.Conn
 
       unquote(verified_routes())
+
+      def render_json(conn, status, data) do
+        conn
+        |> put_status(status)
+        |> put_resp_content_type("application/json")
+        |> render(data)
+      end
     end
   end
 

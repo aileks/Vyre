@@ -34,12 +34,11 @@ defmodule Api.MixProject do
     [
       {:phoenix, "~> 1.7.20"},
       {:phoenix_ecto, "~> 4.5"},
+      {:phoenix_live_view, "~> 1.0"},
       {:ecto_sql, "~> 3.10"},
       {:ecto_sqlite3, "~> 0.18"},
       {:cors_plug, "~> 3.0"},
       {:postgrex, ">= 0.0.0"},
-      {:phoenix_live_dashboard, "~> 0.8.3"},
-      {:swoosh, "~> 1.5"},
       {:finch, "~> 0.13"},
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
