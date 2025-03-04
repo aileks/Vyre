@@ -20,6 +20,10 @@ if System.get_env("PHX_SERVER") do
   config :api, ApiWeb.Endpoint, server: true
 end
 
+if config_env() in [:dev, :test] and File.exists?("../.env") do
+  DotenvParser.load_file(".env")
+end
+
 if config_env() == :prod do
   database_url =
     System.get_env("DATABASE_URL") ||
@@ -48,6 +52,22 @@ if config_env() == :prod do
       You can generate one by calling: mix phx.gen.secret
       """
 
+  guardian_secret_key =
+    System.get_env("GUARDIAN_SECRET_KEY") ||
+      if config_env() in [:dev, :test] do
+        # Fallback for dev/test if not in .env
+        "insecure_key_for_dev_environment_only"
+      else
+        raise """
+        environment variable GUARDIAN_SECRET_KEY is missing.
+        You can generate one by calling: mix phx.gen.secret 32
+        """
+      end
+
+  config :api, Api.Accounts.Guardian,
+    issuer: "api",
+    secret_key: guardian_secret_key
+
   host = System.get_env("PHX_HOST") || "example.com"
   port = String.to_integer(System.get_env("PORT") || "4000")
 
@@ -64,6 +84,12 @@ if config_env() == :prod do
       port: port
     ],
     secret_key_base: secret_key_base
+
+  if config_env() in [:dev, :test] do
+    config :bcrypt_elixir, :log_rounds, 4
+  else
+    config :bcrypt_elixir, :log_rounds, 12
+  end
 
   # ## SSL Support
   #

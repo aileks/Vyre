@@ -43,6 +43,8 @@ defmodule Api.MixProject do
       {:phoenix, "~> 1.7.20"},
       {:phoenix_ecto, "~> 4.5"},
       {:phoenix_live_view, "~> 1.0"},
+      {:bcrypt_elixir, "~> 3.2"},
+      {:guardian, "~> 2.3"},
       {:ecto_sql, "~> 3.10"},
       {:ecto_sqlite3, "~> 0.18"},
       {:cors_plug, "~> 3.0"},
@@ -54,7 +56,8 @@ defmodule Api.MixProject do
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.5"},
-      {:excoveralls, "~> 0.18", only: [:test, :dev], runtime: false}
+      {:excoveralls, "~> 0.18", only: [:test, :dev], runtime: false},
+      {:dotenv_parser, "~> 2.0", only: [:dev, :test]}
     ]
   end
 

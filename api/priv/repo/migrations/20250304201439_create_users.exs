@@ -4,10 +4,10 @@ defmodule Api.Repo.Migrations.CreateUsers do
   def change do
     create table(:users, primary_key: false) do
       add(:id, :binary_id, primary_key: true)
-      add(:username, :string)
-      add(:display_name, :string)
-      add(:email, :string)
-      add(:password, :string)
+      add(:username, :string, null: false)
+      add(:display_name, :string, null: false)
+      add(:email, :string, null: false)
+      add(:password_hash, :string, null: false)
       add(:avatar_url, :string)
       add(:status, :string)
 

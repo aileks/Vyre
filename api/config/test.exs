@@ -32,3 +32,8 @@ config :logger, level: :warning
 
 # Initialize plugs at runtime for faster test compilation
 config :phoenix, :plug_init_mode, :runtime
+
+# Load environment variables from .env file
+if File.exists?("../.env") do
+  DotenvParser.load("../.env")
+end

@@ -9,7 +9,8 @@ defmodule Api.Accounts.User do
     field(:username, :string)
     field(:display_name, :string)
     field(:email, :string)
-    field(:password, :string)
+    field(:password_hash, :string)
+    field(:password, :string, virtual: true)
     field(:avatar_url, :string)
 
     timestamps(type: :utc_datetime)

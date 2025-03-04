@@ -22,6 +22,8 @@ config :api, ApiWeb.Endpoint,
   pubsub_server: Api.PubSub,
   live_view: [signing_salt: "k3W7Q6qB"]
 
+config :api, Api.Accounts.Guardian, issuer: "api"
+
 # Set up CORS
 config :cors_plug,
   origin: ["http://localhost:3000", "http://localhost:5173"],

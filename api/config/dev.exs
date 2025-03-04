@@ -1,5 +1,12 @@
 import Config
 
+# Load environment variables from .env file
+if File.exists?("../.env") do
+  DotenvParser.load("../.env")
+end
+
+config :api, Api.Accounts.Guardian, secret_key: System.get_env("GUARDIAN_SECRET_KEY")
+
 # Configure your database
 config :api, Api.Repo,
   # username: "postgres",

@@ -1,10 +1,12 @@
 import Config
 
+config :api, Api.Accounts.Guardian, secret_key: System.get_env("GUARDIAN_SECRET_KEY")
+
 # Configures Swoosh API Client
 # config :swoosh, api_client: Swoosh.ApiClient.Finch, finch_name: Api.Finch
 
 # Disable Swoosh Local Memory Storage
-config :swoosh, local: false
+# config :swoosh, local: false
 
 # Do not print debug messages in production
 config :logger, level: :info
