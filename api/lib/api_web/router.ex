@@ -5,10 +5,23 @@ defmodule ApiWeb.Router do
     plug(:accepts, ["json"])
   end
 
+  pipeline :auth do
+    plug(:accepts, ["json"])
+    plug(ApiWeb.AuthPlug)
+  end
+
   scope "/api", ApiWeb do
     pipe_through(:api)
 
     resources("/users", UserController)
+    post("/register", AuthController, :register)
+    post("/login", AuthController, :login)
+  end
+
+  scope "/api", ApiWeb do
+    pipe_through([:api, :auth])
+
+    get("/me", AuthController, :me)
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development

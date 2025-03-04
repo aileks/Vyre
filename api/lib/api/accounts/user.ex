@@ -2,26 +2,65 @@ defmodule Api.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
 
-  @primary_key {:id, :binary_id, autogenerate: true}
-  @foreign_key_type :binary_id
   schema "users" do
-    field(:status, :string)
-    field(:username, :string)
-    field(:display_name, :string)
     field(:email, :string)
-    field(:password_hash, :string)
+    field(:username, :string)
     field(:password, :string, virtual: true)
+    field(:password_hash, :string)
+    field(:display_name, :string)
     field(:avatar_url, :string)
+    field(:status, :string, default: "active")
 
-    timestamps(type: :utc_datetime)
+    timestamps()
   end
 
   @doc false
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:username, :display_name, :email, :password, :avatar_url, :status])
-    |> validate_required([:username, :display_name, :email, :password, :avatar_url, :status])
+    |> cast(attrs, [:email, :username, :password, :display_name, :avatar_url, :status])
+    |> validate_required([:email, :username, :password])
+    |> validate_email()
+    |> validate_password()
+    |> validate_username()
     |> unique_constraint(:email)
     |> unique_constraint(:username)
+  end
+
+  defp validate_email(changeset) do
+    changeset
+    |> validate_format(:email, ~r/^[^\s]+@[^\s]+$/, message: "must have the @ sign and no spaces")
+    |> validate_length(:email, max: 160)
+  end
+
+  defp validate_username(changeset) do
+    changeset
+    |> validate_format(:username, ~r/^[a-z0-9_-]+$/i,
+      message: "only letters, numbers, underscores and dashes"
+    )
+    |> validate_length(:username, min: 3, max: 30)
+  end
+
+  defp validate_password(changeset) do
+    changeset
+    |> validate_length(:password, min: 8, max: 80)
+    |> prepare_changes(&hash_password/1)
+  end
+
+  defp hash_password(changeset) do
+    password = get_change(changeset, :password)
+
+    if password do
+      changeset
+      |> put_change(:password_hash, Bcrypt.hash_pwd_salt(password))
+    else
+      changeset
+    end
+  end
+
+  @doc """
+  A user changeset for registration.
+  """
+  def registration_changeset(user, attrs) do
+    changeset(user, attrs)
   end
 end

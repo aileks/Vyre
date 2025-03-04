@@ -101,4 +101,74 @@ defmodule Api.Accounts do
   def change_user(%User{} = user, attrs \\ %{}) do
     User.changeset(user, attrs)
   end
+
+  @doc """
+  Registers a user.
+  """
+  def register_user(attrs \\ %{}) do
+    %User{}
+    |> User.registration_changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Gets a user by email.
+  """
+  def get_user_by_email(email) when is_binary(email) do
+    Repo.get_by(User, email: email)
+  end
+
+  @doc """
+  Gets a user by username.
+  """
+  def get_user_by_username(username) when is_binary(username) do
+    Repo.get_by(User, username: username)
+  end
+
+  @doc """
+  Gets a user by email or username.
+  """
+  def get_user_by_email_or_username(email_or_username) when is_binary(email_or_username) do
+    Repo.get_by(User, email: email_or_username) ||
+      Repo.get_by(User, username: email_or_username)
+  end
+
+  @doc """
+  Authenticates a user.
+  """
+  def authenticate_user(email_or_username, password) do
+    user = get_user_by_email_or_username(email_or_username)
+
+    case user do
+      nil ->
+        Bcrypt.no_user_verify()
+        {:error, :invalid_credentials}
+
+      user ->
+        if Bcrypt.verify_pass(password, user.password_hash) do
+          {:ok, user}
+        else
+          {:error, :invalid_credentials}
+        end
+    end
+  end
+
+  @doc """
+  Creates a token for a user.
+  """
+  def create_token(user) do
+    Guardian.encode_and_sign(user, %{})
+  end
+
+  @doc """
+  Gets current user from a token.
+  """
+  def get_current_user(token) do
+    with {:ok, claims} <- Guardian.decode_and_verify(token, %{}),
+         {:ok, user} <- Guardian.resource_from_claims(claims, %{}) do
+      {:ok, user}
+    else
+      _ -> {:error, :unauthorized}
+    end
+  end
 end
