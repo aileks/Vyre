@@ -4,32 +4,24 @@ defmodule Api.AccountsFixtures do
   entities via the `Api.Accounts` context.
   """
 
-  @doc """
-  Generate a unique user email.
-  """
-  def unique_user_email, do: "some email#{System.unique_integer([:positive])}"
+  def unique_user_email, do: "user-#{System.unique_integer([:positive])}@example.com"
+  def unique_user_username, do: "user_#{System.unique_integer([:positive])}"
 
-  @doc """
-  Generate a unique user username.
-  """
-  def unique_user_username, do: "some username#{System.unique_integer([:positive])}"
+  def valid_user_attributes(attrs \\ %{}) do
+    Enum.into(attrs, %{
+      email: unique_user_email(),
+      username: unique_user_username(),
+      password: "Password123",
+      display_name: "Test User",
+      avatar_url: "https://example.com/avatar.jpg",
+      status: "active"
+    })
+  end
 
-  @doc """
-  Generate a user.
-  """
   def user_fixture(attrs \\ %{}) do
-    {:ok, user} =
-      attrs
-      |> Enum.into(%{
-        avatar_url: "some avatar_url",
-        display_name: "some display_name",
-        email: unique_user_email(),
-        password: "some password",
-        status: "some status",
-        username: unique_user_username()
-      })
-      |> Api.Accounts.create_user()
+    attrs = valid_user_attributes(attrs)
 
+    {:ok, user} = Api.Accounts.register_user(attrs)
     user
   end
 end

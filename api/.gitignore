@@ -11,3 +11,4 @@ api-*.tar
 test.*
 .env
 .env.*
+dev.*

@@ -10,11 +10,9 @@ defmodule Api.Accounts.User do
     field(:display_name, :string)
     field(:avatar_url, :string)
     field(:status, :string, default: "active")
-
     timestamps()
   end
 
-  @doc false
   def changeset(user, attrs) do
     user
     |> cast(attrs, [:email, :username, :password, :display_name, :avatar_url, :status])
@@ -22,8 +20,9 @@ defmodule Api.Accounts.User do
     |> validate_email()
     |> validate_password()
     |> validate_username()
-    |> unique_constraint(:email)
-    |> unique_constraint(:username)
+    |> unique_constraint(:email, message: "Email already taken")
+    |> unique_constraint(:username, message: "Username already taken")
+    |> hash_password()
   end
 
   defp validate_email(changeset) do
@@ -57,9 +56,6 @@ defmodule Api.Accounts.User do
     end
   end
 
-  @doc """
-  A user changeset for registration.
-  """
   def registration_changeset(user, attrs) do
     changeset(user, attrs)
   end

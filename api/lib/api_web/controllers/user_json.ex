@@ -21,7 +21,6 @@ defmodule ApiWeb.UserJSON do
       username: user.username,
       display_name: user.display_name,
       email: user.email,
-      password: user.password,
       avatar_url: user.avatar_url,
       status: user.status
     }

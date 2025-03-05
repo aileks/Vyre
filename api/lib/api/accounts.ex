@@ -161,21 +161,22 @@ defmodule Api.Accounts do
   end
 
   @doc """
-  Creates a token for a user.
+  Creates an authentication token for a user.
+
+  Returns {:ok, token, claims} if successful,
+  otherwise returns {:error, reason}.
   """
   def create_token(user) do
-    Guardian.encode_and_sign(user, %{})
+    Api.Auth.Guardian.encode_and_sign(user)
   end
 
   @doc """
-  Gets the current user from a token.
+  Gets a user based on the provided token.
+
+  Returns {:ok, user} if the token is valid and belongs to a user,
+  otherwise returns {:error, reason}.
   """
   def get_current_user(token) do
-    with {:ok, claims} <- Api.Accounts.Guardian.decode_and_verify(token, %{}),
-         {:ok, user} <- Api.Accounts.Guardian.resource_from_claims(claims) do
-      {:ok, user}
-    else
-      _error -> {:error, :unauthorized}
-    end
+    Api.Auth.Guardian.get_resource_from_token(token)
   end
 end

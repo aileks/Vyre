@@ -1,5 +1,9 @@
 import Config
 
+if File.exists?("../.env") do
+  DotenvParser.load("../.env")
+end
+
 # Configure your database
 #
 # The MIX_TEST_PARTITION environment variable can be used
@@ -33,7 +37,7 @@ config :logger, level: :warning
 # Initialize plugs at runtime for faster test compilation
 config :phoenix, :plug_init_mode, :runtime
 
-# Load environment variables from .env file
-if File.exists?("../.env") do
-  DotenvParser.load("../.env")
-end
+config :api, Api.Auth.Guardian,
+  issuer: "api_test",
+  secret_key: System.get_env("GUARDIAN_SECRET_KEY"),
+  token_ttl: {1, :day}

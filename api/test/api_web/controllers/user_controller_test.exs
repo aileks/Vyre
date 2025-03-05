@@ -6,21 +6,23 @@ defmodule ApiWeb.UserControllerTest do
   alias Api.Accounts.User
 
   @create_attrs %{
-    status: "some status",
-    username: "some username",
-    display_name: "some display_name",
-    email: "some email",
-    password: "some password",
-    avatar_url: "some avatar_url"
+    status: "active",
+    username: "valid_username",
+    display_name: "Test User",
+    email: "test@example.com",
+    password: "Password123",
+    avatar_url: "https://example.com/avatar.jpg"
   }
+
   @update_attrs %{
-    status: "some updated status",
-    username: "some updated username",
-    display_name: "some updated display_name",
-    email: "some updated email",
-    password: "some updated password",
-    avatar_url: "some updated avatar_url"
+    status: "inactive",
+    username: "updated_username",
+    display_name: "Updated User",
+    email: "updated@example.com",
+    password: "UpdatedPass123",
+    avatar_url: "https://example.com/updated.jpg"
   }
+
   @invalid_attrs %{
     status: nil,
     username: nil,
@@ -43,19 +45,33 @@ defmodule ApiWeb.UserControllerTest do
 
   describe "create user" do
     test "renders user when data is valid", %{conn: conn} do
-      conn = post(conn, ~p"/api/users", user: @create_attrs)
+      email = unique_user_email()
+      username = unique_user_username()
+      avatar_url = "https://example.com/avatar.jpg"
+      display_name = "Test User"
+      status = "active"
+
+      attrs = %{
+        status: status,
+        username: username,
+        display_name: display_name,
+        email: email,
+        password: "Password123",
+        avatar_url: avatar_url
+      }
+
+      conn = post(conn, ~p"/api/users", user: attrs)
       assert %{"id" => id} = json_response(conn, 201)["data"]
 
       conn = get(conn, ~p"/api/users/#{id}")
 
       assert %{
                "id" => ^id,
-               "avatar_url" => "some avatar_url",
-               "display_name" => "some display_name",
-               "email" => "some email",
-               "password" => "some password",
-               "status" => "some status",
-               "username" => "some username"
+               "avatar_url" => ^avatar_url,
+               "display_name" => ^display_name,
+               "email" => ^email,
+               "status" => ^status,
+               "username" => ^username
              } = json_response(conn, 200)["data"]
     end
 
@@ -69,19 +85,33 @@ defmodule ApiWeb.UserControllerTest do
     setup [:create_user]
 
     test "renders user when data is valid", %{conn: conn, user: %User{id: id} = user} do
-      conn = put(conn, ~p"/api/users/#{user}", user: @update_attrs)
+      email = unique_user_email()
+      username = unique_user_username()
+      avatar_url = "https://example.com/updated.jpg"
+      display_name = "Updated User"
+      status = "inactive"
+
+      update_attrs = %{
+        status: status,
+        username: username,
+        display_name: display_name,
+        email: email,
+        password: "UpdatedPass123",
+        avatar_url: avatar_url
+      }
+
+      conn = put(conn, ~p"/api/users/#{user}", user: update_attrs)
       assert %{"id" => ^id} = json_response(conn, 200)["data"]
 
       conn = get(conn, ~p"/api/users/#{id}")
 
       assert %{
                "id" => ^id,
-               "avatar_url" => "some updated avatar_url",
-               "display_name" => "some updated display_name",
-               "email" => "some updated email",
-               "password" => "some updated password",
-               "status" => "some updated status",
-               "username" => "some updated username"
+               "avatar_url" => ^avatar_url,
+               "display_name" => ^display_name,
+               "email" => ^email,
+               "status" => ^status,
+               "username" => ^username
              } = json_response(conn, 200)["data"]
     end
 

@@ -10,7 +10,6 @@ defmodule Api.Repo.Migrations.CreateUsers do
       add(:password_hash, :string, null: false)
       add(:avatar_url, :string)
       add(:status, :string)
-
       timestamps(type: :utc_datetime)
     end
 

@@ -7,6 +7,10 @@
 # General application configuration
 import Config
 
+if File.exists?("../.env") do
+  DotenvParser.load_file(".env")
+end
+
 config :api,
   ecto_repos: [Api.Repo],
   generators: [timestamp_type: :utc_datetime, binary_id: true]
@@ -23,6 +27,15 @@ config :api, ApiWeb.Endpoint,
   live_view: [signing_salt: "k3W7Q6qB"]
 
 config :api, Api.Accounts.Guardian, issuer: "api"
+
+config :api, Api.Auth.Guardian,
+  issuer: "api",
+  secret_key: System.get_env("GUARDIAN_SECRET_KEY"),
+  ttl: {1, :hour},
+  token_ttl: %{
+    "access" => {1, :hour},
+    "refresh" => {30, :days}
+  }
 
 # Set up CORS
 config :cors_plug,

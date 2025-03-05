@@ -1,26 +1,38 @@
 defmodule ApiWeb.AuthJSON do
-  @doc """
-  Renders a user
-  """
-  def user(%{user: user, token: token}) do
+  alias Api.Accounts.User
+
+  def user(%{user: user}) do
     %{
-      data: data(user),
+      user: %{
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        display_name: user.display_name,
+        avatar_url: user.avatar_url
+      }
+    }
+  end
+
+  def user_with_token(%{user: user, token: token}) do
+    %{
+      user: %{
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        display_name: user.display_name,
+        avatar_url: user.avatar_url
+      },
       token: token
     }
   end
 
-  def user(%{user: user}) do
-    %{data: data(user)}
-  end
-
-  defp data(user) do
+  defp user_data(%User{} = user) do
     %{
       id: user.id,
       email: user.email,
       username: user.username,
       display_name: user.display_name,
-      avatar_url: user.avatar_url,
-      status: user.status
+      avatar_url: user.avatar_url
     }
   end
 end

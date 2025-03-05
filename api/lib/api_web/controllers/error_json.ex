@@ -4,12 +4,18 @@ defmodule ApiWeb.ErrorJSON do
 
   See config/config.exs.
   """
-  def render("404.json", %{message: message}) do
-    %{errors: %{detail: message}}
+  import Phoenix.Template, only: [format_encoder: 1]
+
+  def render("404.json", _assigns) do
+    %{errors: %{detail: "Not Found"}}
   end
 
-  def render("401.json", %{message: message}) do
-    %{errors: %{detail: message}}
+  def render("401.json", %{error: message}) do
+    %{error: message}
+  end
+
+  def render("401.json", _assigns) do
+    %{error: "Unauthorized"}
   end
 
   def render("403.json", _assigns) do
@@ -17,9 +23,7 @@ defmodule ApiWeb.ErrorJSON do
   end
 
   def render("422.json", %{changeset: changeset}) do
-    %{
-      errors: Ecto.Changeset.traverse_errors(changeset, &translate_error/1)
-    }
+    %{errors: translate_errors(changeset)}
   end
 
   # By default, Phoenix returns the status message from
@@ -39,13 +43,18 @@ defmodule ApiWeb.ErrorJSON do
     %{errors: %{detail: message}}
   end
 
-  defp translate_error({msg, opts}) do
-    if count = opts[:count] do
-      Gettext.dngettext(ApiWeb.Gettext, "errors", msg, count, opts)
-    else
-      Gettext.dgettext(ApiWeb.Gettext, "errors", msg, opts)
-    end
+  # Catch-all
+  def render(template, _assigns) do
+    %{errors: %{detail: Phoenix.Controller.status_message_from_template(template)}}
+  end
 
+  defp translate_errors(changeset) do
+    Ecto.Changeset.traverse_errors(changeset, fn {msg, opts} ->
+      translate_error({msg, opts})
+    end)
+  end
+
+  defp translate_error({msg, opts}) do
     Enum.reduce(opts, msg, fn {key, value}, acc ->
       String.replace(acc, "%{#{key}}", fn _ -> to_string(value) end)
     end)

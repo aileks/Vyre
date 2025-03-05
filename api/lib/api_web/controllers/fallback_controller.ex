@@ -35,4 +35,11 @@ defmodule ApiWeb.FallbackController do
     |> put_view(json: ApiWeb.ErrorJSON)
     |> render("422.json", changeset: changeset)
   end
+
+  def call(conn, {:error, :invalid_credentials}) do
+    conn
+    |> put_status(:unauthorized)
+    |> put_view(json: ApiWeb.ErrorJSON)
+    |> render("401.json", %{error: "Invalid email/username or password"})
+  end
 end

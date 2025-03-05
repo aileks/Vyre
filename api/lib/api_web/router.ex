@@ -20,8 +20,7 @@ defmodule ApiWeb.Router do
   end
 
   scope "/api", ApiWeb do
-    pipe_through([:api, :auth])
-
+    pipe_through(:auth)
     get("/me", AuthController, :me)
   end
 
