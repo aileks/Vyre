@@ -11,3 +11,7 @@ vyre-*.tar
 .elixir_ls/
 node_modules/
 .zed/
+*.db
+test.*
+.env
+dev.*

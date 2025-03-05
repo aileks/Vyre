@@ -2,8 +2,7 @@ import Config
 
 config :api, Api.Auth.Guardian,
   issuer: "api",
-  secret_key: "some_test_secret_key",
-  ttl: {1, :day}
+  secret_key: "some_test_secret_key"
 
 # Configure your database
 #
@@ -11,10 +10,7 @@ config :api, Api.Auth.Guardian,
 # to provide built-in test partitioning in CI environment.
 # Run `mix help test` for more information.
 config :api, Api.Repo,
-  # username: "postgres",
-  # password: "postgres",
-  # hostname: "localhost",
-  database: Path.expand("../test.db", Path.dirname(__ENV__.file)),
+  database: Path.expand("../database/test.db", Path.dirname(__ENV__.file)),
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: System.schedulers_online() * 2
 

@@ -27,7 +27,10 @@ defmodule ApiWeb.AuthController do
   end
 
   def me(conn, _params) do
-    user = conn.assigns.current_user
-    render(conn, :user, %{user: user})
+    case conn.assigns[:current_user] do
+      {:ok, user} -> render(conn, :user, %{user: user})
+      %Api.Accounts.User{} = user -> render(conn, :user, %{user: user})
+      _ -> send_resp(conn, 401, "Unauthorized")
+    end
   end
 end

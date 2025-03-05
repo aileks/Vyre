@@ -21,13 +21,13 @@ defmodule ApiWeb.AuthControllerTest do
       }
 
       conn = post(conn, ~p"/api/register", user: attrs)
-      response = json_response(conn, 201)
+      res = json_response(conn, 201)
 
-      assert response["user"]["email"] == email
-      assert response["user"]["username"] == username
-      assert response["user"]["display_name"] == "Test User"
-      assert Map.has_key?(response, "token")
-      assert is_binary(response["token"])
+      assert res["user"]["email"] == email
+      assert res["user"]["username"] == username
+      assert res["user"]["display_name"] == "Test User"
+      assert Map.has_key?(res, "token")
+      assert is_binary(res["token"])
     end
 
     test "returns errors when registration data is invalid", %{conn: conn} do
@@ -41,11 +41,11 @@ defmodule ApiWeb.AuthControllerTest do
           }
         )
 
-      assert response = json_response(conn, 422)
-      assert response["errors"]["email"]
-      assert response["errors"]["username"]
+      assert res = json_response(conn, 422)
+      assert res["errors"]["email"]
+      assert res["errors"]["username"]
       # Password too short
-      assert response["errors"]["password"]
+      assert res["errors"]["password"]
     end
 
     test "returns error when email is already taken", %{conn: conn} do
@@ -63,8 +63,8 @@ defmodule ApiWeb.AuthControllerTest do
           }
         )
 
-      assert response = json_response(conn, 422)
-      assert get_in(response, ["errors", "email"]) == ["Email already taken"]
+      assert res = json_response(conn, 422)
+      assert get_in(res, ["errors", "email"]) == ["Email already taken"]
     end
   end
 
@@ -82,10 +82,10 @@ defmodule ApiWeb.AuthControllerTest do
           }
         )
 
-      response = json_response(conn, 200)
-      assert response["user"]["id"] == user.id
-      assert response["user"]["email"] == user.email
-      assert is_binary(response["token"])
+      res = json_response(conn, 200)
+      assert res["user"]["id"] == user.id
+      assert res["user"]["email"] == user.email
+      assert is_binary(res["token"])
 
       # Test login with username
       conn =
@@ -98,9 +98,9 @@ defmodule ApiWeb.AuthControllerTest do
           }
         )
 
-      response = json_response(conn, 200)
-      assert response["user"]["id"] == user.id
-      assert is_binary(response["token"])
+      res = json_response(conn, 200)
+      assert res["user"]["id"] == user.id
+      assert is_binary(res["token"])
     end
 
     test "returns error when email/username is invalid", %{conn: conn} do
@@ -135,11 +135,11 @@ defmodule ApiWeb.AuthControllerTest do
 
     test "returns current user when token is valid", %{conn: conn, user: user} do
       conn = get(conn, ~p"/api/me")
-      response = json_response(conn, 200)
+      res = json_response(conn, 200)
 
-      assert response["user"]["id"] == user.id
-      assert response["user"]["email"] == user.email
-      assert response["user"]["username"] == user.username
+      assert res["user"]["id"] == user.id
+      assert res["user"]["email"] == user.email
+      assert res["user"]["username"] == user.username
     end
 
     test "returns 401 when token is missing", %{conn: _conn} do

@@ -4,7 +4,8 @@ defmodule Api.Auth.Guardian do
   alias Api.Accounts, as: Accounts
 
   def subject_for_token(%Accounts.User{} = user, _claims) do
-    {:ok, to_string(user.id)}
+    sub = to_string(user.id)
+    {:ok, sub}
   end
 
   def subject_for_token(_resource, _claims) do
@@ -12,19 +13,12 @@ defmodule Api.Auth.Guardian do
   end
 
   def resource_from_claims(%{"sub" => id}) do
-    Accounts.get_user(id)
+    case Api.Accounts.get_user(id) do
+      nil -> {:error, :resource_not_found}
+      user -> {:ok, user}
+    end
   end
 
-  def resource_from_claims(_claims) do
-    {:error, :invalid_claims}
-  end
-
-  # def create_token(user, _claims \\ %{}) do
-  #   case encode_and_sign(user, %{}, ttl: {1, :hour}) do
-  #     {:ok, token, _claims} -> {:ok, token}
-  #     error -> error
-  #   end
-  # end
   def create_token(user) do
     {:ok, token, _claims} = encode_and_sign(user, %{}, ttl: {1, :hour})
     token

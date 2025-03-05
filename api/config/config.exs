@@ -30,8 +30,7 @@ config :api, Api.Accounts.Guardian, issuer: "api"
 
 config :api, Api.Auth.Guardian,
   issuer: "api",
-  secret_key: System.get_env("GUARDIAN_SECRET_KEY"),
-  ttl: {1, :day}
+  secret_key: System.get_env("GUARDIAN_SECRET_KEY")
 
 # Set up CORS
 config :cors_plug,
