@@ -49,7 +49,6 @@ defmodule ApiWeb.AuthControllerTest do
     end
 
     test "returns error when email is already taken", %{conn: conn} do
-      # First create a user
       user = user_fixture()
 
       # Try to create another user with the same email
@@ -112,7 +111,7 @@ defmodule ApiWeb.AuthControllerTest do
           }
         )
 
-      assert json_response(conn, 401)["error"] =~ "Invalid"
+      assert json_response(conn, 401)["errors"]["message"] =~ "Invalid"
     end
 
     test "returns error when password is invalid", %{conn: conn} do
@@ -126,7 +125,7 @@ defmodule ApiWeb.AuthControllerTest do
           }
         )
 
-      assert json_response(conn, 401)["error"] =~ "Invalid"
+      assert json_response(conn, 401)["errors"]["message"] =~ "Invalid"
     end
   end
 
@@ -147,7 +146,7 @@ defmodule ApiWeb.AuthControllerTest do
       conn = build_conn()
       conn = get(conn, ~p"/api/me")
 
-      assert json_response(conn, 401)["error"] == "Unauthorized"
+      assert json_response(conn, 401)["errors"]["message"] == "Unauthorized"
     end
 
     test "returns 401 when token is invalid", %{conn: _conn} do
@@ -158,7 +157,7 @@ defmodule ApiWeb.AuthControllerTest do
 
       conn = get(conn, ~p"/api/me")
 
-      assert json_response(conn, 401)["error"] == "Unauthorized"
+      assert json_response(conn, 401)["errors"]["message"] =~ "Unauthorized"
     end
   end
 
