@@ -177,6 +177,12 @@ defmodule Api.Accounts do
   otherwise returns {:error, reason}.
   """
   def get_current_user(token) do
-    Api.Auth.Guardian.get_resource_from_token(token)
+    case Api.Auth.Guardian.decode_and_verify(token) do
+      {:ok, claims} ->
+        Api.Auth.Guardian.resource_from_claims(claims)
+
+      {:error, reason} ->
+        {:error, reason}
+    end
   end
 end

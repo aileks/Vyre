@@ -130,50 +130,43 @@ defmodule ApiWeb.AuthControllerTest do
     end
   end
 
-  describe "me (current user)" do
+  describe "me" do
     setup [:create_user_with_token]
 
-    test "returns current user when token is valid", %{conn: conn, user: user, token: token} do
-      conn =
-        conn
-        |> put_req_header("authorization", "Bearer #{token}")
-        |> get(~p"/api/me")
-
+    test "returns current user when token is valid", %{conn: conn, user: user} do
+      conn = get(conn, ~p"/api/me")
       response = json_response(conn, 200)
+
       assert response["user"]["id"] == user.id
       assert response["user"]["email"] == user.email
       assert response["user"]["username"] == user.username
     end
 
-    test "returns 401 when token is missing", %{conn: conn} do
+    test "returns 401 when token is missing", %{conn: _conn} do
+      # Create a new conn without the auth header
+      conn = build_conn()
       conn = get(conn, ~p"/api/me")
 
-      assert json_response(conn, 401)
+      assert json_response(conn, 401)["error"] == "Unauthorized"
     end
 
-    test "returns 401 when token is invalid", %{conn: conn} do
+    test "returns 401 when token is invalid", %{conn: _conn} do
+      # Use a conn with an invalid token
       conn =
-        conn
+        build_conn()
         |> put_req_header("authorization", "Bearer invalid_token")
-        |> get(~p"/api/me")
 
-      assert json_response(conn, 401)
+      conn = get(conn, ~p"/api/me")
+
+      assert json_response(conn, 401)["error"] == "Unauthorized"
     end
   end
 
   # Helper function to create a user with a token for testing
   defp create_user_with_token(%{conn: conn}) do
     user = user_fixture()
-
-    token =
-      try do
-        {:ok, token, _claims} = Api.Auth.Guardian.create_token(user)
-        token
-      rescue
-        # Fallback for tests
-        _ -> "test-token"
-      end
-
+    {:ok, token, _claims} = Api.Auth.Guardian.encode_and_sign(user, %{}, ttl: {1, :hour})
+    conn = conn |> put_req_header("authorization", "Bearer #{token}")
     {:ok, %{conn: conn, user: user, token: token}}
   end
 end
