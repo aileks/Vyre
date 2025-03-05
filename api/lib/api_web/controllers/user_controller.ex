@@ -1,8 +1,8 @@
 defmodule ApiWeb.UserController do
   use ApiWeb, :controller
 
-  alias Api.Accounts
-  alias Api.Accounts.User
+  alias Api.Accounts, as: Accounts
+  alias Api.Accounts.User, as: User
 
   action_fallback(ApiWeb.FallbackController)
 
@@ -21,12 +21,8 @@ defmodule ApiWeb.UserController do
   end
 
   def show(conn, %{"id" => id}) do
-    case Accounts.get_user(id) do
-      {:ok, user} ->
-        render(conn, :show, user: user)
-
-      {:error, _reason} = error ->
-        error
+    with {:ok, user} <- Accounts.get_user(id) do
+      render(conn, :show, user: user)
     end
   end
 
@@ -39,7 +35,7 @@ defmodule ApiWeb.UserController do
 
   def delete(conn, %{"id" => id}) do
     with {:ok, %User{} = user} <- Accounts.get_user(id),
-         {:ok, %User{}} <- Accounts.delete_user(user) do
+         {:ok, _deleted_user} <- Accounts.delete_user(user) do
       send_resp(conn, :no_content, "")
     end
   end

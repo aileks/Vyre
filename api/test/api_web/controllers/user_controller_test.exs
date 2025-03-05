@@ -5,24 +5,6 @@ defmodule ApiWeb.UserControllerTest do
 
   alias Api.Accounts.User
 
-  @create_attrs %{
-    status: "active",
-    username: "valid_username",
-    display_name: "Test User",
-    email: "test@example.com",
-    password: "Password123",
-    avatar_url: "https://example.com/avatar.jpg"
-  }
-
-  @update_attrs %{
-    status: "inactive",
-    username: "updated_username",
-    display_name: "Updated User",
-    email: "updated@example.com",
-    password: "UpdatedPass123",
-    avatar_url: "https://example.com/updated.jpg"
-  }
-
   @invalid_attrs %{
     status: nil,
     username: nil,
@@ -128,9 +110,9 @@ defmodule ApiWeb.UserControllerTest do
       conn = delete(conn, ~p"/api/users/#{user}")
       assert response(conn, 204)
 
-      assert_error_sent(404, fn ->
-        get(conn, ~p"/api/users/#{user}")
-      end)
+      # Checking for 404 res directly - kinda hacky
+      conn = get(conn, ~p"/api/users/#{user}")
+      assert json_response(conn, 404)["errors"] != nil
     end
   end
 

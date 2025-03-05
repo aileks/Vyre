@@ -1,6 +1,4 @@
 defmodule ApiWeb.AuthJSON do
-  alias Api.Accounts.User
-
   def user(%{user: user}) do
     %{
       user: %{

@@ -6,19 +6,19 @@ defmodule ApiWeb.FallbackController do
   """
   use ApiWeb, :controller
 
+  def call(conn, {:error, :not_found}) do
+    conn
+    |> put_status(:not_found)
+    |> put_view(json: ApiWeb.ErrorJSON)
+    |> render("404.json")
+  end
+
   # Handle Ecto.NoResultsError
   def call(conn, {:error, %Ecto.NoResultsError{}}) do
     conn
     |> put_status(:not_found)
     |> put_view(json: ApiWeb.ErrorJSON)
     |> render("404.json", %{message: "Resource not found"})
-  end
-
-  def call(conn, {:error, :not_found}) do
-    conn
-    |> put_status(:not_found)
-    |> put_view(json: ApiWeb.ErrorJSON)
-    |> render("404.json")
   end
 
   def call(conn, {:error, :unauthorized}) do

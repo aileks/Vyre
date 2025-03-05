@@ -9,11 +9,11 @@ defmodule ApiWeb.ErrorJSON do
   end
 
   def render("401.json", %{error: message}) do
-    %{error: message}
+    %{errors: %{detail: message}}
   end
 
   def render("401.json", _assigns) do
-    %{error: "Unauthorized"}
+    %{errors: %{detail: "Unauthorized"}}
   end
 
   def render("403.json", _assigns) do
@@ -25,16 +25,7 @@ defmodule ApiWeb.ErrorJSON do
   end
 
   def render("500.json", _assigns) do
-    %{error: "Internal Server Error"}
-  end
-
-  # Helper functions
-  def error(%{changeset: changeset}) do
-    %{errors: Ecto.Changeset.traverse_errors(changeset, &translate_error/1)}
-  end
-
-  def error(%{message: message}) do
-    %{errors: %{detail: message}}
+    %{errors: %{detail: "Internal Server Error"}}
   end
 
   defp translate_errors(changeset) do
