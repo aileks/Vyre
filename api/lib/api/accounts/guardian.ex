@@ -25,7 +25,7 @@ defmodule Api.Auth.Guardian do
   end
 
   def create_refresh_token(user, _claims \\ %{}) do
-    {:ok, token, _claims} = encode_and_sign(user, %{type: "refresh"}, ttl: {1, :month})
+    {:ok, token, _claims} = encode_and_sign(user, %{type: "refresh"}, ttl: {30, :days})
     token
   end
 
