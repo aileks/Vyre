@@ -35,9 +35,8 @@ if config_env() == :prod do
     url: database_url,
     ipv6: maybe_ipv6,
     ssl: [
-      verify: :verify_peer,
-      cacertfile: "/etc/ssl/certs/prod-ca-2021.crt",
-      versions: [:"tlsv1.3"]
+      verify: :verify_none,
+      cacertfile: "/etc/ssl/certs/prod-ca-2021.crt"
     ],
     parameters: [
       search_path: System.get_env("SCHEMA") || "vyre"
