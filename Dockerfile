@@ -19,7 +19,7 @@ RUN mix deps.get --only prod
 COPY api/ ./
 
 RUN echo "MIX_ENV is $MIX_ENV"
-RUN mix phx.compile
+RUN mix deps.compile
 RUN mix phx.digest
 
 RUN mix release
