@@ -20,9 +20,7 @@ RUN mix deps.get --only prod
 COPY api/ ./
 
 RUN mix deps.compile
-# RUN mix ecto.drop --force
-# RUN mix ecto.create
-# RUN mix ecto.migrate
+RUN mix ecto.migrate
 RUN mix phx.digest
 RUN mix release
 
