@@ -1,20 +1,11 @@
-# FOR DEBUG PURPOSES
-ARG MIX_ENV
-ARG GUARDIAN_SECRET_KEY
-ARG DATABASE_URL
-ARG SCHEMA
-
 FROM elixir:1.18-alpine AS build
 
-# FOR DEBUG PURPOSES
 ARG MIX_ENV
 ARG GUARDIAN_SECRET_KEY
 ARG DATABASE_URL
 ARG SCHEMA
 
-RUN apk add --no-cache build-base
-
-RUN apk add --no-cache openssl ncurses-libs postgresql-dev
+RUN apk add build-base openssl ncurses-libs postgresql-dev
 
 WORKDIR /app
 
