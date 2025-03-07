@@ -14,11 +14,11 @@ if config_env() == :prod do
 
   config :api, Api.Accounts.Guardian, secret_key: System.get_env("GUARDIAN_SECRET_KEY")
 
-  # secret_key_base =
-  #   System.get_env("SECRET_KEY_BASE") ||
-  #     raise "environment variable SECRET_KEY_BASE is missing."
+  secret_key_base =
+    System.get_env("SECRET_KEY_BASE") ||
+      raise "environment variable SECRET_KEY_BASE is missing."
 
-  # config :api, ApiWeb.Endpoint,
-  #   http: [port: String.to_integer(System.get_env("PORT") || "4000")],
-  #   secret_key_base: secret_key_base
+  config :api, ApiWeb.Endpoint,
+    http: [port: String.to_integer(System.get_env("PORT") || "4000")],
+    secret_key_base: secret_key_base
 end
