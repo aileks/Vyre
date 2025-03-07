@@ -1,4 +1,4 @@
-FROM 1.18-otp-27-alpine
+FROM 1.17-alpine
 
 RUN apk add --no-cache build-base openssl ncurses-libs postgresql-dev
 
