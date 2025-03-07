@@ -32,9 +32,11 @@ if config_env() == :prod do
 
   config :api, Api.Repo,
     adapter: Ecto.Adapters.Postgres,
-    ssl: [
-      verify: :verify_none,
-      cacertfile: "/etc/ssl/certs/ca-certificates.crt"
+    ssl: true,
+    ssl_opts: [
+      verify: :verify_peer,
+      cacertfile: Path.join(:code.priv_dir(:api), "certs/prod-ca-2021.crt"),
+      server_name_indication: "aws-0-us-east-1.pooler.supabase.com"
     ],
     url: database_url,
     pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),

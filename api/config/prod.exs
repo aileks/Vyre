@@ -13,9 +13,8 @@ config :api, Api.Repo,
   ssl: true,
   ssl_opts: [
     verify: :verify_peer,
-    cacertfile: "/etc/ssl/certs/ca-certificates.crt",
-    verify_fun: &:ssl_verify_hostname.verify_fun/3,
-    versions: [:"tlsv1.3"]
+    cacertfile: Path.join(:code.priv_dir(:api), "certs/prod-ca-2021.crt"),
+    server_name_indication: "aws-0-us-east-1.pooler.supabase.com"
   ],
   parameters: [
     search_path: System.get_env("SCHEMA") || "vyre"
