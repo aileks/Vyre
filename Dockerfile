@@ -18,7 +18,7 @@ RUN mix phx.digest
 RUN mix release
 
 FROM alpine:3.21
-RUN apk add --no-cache openssl ncurses-libs
+RUN apk add --no-cache openssl ncurses-libs postgresql-dev gcc musl-dev
 
 WORKDIR /app
 
