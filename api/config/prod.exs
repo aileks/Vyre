@@ -1,8 +1,14 @@
 import Config
 
+database_url =
+  System.get_env("DATABASE_URL") ||
+    raise """
+    environment variable DATABASE_URL is missing.
+    For example: ecto://USER:PASS@HOST/DATABASE
+    """
+
 config :api, Api.Accounts.Guardian, secret_key: System.get_env("GUARDIAN_SECRET_KEY")
 
-# Do not print debug messages in production
 config :logger, level: :info
 
 config :api, Api.Repo,
