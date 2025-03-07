@@ -67,4 +67,12 @@ if config_env() == :prod do
       port: port
     ],
     secret_key_base: guardian_secret_key
+else
+  config :bcrypt_elixir, :log_rounds, 4
+
+  unless System.get_env("GUARDIAN_SECRET_KEY") do
+    config :api, Api.Accounts.Guardian,
+      issuer: "api",
+      secret_key: "insecure_key_for_dev_environment_only"
+  end
 end
