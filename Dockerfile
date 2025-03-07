@@ -1,7 +1,7 @@
 FROM 1.18-otp-27-alpine
 
-RUN apk add --no-cache build-base
-RUN apk add --no-cache openssl ncurses-libs postgresql-dev
+RUN apk add build-base
+RUN apk add openssl ncurses-libs postgresql-dev
 
 ARG MIX_ENV
 ARG GUARDIAN_SECRET_KEY
