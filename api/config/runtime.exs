@@ -55,7 +55,7 @@ if config_env() == :prod do
     issuer: "api",
     secret_key: guardian_secret_key
 
-  host = System.get_env("PHX_HOST") || "vyre.app"
+  host = System.get_env("PHX_HOST") || "vyre.com"
   port = String.to_integer(System.get_env("PORT") || "4000")
 
   config :api, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
@@ -67,12 +67,4 @@ if config_env() == :prod do
       port: port
     ],
     secret_key_base: guardian_secret_key
-else
-  config :bcrypt_elixir, :log_rounds, 4
-
-  unless System.get_env("GUARDIAN_SECRET_KEY") do
-    config :api, Api.Accounts.Guardian,
-      issuer: "api",
-      secret_key: "insecure_key_for_dev_environment_only"
-  end
 end
