@@ -32,7 +32,10 @@ if config_env() == :prod do
 
   config :api, Api.Repo,
     adapter: Ecto.Adapters.Postgres,
-    ssl: true,
+    ssl: [
+      verify: :verify_peer,
+      cacertfile: "/etc/ssl/certs/prod-ca-2021.crt"
+    ],
     url: database_url,
     pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
     socket_options: maybe_ipv6
