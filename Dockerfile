@@ -1,11 +1,14 @@
-FROM 1.17-alpine
-
-RUN apk add --no-cache build-base openssl ncurses-libs postgresql-dev
+# ---------------------------
+# Stage 1: Build the release
+# ---------------------------
+FROM elixir:1.18-alpine AS build
 
 ARG MIX_ENV
 ARG GUARDIAN_SECRET_KEY
 ARG DATABASE_URL
 ARG SCHEMA
+
+RUN apk add build-base openssl ncurses-libs postgresql-dev
 
 WORKDIR /app
 
@@ -18,7 +21,17 @@ COPY api/ ./
 RUN echo "MIX_ENV is $MIX_ENV"
 RUN mix phx.compile
 RUN mix phx.digest
+
 RUN mix release
+
+# ---------------------------
+# Stage 2: Runtime environment
+# ---------------------------
+FROM alpine:3.18
+
+WORKDIR /app
+
+COPY --from=build /app/_build/prod/rel/api /app
 
 EXPOSE 4000
 
