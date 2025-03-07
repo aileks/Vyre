@@ -29,8 +29,7 @@ RUN mix release
 # ---------------------------
 FROM alpine:3.21
 
-RUN apk add --no-cache openssl ncurses-libs postgresql-dev libstdc++ curl ca-certificates
-RUN update-ca-certificates
+RUN apk add --no-cache openssl ncurses-libs postgresql-dev libstdc++ curl
 
 WORKDIR /app
 

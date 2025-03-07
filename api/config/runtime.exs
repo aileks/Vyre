@@ -35,8 +35,7 @@ if config_env() == :prod do
     ssl: true,
     ssl_opts: [
       verify: :verify_peer,
-      cacertfile: Path.expand("../../priv/certs/supabase.crt", __DIR__),
-      server_name_indication: "aws-0-us-east-1.pooler.supabase.com"
+      cacertfile: Path.expand("../priv/certs/supabase.crt", __DIR__)
     ],
     url: database_url,
     pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),

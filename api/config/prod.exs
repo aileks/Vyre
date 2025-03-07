@@ -13,7 +13,7 @@ config :api, Api.Repo,
   ssl: true,
   ssl_opts: [
     verify: :verify_peer,
-    cacertfile: Path.expand("../../priv/certs/supabase.crt", __DIR__),
+    cacertfile: Path.expand("../priv/certs/supabase.crt", __DIR__),
     server_name_indication: "aws-0-us-east-1.pooler.supabase.com"
   ],
   parameters: [
