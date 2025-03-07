@@ -27,7 +27,9 @@ RUN mix release
 # ---------------------------
 # Stage 2: Runtime environment
 # ---------------------------
-FROM alpine:3.18
+FROM alpine:3.21
+
+RUN apk add --no-cache openssl ncurses-libs postgresql-dev libstdc++
 
 WORKDIR /app
 
