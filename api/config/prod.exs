@@ -13,9 +13,24 @@ config :api, Api.Repo,
   ssl: [
     verify: :verify_peer,
     cacertfile: "/etc/ssl/certs/prod-ca-2021.crt",
-    versions: [:"tlsv1.3"]
+    versions: [:"tlsv1.3"],
+    secure_renegotiate: true,
+    reuse_sessions: true,
+    depth: 3
   ],
   parameters: [
     search_path: System.get_env("SCHEMA") || "vyre"
   ],
-  pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10")
+  pool_size: String.to_integer(System.get_env("POOL_SIZE") || "20"),
+  timeout: 30000,
+  pool_timeout: 30000,
+  queue_interval: 5000,
+  queue_target: 3000,
+  connect_timeout: 45000,
+  # Set idle interval to maintain active connections
+  idle_interval: 60000,
+  # Handle DBConnection better with backoff on failed connections
+  backoff_type: :exp,
+  backoff_min: 1000,
+  backoff_max: 30000,
+  show_sensitive_data_on_connection_error: false
