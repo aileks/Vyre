@@ -9,11 +9,12 @@ config :logger, level: :info
 # of environment variables, is done on config/runtime.exs.
 config :api, Api.Repo,
   adapter: Ecto.Adapters.Postgres,
+  url: System.get_env("DATABASE_URL") || raise("DATABASE_URL is missing"),
   ssl: true,
-  ssl: [
+  ssl_opts: [
     cacertfile: "/etc/ssl/certs/ca-certificates.crt"
   ],
-  url: database_url,
-  pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
-  socket_options: maybe_ipv6,
+  parameters: [
+    search_path: System.get_env("SCHEMA") || "vyre"
+  ],
   timeout: 30_000
