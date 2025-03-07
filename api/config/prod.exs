@@ -13,9 +13,8 @@ config :api, Api.Repo,
   ssl: true,
   ssl_opts: [
     verify: :verify_peer,
-    cacertfile: "/etc/ssl/certs/prod-ca-2021.crt"
+    cacertfile: "/etc/ssl/certs/ca-certificates.crt"
   ],
   parameters: [
     search_path: System.get_env("SCHEMA") || "vyre"
-  ],
-  timeout: 30_000
+  ]
