@@ -11,7 +11,7 @@ config :api, Api.Repo,
   adapter: Ecto.Adapters.Postgres,
   url: System.get_env("DATABASE_URL") || raise("DATABASE_URL is missing"),
   ssl: [
-    verify: :verify_none,
+    verify: :verify_peer,
     cacertfile: "/etc/ssl/certs/prod-ca-2021.crt",
     server_name_indication: String.to_charlist(URI.parse(System.get_env("DATABASE_URL")).host)
   ],

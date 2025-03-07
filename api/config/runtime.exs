@@ -35,7 +35,7 @@ if config_env() == :prod do
     url: database_url,
     ipv6: maybe_ipv6,
     ssl: [
-      verify: :verify_none,
+      verify: :verify_peer,
       cacertfile: "/etc/ssl/certs/prod-ca-2021.crt",
       server_name_indication: String.to_charlist(URI.parse(System.get_env("DATABASE_URL")).host)
     ],
