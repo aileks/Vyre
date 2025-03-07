@@ -12,7 +12,7 @@ config :api, Api.Repo,
   url: System.get_env("DATABASE_URL") || raise("DATABASE_URL is missing"),
   ssl: [
     verify: :verify_peer,
-    cacertfile: "/etc/ssl/certs/ca-certificates.crt"
+    cacertfile: "/etc/ssl/certs/prod-ca-2021.crt"
   ],
   parameters: [
     search_path: System.get_env("SCHEMA") || "vyre"
