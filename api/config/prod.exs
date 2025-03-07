@@ -5,13 +5,13 @@ config :api, Api.Accounts.Guardian, secret_key: System.get_env("GUARDIAN_SECRET_
 # Do not print debug messages in production
 config :logger, level: :info
 
-config :api, Api.Repo,
-  adapter: Ecto.Adapters.Postgres,
-  url: System.get_env("DATABASE_URL") || raise("DATABASE_URL is missing"),
-  ssl: [
-    verify: :verify_peer,
-    cacertfile: "/etc/ssl/certs/prod-ca-2021.crt",
-    server_name_indication: String.to_charlist(URI.parse(System.get_env("DATABASE_URL")).host)
-  ],
-  pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
-  timeout: 30000
+# config :api, Api.Repo,
+#   adapter: Ecto.Adapters.Postgres,
+#   url: System.get_env("DATABASE_URL") || raise("DATABASE_URL is missing"),
+#   ssl: [
+#     verify: :verify_peer,
+#     cacertfile: "/etc/ssl/certs/prod-ca-2021.crt",
+#     server_name_indication: String.to_charlist(URI.parse(System.get_env("DATABASE_URL")).host)
+#   ],
+#   pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
+#   timeout: 30000

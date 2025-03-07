@@ -24,7 +24,9 @@ if config_env() == :prod do
       server_name_indication: String.to_charlist(URI.parse(System.get_env("DATABASE_URL")).host)
     ],
     pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
-    timeout: 30000
+    timeout: 30000,
+    queue_target: 5000,
+    queue_interval: 5000
 
   guardian_secret_key =
     System.get_env("GUARDIAN_SECRET_KEY") ||
