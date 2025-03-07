@@ -46,7 +46,7 @@ defmodule Api.MixProject do
       {:bcrypt_elixir, "~> 3.2"},
       {:guardian, "~> 2.3"},
       {:ecto_sql, "~> 3.10"},
-      {:ecto_sqlite3, "~> 0.18"},
+      {:ecto_sqlite3, "~> 0.18", only: [:test, :dev]},
       {:cors_plug, "~> 3.0"},
       {:postgrex, ">= 0.0.0"},
       {:finch, "~> 0.13"},
