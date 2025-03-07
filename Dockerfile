@@ -1,4 +1,5 @@
-FROM elixir:1.18-alpine
+FROM elixir:1.18-alpine as build
+FROM alpine:3.21
 
 ARG MIX_ENV
 ARG GUARDIAN_SECRET_KEY
