@@ -22,8 +22,6 @@ WORKDIR /app
 
 COPY --from=build /app/_build/prod/rel/api ./
 
-# Expose the port your Phoenix app uses (typically 4000)
 EXPOSE 4000
 
-# Start your Phoenix application using the release script
 CMD ["bin/api", "start"]
