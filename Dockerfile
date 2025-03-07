@@ -29,4 +29,4 @@ RUN mix release
 
 EXPOSE 4000
 
-CMD ["bin/api", "start"]
+CMD ["/app/_build/prod/rel/api/bin/api", "start"]
