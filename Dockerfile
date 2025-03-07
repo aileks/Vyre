@@ -29,13 +29,14 @@ RUN mix release
 # ---------------------------
 FROM alpine:3.21
 
-RUN apk add --no-cache openssl ncurses-libs postgresql-dev libstdc++ curl
+RUN apk add --no-cache openssl ncurses-libs postgresql-dev libstdc++ curl ca-certificates
 
 WORKDIR /app
 
 COPY --from=build /app/_build/prod/rel/api /app
 
 RUN curl -s -o /etc/ssl/certs/prod-ca-2021.crt https://supabase-downloads.s3-ap-southeast-1.amazonaws.com/prod/ssl/prod-ca-2021.crt
+RUN update-ca-certificates
 
 EXPOSE 4000
 
