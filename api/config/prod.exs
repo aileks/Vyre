@@ -13,5 +13,5 @@ config :api, Api.Repo,
   pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
   ssl: true,
   parameters: [
-    search_path: System.get_env("SCHEMA") || "dev_testing"
+    search_path: System.get_env("SCHEMA") || "vyre"
   ]

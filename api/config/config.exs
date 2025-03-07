@@ -19,6 +19,7 @@ config :api,
 config :api, ApiWeb.Endpoint,
   url: [host: "localhost"],
   adapter: Bandit.PhoenixAdapter,
+  server: true,
   render_errors: [
     formats: [json: ApiWeb.ErrorJSON],
     layout: false
@@ -34,7 +35,7 @@ config :api, Api.Auth.Guardian,
 
 # Set up CORS
 config :cors_plug,
-  origin: ["http://localhost:3000", "http://localhost:5173"],
+  origin: ["http://localhost:4000", "http://localhost:5173"],
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   headers: ["Authorization", "Content-Type", "Accept", "Origin", "User-Agent"]
 
