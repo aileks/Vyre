@@ -13,8 +13,9 @@ config :api, Api.Repo,
   ssl: true,
   ssl_opts: [
     verify: :verify_peer,
-    cacertfile: "/usr/share/ca-certificates/prod-ca-2021.crt",
-    verify_fun: &:ssl_verify_hostname.verify_fun/3
+    cacertfile: "/etc/ssl/certs/ca-certificates.crt",
+    verify_fun: &:ssl_verify_hostname.verify_fun/3,
+    versions: [:"tlsv1.3"]
   ],
   parameters: [
     search_path: System.get_env("SCHEMA") || "vyre"
