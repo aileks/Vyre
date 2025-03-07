@@ -1,7 +1,7 @@
 import Config
 
-if File.exists?("../.env") do
-  DotenvParser.load("../.env")
+if File.exists?("../../.env") do
+  Dotenv.load!(filename: "../../.env")
 end
 
 config :api, Api.Accounts.Guardian, secret_key: System.get_env("GUARDIAN_SECRET_KEY")

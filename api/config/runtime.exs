@@ -20,10 +20,6 @@ if System.get_env("PHX_SERVER") do
   config :api, ApiWeb.Endpoint, server: true
 end
 
-if config_env() in [:dev, :test] and File.exists?("../.env") do
-  DotenvParser.load_file(".env")
-end
-
 if config_env() == :prod do
   database_url =
     System.get_env("DATABASE_URL") ||

@@ -7,8 +7,8 @@
 # General application configuration
 import Config
 
-if File.exists?("../.env") do
-  DotenvParser.load_file(".env")
+if File.exists?("../../.env") do
+  Dotenv.load!(filename: "../../.env")
 end
 
 config :api,

@@ -8,6 +8,7 @@ export default defineConfig({
     tailwindcss()
   ],
   build: {
+    outDir: '../api/priv/static',
     target: 'esnext',
   },
 })
