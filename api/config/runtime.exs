@@ -43,7 +43,7 @@ if config_env() == :prod do
     issuer: "api",
     secret_key: guardian_secret_key
 
-  host = System.get_env("PHX_HOST") || "example.com"
+  host = System.get_env("PHX_HOST") || "vyre.app"
   port = String.to_integer(System.get_env("PORT") || "4000")
 
   config :api, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
