@@ -1,12 +1,13 @@
 FROM elixir:1.18-alpine as build
 FROM alpine:3.21
 
+RUN apk add build-base
+RUN apk add openssl ncurses-libs postgresql-dev
+
 ARG MIX_ENV
 ARG GUARDIAN_SECRET_KEY
 ARG DATABASE_URL
 ARG SCHEMA
-
-RUN apk add build-base openssl ncurses-libs postgresql-dev
 
 WORKDIR /app
 
