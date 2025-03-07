@@ -2,12 +2,6 @@ import Config
 
 config :api, Api.Accounts.Guardian, secret_key: System.get_env("GUARDIAN_SECRET_KEY")
 
-# Configures Swoosh API Client
-# config :swoosh, api_client: Swoosh.ApiClient.Finch, finch_name: Api.Finch
-
-# Disable Swoosh Local Memory Storage
-# config :swoosh, local: false
-
 # Do not print debug messages in production
 config :logger, level: :info
 
@@ -15,6 +9,9 @@ config :logger, level: :info
 # of environment variables, is done on config/runtime.exs.
 config :api, Api.Repo,
   adapter: Ecto.Adapters.Postgres,
-  url: System.get_env("DATABASE_URL"),
+  url: System.get_env("DATABASE_URL") || raise("DATABASE_URL is missing"),
   pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
-  ssl: true
+  ssl: true,
+  parameters: [
+    search_path: System.get_env("SCHEMA") || "dev_testing"
+  ]
