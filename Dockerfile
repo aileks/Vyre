@@ -22,6 +22,7 @@ COPY api/ ./
 RUN echo "MIX_ENV is $MIX_ENV"
 
 RUN mix deps.compile
+RUN mix ecto.create
 RUN mix ecto.migrate
 RUN mix phx.digest
 RUN mix release
