@@ -17,6 +17,7 @@ COPY api/mix.exs api/mix.lock ./
 RUN mix deps.get --only prod
 
 COPY api/ ./
+COPY api/priv/certs/supabase.crt ./
 
 RUN echo "MIX_ENV is $MIX_ENV"
 RUN mix deps.compile
