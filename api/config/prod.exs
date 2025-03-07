@@ -15,8 +15,5 @@ config :api, Api.Repo,
     cacertfile: "/etc/ssl/certs/prod-ca-2021.crt",
     server_name_indication: String.to_charlist(URI.parse(System.get_env("DATABASE_URL")).host)
   ],
-  parameters: [
-    search_path: System.get_env("SCHEMA") || "vyre"
-  ],
   pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
   timeout: 30000

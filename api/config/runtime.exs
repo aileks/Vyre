@@ -39,10 +39,7 @@ if config_env() == :prod do
       cacertfile: "/etc/ssl/certs/prod-ca-2021.crt",
       server_name_indication: String.to_charlist(URI.parse(System.get_env("DATABASE_URL")).host)
     ],
-    parameters: [
-      search_path: System.get_env("SCHEMA") || "vyre"
-    ],
-    pool_size: String.to_integer(System.get_env("POOL_SIZE") || "20"),
+    pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
     timeout: 30000
 
   # The secret key base is used to sign/encrypt cookies and other secrets.
