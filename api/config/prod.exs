@@ -10,8 +10,7 @@ config :logger, level: :info
 config :api, Api.Repo,
   adapter: Ecto.Adapters.Postgres,
   url: System.get_env("DATABASE_URL") || raise("DATABASE_URL is missing"),
-  ssl: true,
-  ssl_opts: [
+  ssl: [
     verify: :verify_peer,
     cacertfile: "/etc/ssl/certs/prod-ca-2021.crt",
     versions: [:"tlsv1.3"],
