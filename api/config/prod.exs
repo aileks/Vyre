@@ -10,12 +10,13 @@ config :logger, level: :info
 config :api, Api.Repo,
   adapter: Ecto.Adapters.Postgres,
   url: System.get_env("DATABASE_URL") || raise("DATABASE_URL is missing"),
-  ssl: [
-    verify: :verify_peer,
-    cacertfile: "/etc/ssl/certs/prod-ca-2021.crt",
-    versions: [:"tlsv1.2"],
-    reuse_sessions: true
-  ],
+  ssl: false,
+  # ssl: [
+  #   verify: :verify_peer,
+  #   cacertfile: "/etc/ssl/certs/prod-ca-2021.crt",
+  #   versions: [:"tlsv1.3"],
+  #   reuse_sessions: true
+  # ],
   parameters: [
     search_path: System.get_env("SCHEMA") || "vyre"
   ],

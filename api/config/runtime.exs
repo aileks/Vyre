@@ -33,12 +33,14 @@ if config_env() == :prod do
   config :api, Api.Repo,
     adapter: Ecto.Adapters.Postgres,
     url: database_url,
-    ssl: [
-      verify: :verify_peer,
-      cacertfile: "/etc/ssl/certs/prod-ca-2021.crt",
-      versions: [:"tlsv1.2"],
-      reuse_sessions: true
-    ],
+    ipv6: maybe_ipv6,
+    ssl: false,
+    # ssl: [
+    #   verify: :verify_peer,
+    #   cacertfile: "/etc/ssl/certs/prod-ca-2021.crt",
+    #   versions: [:"tlsv1.3"],
+    #   reuse_sessions: true
+    # ],
     parameters: [
       search_path: System.get_env("SCHEMA") || "vyre"
     ],
