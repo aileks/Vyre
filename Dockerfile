@@ -7,12 +7,11 @@ ARG SCHEMA
 FROM elixir:1.18-alpine AS build
 
 # FOR DEBUG PURPOSES
-# ARG MIX_ENV
-# ARG GUARDIAN_SECRET_KEY
-# ARG DATABASE_URL
-# ARG SCHEMA
+ARG MIX_ENV
+ARG GUARDIAN_SECRET_KEY
+ARG DATABASE_URL
+ARG SCHEMA
 
-# Installing build tools now in the build stage.
 RUN apk add --no-cache build-base
 
 RUN apk add --no-cache openssl ncurses-libs postgresql-dev
