@@ -11,6 +11,11 @@ config :api, Api.Repo,
   adapter: Ecto.Adapters.Postgres,
   url: System.get_env("DATABASE_URL") || raise("DATABASE_URL is missing"),
   ssl: true,
+  ssl_opts: [
+    verify: :verify_peer,
+    cacertfile: "/usr/share/ca-certificates/prod-ca-2021.crt",
+    verify_fun: &:ssl_verify_hostname.verify_fun/3
+  ],
   parameters: [
     search_path: System.get_env("SCHEMA") || "vyre"
   ]
