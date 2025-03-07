@@ -35,7 +35,7 @@ if config_env() == :prod do
     ssl: true,
     ssl_opts: [
       verify: :verify_peer,
-      cacertfile: Path.join(:code.priv_dir(:api), "certs/prod-ca-2021.crt"),
+      cacertfile: Application.app_dir(:api, "priv/certs/supabase.crt"),
       server_name_indication: "aws-0-us-east-1.pooler.supabase.com"
     ],
     url: database_url,
