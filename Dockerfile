@@ -8,7 +8,7 @@ ARG GUARDIAN_SECRET_KEY
 ARG DATABASE_URL
 ARG SCHEMA
 
-RUN apk add build-base openssl ncurses-libs postgresql-dev ca-certificates
+RUN apk add build-base openssl ncurses-libs postgresql-dev ca-certificates curl
 RUN curl -s -o /etc/ssl/certs/prod-ca-2021.crt https://supabase-downloads.s3-ap-southeast-1.amazonaws.com/prod/ssl/prod-ca-2021.crt && \
     chmod 644 /etc/ssl/certs/prod-ca-2021.crt && \
     update-ca-certificates
@@ -33,7 +33,7 @@ RUN mix release
 # ---------------------------
 FROM alpine:3.21
 
-RUN apk add --no-cache openssl ncurses-libs postgresql-dev postgresql-client libstdc++ curl ca-certificates
+RUN apk add --no-cache openssl postgresql-client libstdc++ curl ca-certificates
 RUN curl -s -o /etc/ssl/certs/prod-ca-2021.crt https://supabase-downloads.s3-ap-southeast-1.amazonaws.com/prod/ssl/prod-ca-2021.crt && \
     chmod 644 /etc/ssl/certs/prod-ca-2021.crt && \
     update-ca-certificates
