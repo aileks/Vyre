@@ -34,6 +34,7 @@ if config_env() == :prod do
     adapter: Ecto.Adapters.Postgres,
     ssl: true,
     ssl_opts: [
+      verify: :verify_peer,
       cacertfile: "/etc/ssl/certs/ca-certificates.crt"
     ],
     url: database_url,

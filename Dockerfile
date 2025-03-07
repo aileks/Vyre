@@ -35,11 +35,7 @@ WORKDIR /app
 
 COPY --from=build /app/_build/prod/rel/api /app
 
-ARG CERT_URL=https://supabase-downloads.s3-ap-southeast-1.amazonaws.com/prod/ssl/prod-ca-2021.crt
-ARG CERT_PATH=/etc/ssl/certs/prod-ca-2021.crt
-
-RUN curl -s -o ${CERT_PATH} ${CERT_URL} \
-    && cat ${CERT_PATH} >> /etc/ssl/certs/ca-certificates.crt
+RUN curl -s -o /etc/ssl/certs/prod-ca-2021.crt https://supabase-downloads.s3-ap-southeast-1.amazonaws.com/prod/ssl/prod-ca-2021.crt
 
 EXPOSE 4000
 
