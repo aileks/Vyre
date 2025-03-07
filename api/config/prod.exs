@@ -13,7 +13,9 @@ config :api, Api.Repo,
   ssl: true,
   ssl_opts: [
     verify: :verify_peer,
-    cacertfile: "/etc/ssl/certs/prod-ca-2021.crt"
+    cacertfile: "/etc/ssl/certs/prod-ca-2021.crt",
+    versions: [:"tlsv1.3"],
+    pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10")
   ],
   parameters: [
     search_path: System.get_env("SCHEMA") || "vyre"
