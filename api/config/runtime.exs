@@ -37,8 +37,7 @@ if config_env() == :prod do
       verify: :verify_peer,
       cacertfile: "/etc/ssl/certs/prod-ca-2021.crt",
       versions: [:"tlsv1.2"],
-      reuse_sessions: true,
-      depth: 3
+      reuse_sessions: true
     ],
     parameters: [
       search_path: System.get_env("SCHEMA") || "vyre"
