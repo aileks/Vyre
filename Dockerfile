@@ -19,12 +19,10 @@ RUN mix deps.get --only prod
 
 COPY api/ ./
 
-RUN echo "MIX_ENV is $MIX_ENV"
-
 RUN mix deps.compile
-RUN mix ecto.drop --force
-RUN mix ecto.create
-RUN mix ecto.migrate
+# RUN mix ecto.drop --force
+# RUN mix ecto.create
+# RUN mix ecto.migrate
 RUN mix phx.digest
 RUN mix release
 
