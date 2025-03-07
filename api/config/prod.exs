@@ -27,9 +27,7 @@ config :api, Api.Repo,
   queue_interval: 5000,
   queue_target: 3000,
   connect_timeout: 45000,
-  # Set idle interval to maintain active connections
   idle_interval: 60000,
-  # Handle DBConnection better with backoff on failed connections
   backoff_type: :exp,
   backoff_min: 1000,
   backoff_max: 30000,
