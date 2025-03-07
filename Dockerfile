@@ -5,14 +5,16 @@ FROM elixir:1.18-alpine AS build
 WORKDIR /app
 
 COPY api/mix.exs api/mix.lock ./
+
+ENV MIX_ENV=prod
 RUN mix deps.get --only prod
 
 COPY api/ ./
 
+RUN echo "MIX_ENV is $MIX_ENV"
 RUN mix phx.compile
 RUN mix phx.digest
 
-ENV MIX_ENV=prod
 RUN mix release
 
 FROM alpine:3.21
