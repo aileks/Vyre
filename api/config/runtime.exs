@@ -32,12 +32,11 @@ if config_env() == :prod do
 
   config :api, Api.Repo,
     adapter: Ecto.Adapters.Postgres,
-    url: System.get_env("DATABASE_URL") || raise("DATABASE_URL is missing"),
+    url: database_url,
     ssl: [
       verify: :verify_peer,
       cacertfile: "/etc/ssl/certs/prod-ca-2021.crt",
       versions: [:"tlsv1.2"],
-      secure_renegotiate: true,
       reuse_sessions: true,
       depth: 3
     ],
