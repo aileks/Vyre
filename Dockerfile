@@ -1,6 +1,7 @@
 FROM elixir:1.18-alpine AS build
 
-# RUN mix local.hex --force && mix local.rebar --force
+RUN apk add build-base
+RUN apk add openssl ncurses-libs postgresql-dev gcc musl-dev
 
 WORKDIR /app
 
@@ -16,12 +17,6 @@ RUN mix phx.compile
 RUN mix phx.digest
 
 RUN mix release
-
-FROM alpine:3.21
-RUN apk add build-base
-RUN apk add openssl ncurses-libs postgresql-dev gcc musl-dev
-
-WORKDIR /app
 
 COPY --from=build /app/_build/prod/rel/api ./
 
