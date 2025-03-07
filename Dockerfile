@@ -1,7 +1,6 @@
 FROM 1.18-otp-27-alpine
 
-RUN apk add build-base
-RUN apk add openssl ncurses-libs postgresql-dev
+RUN apk add --no-cache build-base openssl ncurses-libs postgresql-dev
 
 ARG MIX_ENV
 ARG GUARDIAN_SECRET_KEY
@@ -19,10 +18,7 @@ COPY api/ ./
 RUN echo "MIX_ENV is $MIX_ENV"
 RUN mix phx.compile
 RUN mix phx.digest
-
 RUN mix release
-
-COPY --from=build /app/_build/prod/rel/api ./
 
 EXPOSE 4000
 
