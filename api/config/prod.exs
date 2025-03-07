@@ -13,7 +13,7 @@ config :api, Api.Repo,
   ssl: [
     verify: :verify_peer,
     cacertfile: "/etc/ssl/certs/prod-ca-2021.crt",
-    versions: [:"tlsv1.3"],
+    versions: [:"tlsv1.2"],
     secure_renegotiate: true,
     reuse_sessions: true,
     depth: 3
