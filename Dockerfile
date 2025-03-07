@@ -17,7 +17,6 @@ COPY api/mix.exs api/mix.lock ./
 RUN mix deps.get --only prod
 
 COPY api/ ./
-COPY api/priv/certs/supabase.crt ./
 
 RUN echo "MIX_ENV is $MIX_ENV"
 RUN mix deps.compile
@@ -30,7 +29,10 @@ RUN mix release
 # ---------------------------
 FROM alpine:3.21
 
-RUN apk add --no-cache openssl ncurses-libs postgresql-dev libstdc++ curl
+RUN apk add --no-cache openssl ncurses-libs postgresql-dev libstdc++ curl ca-certificates
+RUN curl -s -o /etc/ssl/certs/prod-ca-2021.crt https://supabase-downloads.s3-ap-southeast-1.amazonaws.com/prod/ssl/prod-ca-2021.crt && \
+    chmod 644 /etc/ssl/certs/prod-ca-2021.crt && \
+    update-ca-certificates
 
 WORKDIR /app
 

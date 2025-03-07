@@ -35,7 +35,7 @@ if config_env() == :prod do
     ssl: true,
     ssl_opts: [
       verify: :verify_peer,
-      cacertfile: Path.expand("../priv/certs/supabase.crt", __DIR__)
+      cacertfile: "/etc/ssl/certs/prod-ca-2021.crt"
     ],
     url: database_url,
     pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
