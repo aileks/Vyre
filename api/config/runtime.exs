@@ -32,8 +32,7 @@ if config_env() == :prod do
 
   config :api, Api.Repo,
     adapter: Ecto.Adapters.Postgres,
-    ssl: true,
-    ssl_opts: [
+    ssl: [
       verify: :verify_peer,
       cacertfile: "/etc/ssl/certs/ca-certificates.crt"
     ],
