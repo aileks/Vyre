@@ -11,6 +11,10 @@ defmodule ApiWeb.Router do
     plug(ApiWeb.AuthPlug)
   end
 
+  pipeline :browser do
+    plug(:accepts, ["html"])
+  end
+
   scope "/api", ApiWeb do
     pipe_through(:api)
 
@@ -22,6 +26,11 @@ defmodule ApiWeb.Router do
   scope "/api", ApiWeb do
     pipe_through(:auth)
     get("/me", AuthController, :me)
+  end
+
+  scope "/", ApiWeb do
+    pipe_through(:browser)
+    get("/*path", PageController, :index)
   end
 
   def handle_errors(conn, %{reason: %Ecto.NoResultsError{} = _reason}) do
