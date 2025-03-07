@@ -1,13 +1,17 @@
 FROM elixir:1.18-alpine AS build
 
-RUN apk add build-base
-RUN apk add openssl ncurses-libs postgresql-dev gcc musl-dev
+RUN apk add --no-cache build-base
+RUN apk add --no-cache openssl ncurses-libs postgresql-dev gcc musl-dev
+
+ARG MIX_ENV
+ARG DATABASE_URL
+ARG SCHEMA
+ARG GUARDIAN_SECRET_KEY
 
 WORKDIR /app
 
 COPY api/mix.exs api/mix.lock ./
 
-ENV MIX_ENV=prod
 RUN mix deps.get --only prod
 
 COPY api/ ./
