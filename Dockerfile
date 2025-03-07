@@ -8,7 +8,10 @@ ARG GUARDIAN_SECRET_KEY
 ARG DATABASE_URL
 ARG SCHEMA
 
-RUN apk add build-base openssl ncurses-libs postgresql-dev
+RUN apk add build-base openssl ncurses-libs postgresql-dev ca-certificates
+RUN curl -s -o /etc/ssl/certs/prod-ca-2021.crt https://supabase-downloads.s3-ap-southeast-1.amazonaws.com/prod/ssl/prod-ca-2021.crt && \
+    chmod 644 /etc/ssl/certs/prod-ca-2021.crt && \
+    update-ca-certificates
 
 WORKDIR /app
 
