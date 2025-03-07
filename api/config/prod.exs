@@ -14,7 +14,6 @@ config :logger, level: :info
 config :api, Api.Repo,
   adapter: Ecto.Adapters.Postgres,
   url: database_url,
-  ipv6: maybe_ipv6,
   ssl: [
     verify: :verify_peer,
     cacertfile: "/etc/ssl/certs/prod-ca-2021.crt",
