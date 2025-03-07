@@ -49,12 +49,12 @@ if config_env() == :prod do
   # want to use a different value for prod and you most likely don't want
   # to check this value into version control, so we use an environment
   # variable instead.
-  secret_key_base =
-    System.get_env("SECRET_KEY_BASE") ||
-      raise """
-      environment variable SECRET_KEY_BASE is missing.
-      You can generate one by calling: mix phx.gen.secret
-      """
+  # secret_key_base =
+  #   System.get_env("SECRET_KEY_BASE") ||
+  #     raise """
+  #     environment variable SECRET_KEY_BASE is missing.
+  #     You can generate one by calling: mix phx.gen.secret
+  #     """
 
   guardian_secret_key =
     System.get_env("GUARDIAN_SECRET_KEY") ||
@@ -87,7 +87,7 @@ if config_env() == :prod do
       ip: {0, 0, 0, 0, 0, 0, 0, 0},
       port: port
     ],
-    secret_key_base: secret_key_base
+    secret_key_base: guardian_secret_key
 
   if config_env() in [:dev, :test] do
     config :bcrypt_elixir, :log_rounds, 4
