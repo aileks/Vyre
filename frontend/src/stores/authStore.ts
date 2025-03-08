@@ -12,6 +12,7 @@ export interface User {
 export interface AppState {
   user: User | null;
   isAuthenticated: boolean;
+  token?: string | null;
 }
 
 const initialState: AppState = {
@@ -19,19 +20,26 @@ const initialState: AppState = {
   isAuthenticated: false,
 };
 
-export const [state, setState] = createStore<AppState>(initialState);
+const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
+
+export const [state, setState] = createStore<AppState>({
+  ...initialState,
+  token,
+});
 
 export const useStore = () => [state, setState];
 
 export const login = (user: User) => {
   setState({
-    user: {
-      ...user,
-    },
+    user,
     isAuthenticated: true,
+    token,
   });
+
+  localStorage.setItem('token', token!);
 };
 
 export const logout = () => {
   setState(initialState);
+  localStorage.removeItem('token');
 };

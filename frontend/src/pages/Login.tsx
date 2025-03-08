@@ -1,8 +1,8 @@
 import { A } from '@solidjs/router';
 import { useNavigate } from '@solidjs/router';
-import { createSignal } from 'solid-js';
+import { createEffect, createSignal } from 'solid-js';
 
-import { login } from '../stores/authStore';
+import { login, state } from '../stores/authStore';
 
 interface LoginCredentials {
   email: string;

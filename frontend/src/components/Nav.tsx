@@ -1,10 +1,13 @@
 // NOTE: THIS IS A PLACEHOLDER UNTIL REAL NAVIGATION IS READY FOR IMPLEMENTATION
 import { A } from '@solidjs/router';
+import { createEffect } from 'solid-js';
 
 import { state } from '../stores/authStore';
 
 export default function Nav() {
-  const { user } = state;
+  createEffect(() => {
+    console.log('REACTIVE STATE:\n\n', state.user);
+  });
 
   return (
     <nav class='bg-midnight-700 shadow-midnight-900/50 shadow-md'>
@@ -19,9 +22,12 @@ export default function Nav() {
         </li>
 
         <span class='flex gap-4'>
-          {user ?
+          {state.user ?
             <li>
-              <A class='bg-primary-800 rounded-sm px-2 py-0.5' href='/logout'>
+              <A
+                class='hover:text-cybertext-400 rounded-sm bg-pink-600 px-2 py-0.5 transition-all duration-200 hover:bg-pink-500'
+                href='/logout'
+              >
                 Logout
               </A>
             </li>
