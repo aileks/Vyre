@@ -76,7 +76,7 @@ defmodule ApiWeb.AuthControllerTest do
       conn =
         post(conn, ~p"/api/login",
           user: %{
-            email_or_username: user.email,
+            email: user.email,
             password: password
           }
         )
@@ -92,7 +92,7 @@ defmodule ApiWeb.AuthControllerTest do
         |> put_req_header("accept", "application/json")
         |> post(~p"/api/login",
           user: %{
-            email_or_username: user.username,
+            email: user.username,
             password: password
           }
         )
@@ -106,7 +106,7 @@ defmodule ApiWeb.AuthControllerTest do
       conn =
         post(conn, ~p"/api/login",
           user: %{
-            email_or_username: "nonexistent@example.com",
+            email: "nonexistent@example.com",
             password: "Password123"
           }
         )
@@ -120,7 +120,7 @@ defmodule ApiWeb.AuthControllerTest do
       conn =
         post(conn, ~p"/api/login",
           user: %{
-            email_or_username: user.email,
+            email: user.email,
             password: "WrongPassword123"
           }
         )
@@ -164,7 +164,7 @@ defmodule ApiWeb.AuthControllerTest do
   # Helper function to create a user with a token for testing
   defp create_user_with_token(%{conn: conn}) do
     user = user_fixture()
-    {:ok, token, _claims} = Api.Auth.Guardian.encode_and_sign(user, %{}, ttl: {1, :hour})
+    {:ok, token, _claims} = Api.Accounts.Guardian.encode_and_sign(user, %{}, ttl: {1, :hour})
     conn = conn |> put_req_header("authorization", "Bearer #{token}")
     {:ok, %{conn: conn, user: user, token: token}}
   end

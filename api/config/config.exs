@@ -22,7 +22,7 @@ config :api, ApiWeb.Endpoint,
 
 config :api, Api.Accounts.Guardian, issuer: "api"
 
-config :api, Api.Auth.Guardian,
+config :api, Api.Accounts.Guardian,
   issuer: "api",
   secret_key: System.get_env("GUARDIAN_SECRET_KEY")
 

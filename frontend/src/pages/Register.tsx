@@ -3,9 +3,9 @@ import { createSignal } from 'solid-js';
 
 interface RegisterCredentials {
   username: string;
+  display_name: string;
   email: string;
   password: string;
-  password_confirmation: string;
 }
 
 interface RegisterResponse {
@@ -38,9 +38,9 @@ export default function Register() {
 
     const credentials: RegisterCredentials = {
       username: username(),
+      display_name: username(), // display_name defaults to username
       email: email(),
       password: password(),
-      password_confirmation: passwordConfirmation(),
     };
 
     try {
@@ -49,7 +49,7 @@ export default function Register() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(credentials),
+        body: JSON.stringify({ user: credentials }),
       });
 
       const data: RegisterResponse = await res.json();

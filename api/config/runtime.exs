@@ -5,14 +5,14 @@ if System.get_env("PHX_SERVER") do
 end
 
 if config_env() == :prod do
+  config :bcrypt_elixir, :log_rounds, 4
+
   database_url =
     System.get_env("DATABASE_URL") ||
       raise """
       environment variable DATABASE_URL is missing.
       For example: ecto://USER:PASS@HOST/DATABASE
       """
-
-  # maybe_ipv6 = if System.get_env("ECTO_IPV6") in ~w(true 1), do: [:inet6], else: []
 
   config :api, Api.Repo,
     adapter: Ecto.Adapters.Postgres,
@@ -53,10 +53,6 @@ if config_env() == :prod do
       port: port
     ],
     secret_key_base: guardian_secret_key
-
-  if config_env() in [:dev, :test] do
-    config :bcrypt_elixir, :log_rounds, 4
-  else
-    config :bcrypt_elixir, :log_rounds, 12
-  end
+else
+  config :bcrypt_elixir, :log_rounds, 4
 end

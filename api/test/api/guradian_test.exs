@@ -1,8 +1,8 @@
-defmodule Api.Auth.GuardianTest do
+defmodule Api.Accounts.GuardianTest do
   use Api.DataCase, async: true
 
   alias Api.Accounts
-  alias Api.Auth.Guardian
+  alias Api.Accounts.Guardian
 
   @valid_attrs %{
     email: "user@example.com",

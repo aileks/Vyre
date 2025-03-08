@@ -2,7 +2,7 @@ defmodule ApiWeb.AuthController do
   use ApiWeb, :controller
 
   alias Api.Accounts
-  alias Api.Auth.Guardian
+  alias Api.Accounts.Guardian
 
   action_fallback(ApiWeb.FallbackController)
 
@@ -16,8 +16,8 @@ defmodule ApiWeb.AuthController do
     end
   end
 
-  def login(conn, %{"user" => %{"email_or_username" => email_or_username, "password" => password}}) do
-    with {:ok, user} <- Accounts.authenticate_user(email_or_username, password) do
+  def login(conn, %{"user" => %{"email" => email, "password" => password}}) do
+    with {:ok, user} <- Accounts.authenticate_user(email, password) do
       token = Guardian.create_token(user)
 
       conn

@@ -1,10 +1,6 @@
 import Config
 
-if File.exists?("../../.env") do
-  Dotenv.load!(filename: "../../.env")
-end
-
-config :api, Api.Accounts.Guardian, secret_key: System.get_env("GUARDIAN_SECRET_KEY")
+config :api, Api.Accounts.Guardian, secret_key: "insecure_key_for_testing_32"
 
 # Configure your database
 config :api, Api.Repo,

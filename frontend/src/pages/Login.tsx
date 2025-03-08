@@ -38,7 +38,7 @@ export default function Login() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(credentials),
+        body: JSON.stringify({ user: credentials }),
       });
 
       const data: LoginResponse = await res.json();
@@ -54,7 +54,7 @@ export default function Login() {
         if (data.user) {
           localStorage.setItem('user', JSON.stringify(data.user));
         }
-        window.location.href = '/dashboard';
+        window.location.href = '/';
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unexpected error occurred');
@@ -93,7 +93,7 @@ export default function Login() {
       <form onSubmit={handleSubmit} class='space-y-5'>
         <div>
           <label for='email' class='mb-2 block'>
-            Username
+            Email
           </label>
 
           <input
@@ -105,7 +105,7 @@ export default function Login() {
             value={email()}
             onInput={(e: InputEvent) => setEmail((e.target as HTMLInputElement).value)}
             class='bg-midnight-900 focus:border-primary-500 focus:ring-primary-500/30 w-full rounded-sm border border-gray-700 px-3 py-2.5 transition-colors duration-200 focus:ring-1 focus:outline-none'
-            placeholder='user'
+            placeholder='user@domain.com'
           />
         </div>
 

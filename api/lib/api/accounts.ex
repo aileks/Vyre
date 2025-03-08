@@ -133,18 +133,10 @@ defmodule Api.Accounts do
   end
 
   @doc """
-  Gets a user by email or username.
-  """
-  def get_user_by_email_or_username(email_or_username) when is_binary(email_or_username) do
-    Repo.get_by(User, email: email_or_username) ||
-      Repo.get_by(User, username: email_or_username)
-  end
-
-  @doc """
   Authenticates a user.
   """
-  def authenticate_user(email_or_username, password) do
-    user = get_user_by_email_or_username(email_or_username)
+  def authenticate_user(email, password) do
+    user = get_user_by_email(email)
 
     case user do
       nil ->
@@ -167,7 +159,7 @@ defmodule Api.Accounts do
   otherwise returns {:error, reason}.
   """
   def create_token(user) do
-    Api.Auth.Guardian.encode_and_sign(user)
+    Api.Accounts.Guardian.encode_and_sign(user)
   end
 
   @doc """
@@ -177,9 +169,9 @@ defmodule Api.Accounts do
   otherwise returns {:error, reason}.
   """
   def get_current_user(token) do
-    case Api.Auth.Guardian.decode_and_verify(token) do
+    case Api.Accounts.Guardian.decode_and_verify(token) do
       {:ok, claims} ->
-        Api.Auth.Guardian.resource_from_claims(claims)
+        Api.Accounts.Guardian.resource_from_claims(claims)
 
       {:error, reason} ->
         {:error, reason}
