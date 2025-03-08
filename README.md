@@ -10,6 +10,7 @@ Check out the [Wiki](https://github.com/aileks/Vyre/wiki)!
 
 - [x] User authentication & authorization
 - [ ] Real-time chat
+- [ ] Chat commands
 - [ ] Rich text support
 - [ ] Group chats
 - [ ] User profiles
