@@ -63,8 +63,8 @@ export default function Login() {
   };
 
   return (
-    <div class='mx-auto my-12 max-w-md rounded border border-gray-900 bg-gray-900 p-7'>
-      <div class='text-accent-500 mb-3 text-2xl font-semibold'>Login</div>
+    <div class='mx-auto my-12 max-w-md rounded border border-gray-800 bg-gray-900 p-7'>
+      <div class='text-accent-500 mb-3 text-4xl font-semibold'>Login</div>
       <div class='mb-6 text-gray-400'>Sign in to your account</div>
 
       {error() && <div class='text-error-500 mb-4 text-sm'>{error()}</div>}
