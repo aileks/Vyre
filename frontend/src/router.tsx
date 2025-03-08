@@ -1,5 +1,7 @@
 import { RouteDefinition, Router } from '@solidjs/router';
-import { lazy } from 'solid-js';
+import { Component, ParentProps, lazy } from 'solid-js';
+
+import Nav from './components/Nav';
 
 export type AppRouteDefinition = RouteDefinition & {
   protected?: boolean;
@@ -10,6 +12,18 @@ const Home = lazy(() => import('./pages/Home'));
 const Login = lazy(() => import('./pages/Login'));
 const Register = lazy(() => import('./pages/Register'));
 const NotFound = lazy(() => import('./pages/NotFound'));
+
+const Layout: Component<ParentProps> = props => {
+  return (
+    <>
+      <header>
+        <Nav />
+      </header>
+
+      {props.children}
+    </>
+  );
+};
 
 export const routes: AppRouteDefinition[] = [
   // Public routes
@@ -34,5 +48,5 @@ export const routes: AppRouteDefinition[] = [
 ];
 
 export default function AppRouter() {
-  return <Router>{routes}</Router>;
+  return <Router root={Layout}>{routes}</Router>;
 }
