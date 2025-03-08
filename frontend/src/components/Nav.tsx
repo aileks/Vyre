@@ -1,3 +1,4 @@
+// NOTE: THIS IS A PLACEHOLDER UNTIL REAL NAVIGATION IS READY FOR IMPLEMENTATION
 import { A } from '@solidjs/router';
 
 import { state } from '../stores/authStore';
