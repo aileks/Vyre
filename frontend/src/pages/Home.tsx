@@ -3,7 +3,7 @@ import { A } from '@solidjs/router';
 export default function Home() {
   return (
     <div class='container mx-auto mt-32 max-w-6xl px-4 py-16'>
-      <div class='bg-midnight-800 mb-12 overflow-hidden rounded-md border border-gray-700'>
+      <div class='bg-midnight-800 shadow-midnight-900/50 mb-12 overflow-hidden rounded-md border border-gray-700 shadow-md'>
         <div class='bg-midnight-900 flex items-center border-b border-gray-700 px-4 py-2'>
           <div class='mr-4 flex space-x-2'>
             <div class='h-3 w-3 rounded-full bg-red-500'></div>

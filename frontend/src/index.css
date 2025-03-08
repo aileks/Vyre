@@ -6,7 +6,7 @@
   --font-sans: 'Liter', 'sans-serif';
   --font-mono: 'IBM Plex Mono', 'monospace';
 
-  /* Primary Accent - Violet */
+  /* Primary Accent - primary */
   --color-primary-50: oklch(0.98 0.02 290);
   --color-primary-100: oklch(0.95 0.04 290);
   --color-primary-200: oklch(0.9 0.08 290);
@@ -132,20 +132,20 @@
   --ui-container-border: var(--color-gray-700);
   --ui-text: var(--color-cybertext-200);
   --ui-text-secondary: var(--color-cybertext-600);
-  --ui-accent: var(--color-violet-500);
+  --ui-accent: var(--color-primary-500);
   --ui-input-bg: var(--color-midnight-900);
-  --ui-input-border: var(--color-violet-800);
+  --ui-input-border: var(--color-primary-800);
   --ui-error: var(--color-error-500);
   --ui-success: var(--color-success-500);
   --ui-warning: var(--color-warning-500);
 
   /* Chat Specific Colors */
-  --color-chat-sender-bubble: var(--color-violet-600);
+  --color-chat-sender-bubble: var(--color-primary-600);
   --color-chat-sender-text: var(--color-cybertext-100);
   --color-chat-recipient-bubble: var(--color-midnight-600);
   --color-chat-recipient-text: var(--color-cybertext-300);
   --color-chat-system-bubble: var(--color-gray-700);
-  --color-chat-system-text: var(--color-violet-200);
+  --color-chat-system-text: var(--color-primary-200);
 
   /* Status Indicators */
   --color-status-online: var(--color-success-500);
@@ -163,8 +163,8 @@
   max-width: 80%;
   margin-left: auto;
   font-family: var(--font-mono);
-  border-left: 2px solid var(--color-violet-400);
-  border-top: 1px solid var(--color-violet-300);
+  border-left: 2px solid var(--color-primary-400);
+  border-top: 1px solid var(--color-primary-300);
 }
 
 @utility chat-bubble-recipient {
