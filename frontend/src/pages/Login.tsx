@@ -1,5 +1,8 @@
 import { A } from '@solidjs/router';
+import { useNavigate } from '@solidjs/router';
 import { createSignal } from 'solid-js';
+
+import { login, state } from '../stores/authStore';
 
 interface LoginCredentials {
   email: string;
@@ -7,16 +10,22 @@ interface LoginCredentials {
 }
 
 interface LoginResponse {
-  token?: string;
   user?: {
     id: string;
+    status: string;
     email: string;
-    name: string;
+    username: string;
+    display_name: string;
+    avatar_url: string | null;
   };
-  error?: string;
+  token?: string;
+  errors?: {
+    message: string;
+  };
 }
 
 export default function Login() {
+  const navigate = useNavigate();
   const [email, setEmail] = createSignal<string>('');
   const [password, setPassword] = createSignal<string>('');
   const [error, setError] = createSignal<string>('');
@@ -33,7 +42,7 @@ export default function Login() {
     };
 
     try {
-      const res = await fetch('/api/login', {
+      const res = await fetch('http://localhost:4000/api/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -44,17 +53,15 @@ export default function Login() {
       const data: LoginResponse = await res.json();
 
       if (!res.ok) {
-        console.log(data);
-        throw new Error(data.error || 'Login failed');
+        setError(data.errors?.message || 'Login failed');
+        return;
       }
 
-      // Handle successful login
-      if (data.token) {
+      if (data.token && data.user) {
         localStorage.setItem('token', data.token);
-        if (data.user) {
-          localStorage.setItem('user', JSON.stringify(data.user));
-        }
-        window.location.href = '/';
+        console.log('CURRENT STATE:\n', state);
+        login(data.user);
+        navigate('/', { replace: true });
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unexpected error occurred');

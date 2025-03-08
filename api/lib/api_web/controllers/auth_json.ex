@@ -15,6 +15,7 @@ defmodule ApiWeb.AuthJSON do
     %{
       user: %{
         id: user.id,
+        status: user.status,
         email: user.email,
         username: user.username,
         display_name: user.display_name,
