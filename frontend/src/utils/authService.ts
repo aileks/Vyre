@@ -18,40 +18,40 @@ export const register = async (userData: any) => {
 };
 
 export const doLogin = async (credentials: { email: string; password: string }) => {
-  const response = await fetch('/api/auth/login', {
+  const res = await fetch('/api/auth/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ user: credentials }),
   });
 
-  if (response.ok) {
-    const { user, token } = await response.json();
+  if (res.ok) {
+    const { user, token } = await res.json();
     login(user, token);
     return { user, token };
   } else {
-    const error = await response.json();
+    const error = await res.json();
     return { error };
   }
 };
 
 export const doLogout = async () => {
-  await fetch('/api/auth/logout', { method: 'POST' });
+  await fetch('/api/auth/logout', { method: 'DELETE' });
   logout();
 };
 
 export const fetchSession = async () => {
-  const token = localStorage.getItem('auth_token');
+  const token = localStorage.getItem('token');
   if (!token) return;
 
-  const response = await fetch('/api/auth/me', {
+  const res = await fetch('/api/auth/me', {
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
   });
 
-  if (response.ok) {
-    const { user } = await response.json();
+  if (res.ok) {
+    const { user } = await res.json();
     login(user, token);
   } else {
     logout();

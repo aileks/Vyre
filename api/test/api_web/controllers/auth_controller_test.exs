@@ -33,7 +33,7 @@ defmodule ApiWeb.AuthControllerTest do
     test "returns errors when registration data is invalid", %{conn: conn} do
       # Missing required fields
       conn =
-        post(conn, ~p"/api/register",
+        post(conn, ~p"/api/auth/register",
           user: %{
             email: "",
             username: "",
@@ -53,7 +53,7 @@ defmodule ApiWeb.AuthControllerTest do
 
       # Try to create another user with the same email
       conn =
-        post(conn, ~p"/api/register",
+        post(conn, ~p"/api/auth/register",
           user: %{
             email: user.email,
             username: unique_user_username(),
@@ -74,7 +74,7 @@ defmodule ApiWeb.AuthControllerTest do
 
       # Test login with email
       conn =
-        post(conn, ~p"/api/login",
+        post(conn, ~p"/api/auth/login",
           user: %{
             email: user.email,
             password: password
@@ -90,7 +90,7 @@ defmodule ApiWeb.AuthControllerTest do
       conn =
         build_conn()
         |> put_req_header("accept", "application/json")
-        |> post(~p"/api/login",
+        |> post(~p"/api/auth/logout",
           user: %{
             email: user.username,
             password: password
@@ -104,7 +104,7 @@ defmodule ApiWeb.AuthControllerTest do
 
     test "returns error when email/username is invalid", %{conn: conn} do
       conn =
-        post(conn, ~p"/api/login",
+        post(conn, ~p"/api/auth/logout",
           user: %{
             email: "nonexistent@example.com",
             password: "Password123"
@@ -118,7 +118,7 @@ defmodule ApiWeb.AuthControllerTest do
       user = user_fixture()
 
       conn =
-        post(conn, ~p"/api/login",
+        post(conn, ~p"/api/auth/logout",
           user: %{
             email: user.email,
             password: "WrongPassword123"

@@ -62,9 +62,9 @@
   --color-midnight-400: oklch(0.18 0.01 280);
   --color-midnight-500: oklch(0.15 0.01 280);
   --color-midnight-600: oklch(0.12 0.01 280);
-  --color-midnight-700: oklch(0.09 0.005 280);
-  --color-midnight-800: oklch(0.06 0.005 280);
-  --color-midnight-900: oklch(0.04 0 280);
+  --color-midnight-700: oklch(0.11 0.01 280);
+  --color-midnight-800: oklch(0.08 0.01 280);
+  --color-midnight-900: oklch(0.04 0.01 280);
 
   /* Text Contrast Colors */
   --color-cybertext-50: oklch(0.99 0.01 280);

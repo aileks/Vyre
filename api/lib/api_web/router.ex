@@ -19,12 +19,16 @@ defmodule ApiWeb.Router do
     pipe_through(:api)
 
     resources("/users", UserController)
+  end
+
+  scope "/api/auth", ApiWeb do
+    # Public auth routs
+    pipe_through(:api)
     post("/register", AuthController, :register)
     post("/login", AuthController, :login)
     delete("/logout", AuthController, :logout)
-  end
 
-  scope "/api", ApiWeb do
+    # Protected auth routes
     pipe_through(:auth)
     get("/me", AuthController, :me)
   end

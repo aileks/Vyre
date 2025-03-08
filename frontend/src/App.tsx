@@ -1,10 +1,10 @@
-import { Suspense, onMount } from 'solid-js';
+import { Suspense, createEffect } from 'solid-js';
 
 import AppRouter from './router';
 import { fetchSession } from './utils/authService';
 
 export default function App() {
-  onMount(() => {
+  createEffect(() => {
     fetchSession();
   });
 
@@ -12,7 +12,7 @@ export default function App() {
     <Suspense
       fallback={
         <div class='bg-midnight-400 flex min-h-screen items-center justify-center'>
-          <div class='border-primary-600 h-10 w-10 animate-spin rounded-full border-2 border-t-transparent'></div>
+          <div class='border-primary-600 rounded-xs-full h-10 w-10 animate-spin border-2 border-t-transparent'></div>
         </div>
       }
     >

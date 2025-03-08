@@ -1,28 +1,8 @@
 import { A } from '@solidjs/router';
 import { useNavigate } from '@solidjs/router';
-import { createEffect, createSignal } from 'solid-js';
+import { createSignal } from 'solid-js';
 
-import { login } from '../stores/authStore';
-
-interface LoginCredentials {
-  email: string;
-  password: string;
-}
-
-interface LoginResponse {
-  user?: {
-    id: string;
-    status: string;
-    email: string;
-    username: string;
-    display_name: string;
-    avatar_url: string | null;
-  };
-  token?: string;
-  errors?: {
-    message: string;
-  };
-}
+import { doLogin } from '../utils/authService';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -36,46 +16,25 @@ export default function Login() {
     setIsLoading(true);
     setError('');
 
-    const credentials: LoginCredentials = {
-      email: email(),
-      password: password(),
-    };
+    const credentials = { email: email(), password: password() };
 
-    try {
-      const res = await fetch('/api/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ user: credentials }),
-      });
+    const res = await doLogin(credentials);
 
-      const data: LoginResponse = await res.json();
-
-      if (!res.ok) {
-        setError(data.errors?.message || 'Login failed');
-        return;
-      }
-
-      if (data.user && data.token) {
-        createEffect(() => {
-          login(data.user!, data.token!);
-        });
-        navigate('/', { replace: true });
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An unexpected error occurred');
-    } finally {
-      setIsLoading(false);
+    if (res.error) {
+      setError(res.error.message || 'Login failed');
+    } else {
+      navigate('/', { replace: true });
     }
+
+    setIsLoading(false);
   };
 
   return (
-    <div class='bg-midnight-700 shadow-midnight-900/50 mx-auto mt-64 max-w-lg rounded-sm border border-gray-700 p-7 shadow-lg'>
+    <div class='bg-midnight-700 shadow-midnight-900/50 mx-auto mt-64 max-w-lg rounded-xs border border-gray-700 p-7 shadow-lg'>
       <div class='text-primary-400 mb-4 text-4xl font-bold tracking-wide'>Login</div>
 
       {error() && (
-        <div class='border-error-700 bg-midnight-800 text-error-400 mb-5 rounded-sm border p-3 text-sm'>
+        <div class='border-error-700 bg-midnight-800 text-error-400 mb-5 rounded-xs border p-3 text-sm'>
           <div class='flex items-center'>
             <svg
               xmlns='http://www.w3.org/2000/svg'
@@ -111,7 +70,7 @@ export default function Login() {
             required
             value={email()}
             onInput={(e: InputEvent) => setEmail((e.target as HTMLInputElement).value)}
-            class='bg-midnight-900 focus:border-primary-500 focus:ring-primary-500/30 w-full rounded-sm border border-gray-700 px-3 py-2.5 transition-colors duration-200 focus:ring-1 focus:outline-none'
+            class='bg-midnight-900 focus:border-primary-500 focus:ring-primary-500/30 w-full rounded-xs border border-gray-700 px-3 py-2.5 transition-colors duration-200 focus:ring-1 focus:outline-none'
             placeholder='user@domain.com'
           />
         </div>
@@ -135,7 +94,7 @@ export default function Login() {
             required
             value={password()}
             onInput={(e: InputEvent) => setPassword((e.target as HTMLInputElement).value)}
-            class='bg-midnight-900 focus:border-primary-500 focus:ring-primary-500/30 w-full rounded-sm border border-gray-700 px-3 py-2.5 transition-colors duration-200 focus:ring-1 focus:outline-none'
+            class='bg-midnight-900 focus:border-primary-500 focus:ring-primary-500/30 w-full rounded-xs border border-gray-700 px-3 py-2.5 transition-colors duration-200 focus:ring-1 focus:outline-none'
             placeholder='••••••••'
           />
         </div>
@@ -143,7 +102,7 @@ export default function Login() {
         <button
           type='submit'
           disabled={isLoading()}
-          class='bg-primary-600 hover:bg-primary-500 focus:ring-primary-500/50 border-primary-400 w-full rounded-sm border px-4 py-2.5 transition-all duration-200 hover:cursor-pointer focus:ring-2 focus:outline-none disabled:opacity-70'
+          class='bg-primary-600 hover:bg-primary-500 focus:ring-primary-500/50 border-primary-400 w-full rounded-xs border px-4 py-2.5 transition-all duration-200 hover:cursor-pointer focus:ring-2 focus:outline-none disabled:opacity-70'
         >
           {isLoading() ?
             <span class='flex items-center justify-center'>

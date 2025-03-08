@@ -1,13 +1,15 @@
-// NOTE: THIS IS A PLACEHOLDER UNTIL REAL NAVIGATION IS READY FOR IMPLEMENTATION
-import { A } from '@solidjs/router';
-import { createEffect } from 'solid-js';
+import { A, useNavigate } from '@solidjs/router';
 
 import { state } from '../stores/authStore';
+import { doLogout } from '../utils/authService';
 
 export default function Nav() {
-  createEffect(() => {
-    console.log('REACTIVE STATE:\n\n', state.user);
-  });
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    doLogout();
+    navigate('/login', { replace: true });
+  };
 
   return (
     <nav class='bg-midnight-700 shadow-midnight-900/50 shadow-md'>
@@ -24,26 +26,26 @@ export default function Nav() {
         <span class='flex gap-4'>
           {state.user ?
             <li>
-              <A
-                class='hover:text-cybertext-400 rounded-sm bg-pink-600 px-2 py-0.5 transition-all duration-200 hover:bg-pink-500'
-                href='/logout'
+              <span
+                onClick={handleLogout}
+                class='hover:text-cybertext-200 text-cybertext-50 bg-error-800 hover:bg-error-700 cursor-pointer rounded-xs px-2 py-0.5 transition-all duration-200'
               >
                 Logout
-              </A>
+              </span>
             </li>
           : <>
-              <li>
+              {/* <li>
                 <A
-                  class='hover:text-cybertext-400 rounded-sm bg-pink-600 px-2 py-0.5 transition-all duration-200 hover:bg-pink-500'
+                  class='hover:text-cybertext-400 rounded-xs bg-pink-600 px-2 py-0.5 transition-all duration-200 hover:bg-pink-500'
                   href='/register'
                 >
                   Register
                 </A>
-              </li>
+              </li> */}
 
               <li>
                 <A
-                  class='bg-electric-600 hover:bg-electric-500 hover:text-cybertext-400 rounded-sm px-2 py-0.5 transition-all duration-200'
+                  class='bg-electric-600 hover:bg-electric-500 hover:text-cybertext-400 rounded-xs px-2 py-0.5 transition-all duration-200'
                   href='/login'
                 >
                   Login
