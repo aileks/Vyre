@@ -1,6 +1,6 @@
 # Vyre
 
-I've been increasingly frustrated with Discord. So, I made my own!
+I've been increasingly frustrated with Discord as of late. So, I made my own!
 The general idea is to create a chat application inspired by classic IRC client with the modern bells and whistles you're accustomed to.
 It's built to be fast, secure, and easy to use without sacrificing scalability or cutting corners.
 
