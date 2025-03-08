@@ -2,7 +2,7 @@ import { A } from '@solidjs/router';
 import { useNavigate } from '@solidjs/router';
 import { createSignal } from 'solid-js';
 
-import { login, state } from '../stores/authStore';
+import { login } from '../stores/authStore';
 
 interface LoginCredentials {
   email: string;
@@ -42,7 +42,7 @@ export default function Login() {
     };
 
     try {
-      const res = await fetch('http://localhost:4000/api/login', {
+      const res = await fetch('/api/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -59,7 +59,6 @@ export default function Login() {
 
       if (data.token && data.user) {
         localStorage.setItem('token', data.token);
-        console.log('CURRENT STATE:\n', state);
         login(data.user);
         navigate('/', { replace: true });
       }
