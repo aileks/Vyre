@@ -31,10 +31,10 @@ export const routes: AppRouteDefinition[] = [
     path: '/',
     component: Home,
   },
-  {
-    path: '/login',
-    component: Login,
-  },
+  // {
+  //   path: '/login',
+  //   component: Login,
+  // },
   {
     path: '/register',
     component: Register,
