@@ -24,7 +24,6 @@ if config_env() == :prod do
       server_name_indication: String.to_charlist(URI.parse(System.get_env("DATABASE_URL")).host)
     ],
     pool_size: 1,
-    timeout: 30000,
     queue_target: 5000,
     queue_interval: 5000
 
