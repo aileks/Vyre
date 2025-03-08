@@ -12,18 +12,17 @@ if config_env() == :prod do
       For example: ecto://USER:PASS@HOST/DATABASE
       """
 
-  maybe_ipv6 = if System.get_env("ECTO_IPV6") in ~w(true 1), do: [:inet6], else: []
+  # maybe_ipv6 = if System.get_env("ECTO_IPV6") in ~w(true 1), do: [:inet6], else: []
 
   config :api, Api.Repo,
     adapter: Ecto.Adapters.Postgres,
     url: database_url,
-    ipv6: maybe_ipv6,
     ssl: [
       verify: :verify_peer,
       cacertfile: "/etc/ssl/certs/prod-ca-2021.crt",
       server_name_indication: String.to_charlist(URI.parse(System.get_env("DATABASE_URL")).host)
     ],
-    pool_size: 1,
+    pool_size: 5,
     queue_target: 5000,
     queue_interval: 5000
 

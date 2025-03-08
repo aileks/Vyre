@@ -19,6 +19,6 @@ config :api, Api.Repo,
     cacertfile: "/etc/ssl/certs/prod-ca-2021.crt",
     server_name_indication: String.to_charlist(URI.parse(System.get_env("DATABASE_URL")).host)
   ],
-  pool_size: 1,
+  pool_size: 5,
   queue_target: 5000,
   queue_interval: 5000
