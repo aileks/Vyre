@@ -1,9 +1,12 @@
 /** @type {import('prettier').Config & import('@trivago/prettier-plugin-sort-imports').PluginConfig & import('prettier-plugin-tailwindcss').options} */
 module.exports = {
-  plugins: ['@trivago/prettier-plugin-sort-imports', 'prettier-plugin-tailwindcss'],
+  plugins: [
+    '@trivago/prettier-plugin-sort-imports',
+    'prettier-plugin-tailwindcss',
+  ],
 
   // Prettier
-  printWidth: 120,
+  printWidth: 80,
   tabWidth: 2,
   useTabs: false,
   semi: true,
@@ -13,7 +16,14 @@ module.exports = {
   arrowParens: 'avoid',
 
   // Import sorting
-  importOrder: ['^solid/(.*)$', '^@solid/(.*)$', '^@solid-start/(.*)$', '^~/(.*)$', '^~/(.css)$', '^[./]'],
+  importOrder: [
+    '^solid/(.*)$',
+    '^@solid/(.*)$',
+    '^@solid-start/(.*)$',
+    '^~/(.*)$',
+    '^~/(.css)$',
+    '^[./]',
+  ],
   importOrderSeparation: true,
   importOrderSortSpecifiers: true,
 

@@ -2,7 +2,7 @@ import { A } from '@solidjs/router';
 import { useNavigate } from '@solidjs/router';
 import { createEffect, createSignal } from 'solid-js';
 
-import { login, state } from '../stores/authStore';
+import { login } from '../stores/authStore';
 
 interface LoginCredentials {
   email: string;
@@ -57,9 +57,10 @@ export default function Login() {
         return;
       }
 
-      if (data.token && data.user) {
-        localStorage.setItem('token', data.token);
-        login(data.user);
+      if (data.user && data.token) {
+        createEffect(() => {
+          login(data.user!, data.token!);
+        });
         navigate('/', { replace: true });
       }
     } catch (err) {

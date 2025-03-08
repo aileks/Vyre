@@ -15,31 +15,34 @@ export interface AppState {
   token?: string | null;
 }
 
+const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+
 const initialState: AppState = {
   user: null,
   isAuthenticated: false,
+  token: token,
 };
 
-const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
-
-export const [state, setState] = createStore<AppState>({
-  ...initialState,
-  token,
-});
+export const [state, setState] = createStore<AppState>(initialState);
 
 export const useStore = () => [state, setState];
 
-export const login = (user: User) => {
+export const login = (user: User, token: string) => {
   setState({
     user,
     isAuthenticated: true,
     token,
   });
 
-  localStorage.setItem('token', token!);
+  localStorage.setItem('token', token);
 };
 
 export const logout = () => {
-  setState(initialState);
+  setState({
+    user: null,
+    isAuthenticated: false,
+    token: null,
+  });
+
   localStorage.removeItem('token');
 };

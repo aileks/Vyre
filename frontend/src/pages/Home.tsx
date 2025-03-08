@@ -10,7 +10,9 @@ export default function Home() {
             <div class='h-3 w-3 rounded-full bg-yellow-500'></div>
             <div class='h-3 w-3 rounded-full bg-green-500'></div>
           </div>
-          <div class='text-cybertext-400 font-mono text-sm'>Vyre - Connected</div>
+          <div class='text-cybertext-400 font-mono text-sm'>
+            Vyre - Connected
+          </div>
         </div>
 
         <div class='px-6 py-10 md:py-16'>
@@ -40,7 +42,9 @@ export default function Home() {
             <div class='flex flex-col space-y-2 font-mono text-xs md:text-sm'>
               <div class='flex'>
                 <span class='w-24 shrink-0 text-gray-500'>[STATUS]</span>
-                <span class='text-electric-400'>Building infrastructure...</span>
+                <span class='text-electric-400'>
+                  Building infrastructure...
+                </span>
               </div>
 
               <div class='flex'>
