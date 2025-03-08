@@ -1,8 +1,8 @@
 import Config
 
-if File.exists?("../.env") do
-  Dotenv.load("../.env")
-end
+# if File.exists?("../.env") do
+#   Dotenv.load("../.env")
+# end
 
 config :api, Api.Auth.Guardian,
   issuer: "api",

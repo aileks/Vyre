@@ -56,7 +56,7 @@ defmodule Api.MixProject do
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.5"},
-      {:excoveralls, "~> 0.18", only: [:test, :dev], runtime: false},
+      {:excoveralls, "~> 0.18", only: [:test, :dev]},
       {:dotenv, "~> 3.0", only: [:dev, :test]}
     ]
   end

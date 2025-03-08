@@ -1,15 +1,8 @@
-# This file is responsible for configuring your application
-# and its dependencies with the aid of the Config module.
-#
-# This configuration file is loaded before any dependency and
-# is restricted to this project.
-
-# General application configuration
 import Config
 
-if File.exists?("../../.env") do
-  Dotenv.load!(filename: "../../.env")
-end
+# if File.exists?("../../.env") do
+#   Dotenv.load!(filename: "../../.env")
+# end
 
 config :api,
   ecto_repos: [Api.Repo],
@@ -38,15 +31,6 @@ config :cors_plug,
   origin: ["http://localhost:4000", "http://localhost:5173"],
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   headers: ["Authorization", "Content-Type", "Accept", "Origin", "User-Agent"]
-
-# Configures the mailer
-#
-# By default it uses the "Local" adapter which stores the emails
-# locally. You can see the emails in your browser, at "/dev/mailbox".
-#
-# For production it's recommended to configure a different adapter
-# at the `config/runtime.exs`.
-# config :api, Api.Mailer, adapter: Swoosh.Adapters.Local
 
 # Configures Elixir's Logger
 config :logger, :console,
