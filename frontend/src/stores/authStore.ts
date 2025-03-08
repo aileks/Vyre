@@ -12,10 +12,11 @@ export interface User {
 export interface AppState {
   user: User | null;
   isAuthenticated: boolean;
-  token?: string | null;
+  token: string | null;
 }
 
-const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+const token =
+  typeof window !== 'undefined' ? localStorage.getItem('token') : null;
 
 const initialState: AppState = {
   user: null,
@@ -27,16 +28,39 @@ export const [state, setState] = createStore<AppState>(initialState);
 
 export const useStore = () => [state, setState];
 
-export const login = (user: User, token: string) => {
+export const login = (
+  user: User,
+  token: string,
+  rememberMe: boolean = false,
+  expiryOverride?: number,
+) => {
+  let expiry: number;
+  if (expiryOverride) {
+    expiry = expiryOverride;
+  } else {
+    if (rememberMe) {
+      // 30 days
+      expiry = Date.now() + 30 * 24 * 60 * 60 * 1000;
+    } else {
+      // 1 hour
+      expiry = Date.now() + 60 * 60 * 1000;
+    }
+  }
+
+  localStorage.setItem(
+    'token',
+    JSON.stringify({
+      value: token,
+      expiry: expiry,
+    }),
+  );
+
   setState({
     user,
     isAuthenticated: true,
     token,
   });
-
-  localStorage.setItem('token', token);
 };
-
 export const logout = () => {
   setState({
     user: null,

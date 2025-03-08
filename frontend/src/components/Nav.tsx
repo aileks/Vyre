@@ -1,20 +1,22 @@
-import { A, useNavigate } from '@solidjs/router';
+import { A } from '@solidjs/router';
 
 import { state } from '../stores/authStore';
-import { doLogout } from '../utils/authService';
+
+// COMMENTED OUT FOR PROD
+// import { doLogout } from '../utils/authService';
 
 export default function Nav() {
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    doLogout();
-    navigate('/login', { replace: true });
-  };
+  // COMMENTED OUT FOR PROD
+  // const navigate = useNavigate();
+  // const handleLogout = () => {
+  //   doLogout();
+  //   navigate('/login', { replace: true });
+  // };
 
   return (
     <nav class='bg-midnight-700 shadow-midnight-900/50 shadow-md'>
       <ul class='text-cybertext-200 border-primary-800 flex items-center justify-between border-b p-2 text-lg font-medium'>
-        <li>
+        <li class='ml-2'>
           <A
             class='text-cybertext-500 hover:text-cybertext-300 transition-all duration-100 hover:font-semibold'
             href='/'
@@ -26,12 +28,13 @@ export default function Nav() {
         <span class='flex gap-4'>
           {state.user ?
             <li>
-              <span
+              {/* COMMENTED OUT FOR PROD */}
+              {/* <span
                 onClick={handleLogout}
                 class='hover:text-cybertext-200 text-cybertext-50 bg-error-800 hover:bg-error-700 cursor-pointer rounded-xs px-2 py-0.5 transition-all duration-200'
               >
                 Logout
-              </span>
+              </span> */}
             </li>
           : <>
               {/* <li>
@@ -43,7 +46,7 @@ export default function Nav() {
                 </A>
               </li> */}
 
-              <li>
+              <li class='mr-2'>
                 <A
                   class='bg-electric-600 hover:bg-electric-500 hover:text-cybertext-400 rounded-xs px-2 py-0.5 transition-all duration-200'
                   href='/login'

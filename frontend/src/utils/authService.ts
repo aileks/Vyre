@@ -9,7 +9,7 @@ export const register = async (userData: any) => {
 
   if (res.ok) {
     const { user, token } = await res.json();
-    login(user, token);
+    login(user, token, false);
     return { user, token };
   } else {
     const error = await res.json();
@@ -17,16 +17,22 @@ export const register = async (userData: any) => {
   }
 };
 
-export const doLogin = async (credentials: { email: string; password: string }) => {
+export const doLogin = async (credentials: {
+  email: string;
+  password: string;
+  rememberMe: boolean;
+}) => {
+  const { email, password, rememberMe } = credentials;
+
   const res = await fetch('/api/auth/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ user: credentials }),
+    body: JSON.stringify({ user: { email, password } }),
   });
 
   if (res.ok) {
     const { user, token } = await res.json();
-    login(user, token);
+    login(user, token, rememberMe);
     return { user, token };
   } else {
     const error = await res.json();
@@ -40,20 +46,38 @@ export const doLogout = async () => {
 };
 
 export const fetchSession = async () => {
-  const token = localStorage.getItem('token');
-  if (!token) return;
+  const tokenData = localStorage.getItem('token');
+  if (!tokenData) return;
 
-  const res = await fetch('/api/auth/me', {
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  try {
+    const parsedData = JSON.parse(tokenData);
+    const { value: token, expiry } = parsedData;
 
-  if (res.ok) {
-    const { user } = await res.json();
-    login(user, token);
-  } else {
-    logout();
+    const now = new Date();
+    if (now.getTime() > expiry) {
+      // Token expired, clean up and return
+      localStorage.removeItem('token');
+      return;
+    }
+
+    // Token is valid, proceed with the request
+    const res = await fetch('/api/auth/me', {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (res.ok) {
+      const { user } = await res.json();
+      // Pass in the original expiry so it’s preserved
+      login(user, token, false, expiry);
+    } else {
+      logout();
+    }
+  } catch (error) {
+    // If there's any error parsing the token data, clean up
+    localStorage.removeItem('token');
+    return;
   }
 };
