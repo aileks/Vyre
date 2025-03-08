@@ -8,8 +8,8 @@ export type AppRouteDefinition = RouteDefinition & {
 
 // Lazy load components for better performance
 const Home = lazy(() => import('./pages/home'));
-const Login = lazy(() => import('./pages/login'));
-const Register = lazy(() => import('./pages/register'));
+// const Login = lazy(() => import('./pages/login'));
+// const Register = lazy(() => import('./pages/register'));
 const NotFound = lazy(() => import('./pages/not_found'));
 
 // Define routes as an array
@@ -19,14 +19,14 @@ export const routes: AppRouteDefinition[] = [
     path: '/',
     component: Home,
   },
-  {
-    path: '/login',
-    component: Login,
-  },
-  {
-    path: '/register',
-    component: Register,
-  },
+  // {
+  //   path: '/login',
+  //   component: Login,
+  // },
+  // {
+  //   path: '/register',
+  //   component: Register,
+  // },
 
   // Catch-all route for 404
   {
