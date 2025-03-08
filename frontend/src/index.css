@@ -6,7 +6,7 @@
   --font-sans: 'Liter', 'sans-serif';
   --font-mono: 'IBM Plex Mono', 'monospace';
 
-  /* Primary Accent - Violet (IRC-inspired) */
+  /* Primary Accent - Violet */
   --color-primary-50: oklch(0.98 0.02 290);
   --color-primary-100: oklch(0.95 0.04 290);
   --color-primary-200: oklch(0.9 0.08 290);
@@ -223,7 +223,22 @@
 }
 
 body {
+  @apply antialiased;
   @apply font-sans;
-  @apply bg-midnight-800;
-  @apply text-cybertext-200;
+  @apply bg-midnight-500;
+  @apply text-cybertext-300;
+}
+
+@utility animate-blink {
+  animation: blink 1.5s step-end infinite;
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
 }

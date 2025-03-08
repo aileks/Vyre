@@ -44,6 +44,7 @@ export default function Login() {
       const data: LoginResponse = await res.json();
 
       if (!res.ok) {
+        console.log(data);
         throw new Error(data.error || 'Login failed');
       }
 
@@ -63,15 +64,35 @@ export default function Login() {
   };
 
   return (
-    <div class='mx-auto my-12 max-w-md rounded border border-gray-800 bg-gray-900 p-7'>
-      <div class='text-accent-500 mb-3 text-4xl font-semibold'>Login</div>
-      <div class='mb-6 text-gray-400'>Sign in to your account</div>
+    <div class='bg-midnight-700 shadow-midnight-900/50 mx-auto mt-64 max-w-lg rounded-sm border border-gray-700 p-7 shadow-lg'>
+      <div class='text-primary-400 mb-4 text-4xl font-bold tracking-wide'>Login</div>
 
-      {error() && <div class='text-error-500 mb-4 text-sm'>{error()}</div>}
+      {error() && (
+        <div class='border-error-700 bg-midnight-800 text-error-400 mb-5 rounded-sm border p-3 text-sm'>
+          <div class='flex items-center'>
+            <svg
+              xmlns='http://www.w3.org/2000/svg'
+              class='text-error-500 mr-2 h-4 w-4'
+              fill='none'
+              viewBox='0 0 24 24'
+              stroke='currentColor'
+            >
+              <path
+                stroke-linecap='round'
+                stroke-linejoin='round'
+                stroke-width='2'
+                d='M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
+              />
+            </svg>
 
-      <form onSubmit={handleSubmit}>
-        <div class='mb-4'>
-          <label for='email' class='mb-2 block text-gray-300'>
+            <span>{error()}</span>
+          </div>
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} class='space-y-5'>
+        <div>
+          <label for='email' class='mb-2 block'>
             Username
           </label>
 
@@ -83,15 +104,21 @@ export default function Login() {
             required
             value={email()}
             onInput={(e: InputEvent) => setEmail((e.target as HTMLInputElement).value)}
-            class='focus:border-accent-500 w-full rounded border border-gray-700 bg-gray-900 px-3 py-2 text-white focus:outline-none'
-            placeholder='username or email'
+            class='bg-midnight-900 focus:border-primary-500 focus:ring-primary-500/30 w-full rounded-sm border border-gray-700 px-3 py-2.5 transition-colors duration-200 focus:ring-1 focus:outline-none'
+            placeholder='user'
           />
         </div>
 
-        <div class='mb-6'>
-          <label for='password' class='mb-2 block text-gray-300'>
-            Password
-          </label>
+        <div>
+          <div class='mb-2 flex justify-between'>
+            <label for='password' class='block'>
+              Password
+            </label>
+
+            <A href='/forgot-password' class='text-sm text-teal-400 transition-colors duration-200 hover:text-teal-300'>
+              Forgot?
+            </A>
+          </div>
 
           <input
             id='password'
@@ -101,7 +128,7 @@ export default function Login() {
             required
             value={password()}
             onInput={(e: InputEvent) => setPassword((e.target as HTMLInputElement).value)}
-            class='focus:border-accent-500 w-full rounded border border-gray-900 bg-gray-900 px-3 py-2 text-white focus:outline-none'
+            class='bg-midnight-900 focus:border-primary-500 focus:ring-primary-500/30 w-full rounded-sm border border-gray-700 px-3 py-2.5 transition-colors duration-200 focus:ring-1 focus:outline-none'
             placeholder='••••••••'
           />
         </div>
@@ -109,22 +136,28 @@ export default function Login() {
         <button
           type='submit'
           disabled={isLoading()}
-          class='bg-accent-500 hover:bg-accent-600 mb-4 w-full rounded px-4 py-2 text-white transition-colors'
+          class='bg-primary-600 hover:bg-primary-500 focus:ring-primary-500/50 border-primary-400 w-full rounded-sm border px-4 py-2.5 transition-all duration-200 hover:cursor-pointer focus:ring-2 focus:outline-none disabled:opacity-70'
         >
-          {isLoading() ? 'Signing In...' : 'Sign In'}
+          {isLoading() ?
+            <span class='flex items-center justify-center'>
+              <svg class='mr-2 h-4 w-4 animate-spin' xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24'>
+                <circle class='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' stroke-width='4'></circle>
+                <path
+                  class='opacity-75'
+                  fill='currentColor'
+                  d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
+                ></path>
+              </svg>
+              Loggin In...
+            </span>
+          : 'Log In'}
         </button>
-
-        <div class='text-center text-sm'>
-          <A href='/forgot-password' class='text-accent-400 hover:text-accent-300 underline'>
-            Forgot your password? Reset it here
-          </A>
-        </div>
       </form>
 
-      <div class='mt-6 border-t border-gray-700 pt-4 text-center text-sm'>
-        <span class='text-gray-400'>Don't have an account?</span>{' '}
-        <A href='/register' class='text-accent-400 hover:text-accent-300 underline'>
-          Register now
+      <div class='mt-8 border-t border-gray-700 pt-6 text-center'>
+        <span class='text-cybertext-600'>Need an account?</span>{' '}
+        <A href='/register' class='text-electric-500 hover:text-electric-400 transition-colors duration-200'>
+          Register here
         </A>
       </div>
     </div>

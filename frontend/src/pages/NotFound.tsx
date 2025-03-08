@@ -2,17 +2,50 @@ import { A } from '@solidjs/router';
 
 export default function NotFound() {
   return (
-    <div class='mx-auto my-12 max-w-md rounded border border-[gray-700] bg-gray-900 p-7'>
-      <div class='text-accent-500 mb-3 text-2xl font-semibold'>404 Error</div>
-      <div class='mb-6 text-gray-400'>The page you were looking for could not be found.</div>
+    <div class='bg-midnight-700 shadow-midnight-900/50 mx-auto mt-64 max-w-xl rounded-sm border border-gray-700 p-7 shadow-lg'>
+      <div class='text-center'>
+        <div class='text-error-500 mb-3 font-mono text-5xl font-bold underline'>404</div>
+        <div class='text-error-600 mb-4 font-mono text-xl font-semibold tracking-wide'>Failure!</div>
+      </div>
 
-      <div class='text-error-500 mb-4 text-sm'>The requested resource could not be located on this server.</div>
+      <div class='text-cybertext-400 mb-6 text-center font-mono'>The requested channel or user does not exist.</div>
+
+      <div class='border-midnight-900 bg-midnight-800 mb-8 rounded-sm border p-4 font-mono'>
+        <div class='flex items-start'>
+          <div class='text-error-500 mr-2'>
+            <svg
+              xmlns='http://www.w3.org/2000/svg'
+              class='h-5 w-5'
+              fill='none'
+              viewBox='0 0 24 24'
+              stroke='currentColor'
+            >
+              <path
+                stroke-linecap='round'
+                stroke-linejoin='round'
+                stroke-width='2'
+                d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'
+              />
+            </svg>
+          </div>
+          <div>
+            <div class='text-error-400 mb-1 text-sm font-bold'>ERROR: Resource not found</div>
+            <code class='text-cybertext-300 block text-xs'>
+              [SERVER]: The requested resource could not be located on this server.
+              <br />
+              [SERVER]: Error code: 404
+              <br />
+              [SERVER]: Timestamp: {new Date().toISOString()}
+            </code>
+          </div>
+        </div>
+      </div>
 
       <A
         href='/'
-        class='bg-accent-500 hover:bg-accent-600 block w-full rounded px-4 py-2 text-center text-white transition-colors'
+        class='bg-primary-600 text-cybertext-100 hover:bg-primary-500 focus:ring-primary-500/50 border-primary-400 flex items-center justify-center rounded-sm border px-4 py-2.5 font-mono transition-all duration-200 focus:ring-2 focus:outline-none'
       >
-        Return to Home
+        Go Back
       </A>
     </div>
   );

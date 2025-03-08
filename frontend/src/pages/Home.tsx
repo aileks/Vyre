@@ -1,15 +1,75 @@
+import { A } from '@solidjs/router';
+
 export default function Home() {
   return (
-    <div class='flex min-h-screen items-center justify-center bg-gray-900 p-4'>
-      <div class='from-primary-900 to-primary-700 relative w-full max-w-2xl overflow-hidden rounded-lg border-gray-500 bg-gradient-to-br p-12 text-center shadow-xl'>
-        {/* Decorative elements */}
-        <div class='absolute top-0 left-0 h-full w-full bg-gray-700 opacity-10'></div>
-        <div class='bg-primary-300/10 absolute right-0 bottom-0 h-64 w-64 translate-x-1/4 translate-y-1/4 transform rounded-full blur-xl'></div>
-        <div class='bg-accent-400/10 absolute top-0 left-0 h-64 w-64 -translate-x-1/4 -translate-y-1/4 transform rounded-full blur-xl'></div>
+    <div class='container mx-auto max-w-6xl px-4 py-16'>
+      <div class='bg-midnight-800 mb-12 overflow-hidden rounded-md border border-gray-700'>
+        <div class='bg-midnight-900 flex items-center border-b border-gray-700 px-4 py-2'>
+          <div class='mr-4 flex space-x-2'>
+            <div class='h-3 w-3 rounded-full bg-red-500'></div>
+            <div class='h-3 w-3 rounded-full bg-yellow-500'></div>
+            <div class='h-3 w-3 rounded-full bg-green-500'></div>
+          </div>
+          <div class='text-cybertext-400 font-mono text-sm'>Vyre - Connected</div>
+        </div>
 
-        <div class='relative z-10'>
-          <h1 class='mb-2 font-mono text-6xl font-extrabold tracking-wider text-white md:text-7xl'>COMING SOON!</h1>
-          <div class='mx-auto mt-6 h-1 w-full bg-white/80'></div>
+        <div class='px-6 py-10 md:py-16'>
+          <h1 class='mb-6 text-center font-mono text-4xl font-bold md:text-6xl'>
+            <span class='text-primary-400'>Vyre</span>
+          </h1>
+
+          <pre class='text-cybertext-300 mb-8 overflow-x-auto text-center font-mono text-sm whitespace-pre md:text-base'>
+            {`
+ ██████╗ ██████╗ ███╗   ███╗██╗███╗   ██╗ ██████╗     ███████╗ ██████╗  ██████╗ ███╗   ██╗
+██╔════╝██╔═══██╗████╗ ████║██║████╗  ██║██╔════╝     ██╔════╝██╔═══██╗██╔═══██╗████╗  ██║
+██║     ██║   ██║██╔████╔██║██║██╔██╗ ██║██║  ███╗    ███████╗██║   ██║██║   ██║██╔██╗ ██║
+██║     ██║   ██║██║╚██╔╝██║██║██║╚██╗██║██║   ██║    ╚════██║██║   ██║██║   ██║██║╚██╗██║
+╚██████╗╚██████╔╝██║ ╚═╝ ██║██║██║ ╚████║╚██████╔╝    ███████║╚██████╔╝╚██████╔╝██║ ╚████║
+ ╚═════╝ ╚═════╝ ╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝ ╚═════╝     ╚══════╝ ╚═════╝  ╚═════╝ ╚═╝  ╚═══╝
+`}
+          </pre>
+
+          <div class='mb-8 flex justify-center'>
+            <div class='text-cybertext-400 flex items-center font-mono text-lg md:text-xl'>
+              <span>Estimated Launch Date: 2025/06/15</span>
+              <span class='bg-primary-400 animate-blink ml-1 inline-block h-5 w-2.5'></span>
+            </div>
+          </div>
+
+          <div class='bg-midnight-900 mb-8 rounded border border-gray-700 px-4 py-3'>
+            <div class='flex flex-col space-y-2 font-mono text-xs md:text-sm'>
+              <div class='flex'>
+                <span class='w-24 shrink-0 text-gray-500'>[STATUS]</span>
+                <span class='text-electric-400'>Building infrastructure...</span>
+              </div>
+
+              <div class='flex'>
+                <span class='w-24 shrink-0 text-gray-500'>[PROGRESS]</span>
+                <span class='text-teal-300'>8% complete</span>
+              </div>
+
+              <div class='flex'>
+                <span class='w-24 shrink-0 text-gray-500'>[NOTICE]</span>
+                <span class='text-cybertext-300'>Check out the repo!</span>
+              </div>
+            </div>
+          </div>
+
+          <div class='flex flex-col justify-center gap-4 md:flex-row'>
+            <A
+              href='/register'
+              class='bg-primary-600 text-cybertext-100 hover:bg-primary-500 focus:ring-primary-500/50 border-primary-400 rounded-md border px-6 py-3 text-center font-mono transition-all duration-200 focus:ring-2 focus:outline-none'
+            >
+              Pre-Register
+            </A>
+
+            <A
+              href='https://github.com/aileks/Vyre'
+              class='bg-midnight-900 text-electric-400 hover:bg-midnight-700 focus:ring-electric-500/50 rounded-md border border-gray-700 px-6 py-3 text-center font-mono transition-all duration-200 focus:ring-2 focus:outline-none'
+            >
+              Learn More
+            </A>
+          </div>
         </div>
       </div>
     </div>

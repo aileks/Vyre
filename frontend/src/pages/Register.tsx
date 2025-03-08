@@ -2,7 +2,7 @@ import { A } from '@solidjs/router';
 import { createSignal } from 'solid-js';
 
 interface RegisterCredentials {
-  name: string;
+  username: string;
   email: string;
   password: string;
   password_confirmation: string;
@@ -18,7 +18,7 @@ interface RegisterResponse {
 }
 
 export default function Register() {
-  const [name, setName] = createSignal<string>('');
+  const [username, setUsername] = createSignal<string>('');
   const [email, setEmail] = createSignal<string>('');
   const [password, setPassword] = createSignal<string>('');
   const [passwordConfirmation, setPasswordConfirmation] = createSignal<string>('');
@@ -37,7 +37,7 @@ export default function Register() {
     }
 
     const credentials: RegisterCredentials = {
-      name: name(),
+      username: username(),
       email: email(),
       password: password(),
       password_confirmation: passwordConfirmation(),
@@ -69,15 +69,34 @@ export default function Register() {
   };
 
   return (
-    <div class='mx-auto my-12 max-w-md rounded border border-gray-900 bg-gray-900 p-7'>
-      <div class='text-accent-500 mb-3 text-2xl font-semibold'>Register</div>
-      <div class='mb-6 text-gray-400'>Create a new account</div>
+    <div class='bg-midnight-700 shadow-midnight-900/50 mx-auto mt-64 max-w-lg rounded-sm border border-gray-700 p-7 shadow-lg'>
+      <div class='mb-4 text-4xl font-bold tracking-wide text-pink-400'>Register</div>
 
-      {error() && <div class='text-error-500 mb-4 text-sm'>{error()}</div>}
+      {error() && (
+        <div class='border-error-700 bg-midnight-800 text-error-400 mb-5 rounded-sm border p-3 text-sm'>
+          <div class='flex items-center'>
+            <svg
+              xmlns='http://www.w3.org/2000/svg'
+              class='text-error-500 mr-2 h-4 w-4'
+              fill='none'
+              viewBox='0 0 24 24'
+              stroke='currentColor'
+            >
+              <path
+                stroke-linecap='round'
+                stroke-linejoin='round'
+                stroke-width='2'
+                d='M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
+              />
+            </svg>
+            <span>{error()}</span>
+          </div>
+        </div>
+      )}
 
-      <form onSubmit={handleSubmit}>
-        <div class='mb-4'>
-          <label for='name' class='mb-2 block text-gray-300'>
+      <form onSubmit={handleSubmit} class='space-y-4'>
+        <div>
+          <label for='name' class='text-cybertext-300 mb-2 block'>
             Username
           </label>
 
@@ -87,15 +106,15 @@ export default function Register() {
             type='text'
             autocomplete='name'
             required
-            value={name()}
-            onInput={(e: InputEvent) => setName((e.target as HTMLInputElement).value)}
-            class='focus:border-accent-500 w-full rounded border border-gray-900 bg-gray-900 px-3 py-2 text-white focus:outline-none'
-            placeholder='username'
+            value={username()}
+            onInput={(e: InputEvent) => setUsername((e.target as HTMLInputElement).value)}
+            class='bg-midnight-900 text-cybertext-100 w-full rounded-sm border border-gray-700 px-3 py-2.5 transition-colors duration-200 focus:border-pink-500 focus:ring-1 focus:ring-pink-500/30 focus:outline-none'
+            placeholder='user'
           />
         </div>
 
-        <div class='mb-4'>
-          <label for='email' class='mb-2 block text-gray-300'>
+        <div>
+          <label for='email' class='text-cybertext-300 mb-2 block'>
             Email
           </label>
 
@@ -107,13 +126,13 @@ export default function Register() {
             required
             value={email()}
             onInput={(e: InputEvent) => setEmail((e.target as HTMLInputElement).value)}
-            class='focus:border-accent-500 w-full rounded border border-gray-900 bg-gray-900 px-3 py-2 text-white focus:outline-none'
-            placeholder='your@email.com'
+            class='bg-midnight-900 text-cybertext-100 w-full rounded-sm border border-gray-700 px-3 py-2.5 transition-colors duration-200 focus:border-pink-500 focus:ring-1 focus:ring-pink-500/30 focus:outline-none'
+            placeholder='user@domain.com'
           />
         </div>
 
-        <div class='mb-4'>
-          <label for='password' class='mb-2 block text-gray-300'>
+        <div>
+          <label for='password' class='text-cybertext-300 mb-2 block'>
             Password
           </label>
 
@@ -125,13 +144,14 @@ export default function Register() {
             required
             value={password()}
             onInput={(e: InputEvent) => setPassword((e.target as HTMLInputElement).value)}
-            class='focus:border-accent-500 w-full rounded border border-gray-900 bg-gray-900 px-3 py-2 text-white focus:outline-none'
+            class='bg-midnight-900 text-cybertext-100 w-full rounded-sm border border-gray-700 px-3 py-2.5 transition-colors duration-200 focus:border-pink-500 focus:ring-1 focus:ring-pink-500/30 focus:outline-none'
             placeholder='••••••••'
           />
+          <div class='mt-1 text-xs text-gray-400'>Minimum 8 characters</div>
         </div>
 
-        <div class='mb-6'>
-          <label for='password_confirmation' class='mb-2 block text-gray-300'>
+        <div>
+          <label for='password_confirmation' class='text-cybertext-300 mb-2 block'>
             Confirm Password
           </label>
 
@@ -143,7 +163,7 @@ export default function Register() {
             required
             value={passwordConfirmation()}
             onInput={(e: InputEvent) => setPasswordConfirmation((e.target as HTMLInputElement).value)}
-            class='focus:border-accent-500 w-full rounded border border-gray-900 bg-gray-900 px-3 py-2 text-white focus:outline-none'
+            class='bg-midnight-900 text-cybertext-100 w-full rounded-sm border border-gray-700 px-3 py-2.5 transition-colors duration-200 focus:border-pink-500 focus:ring-1 focus:ring-pink-500/30 focus:outline-none'
             placeholder='••••••••'
           />
         </div>
@@ -151,16 +171,28 @@ export default function Register() {
         <button
           type='submit'
           disabled={isLoading()}
-          class='bg-accent-500 hover:bg-accent-600 w-full rounded px-4 py-2 text-white transition-colors'
+          class='text-cybertext-100 mt-6 w-full rounded-sm border border-pink-400 bg-pink-600 px-4 py-2.5 transition-all duration-200 hover:cursor-pointer hover:bg-pink-500 focus:ring-2 focus:ring-pink-500/50 focus:outline-none disabled:opacity-70'
         >
-          {isLoading() ? 'Creating Account...' : 'Create Account'}
+          {isLoading() ?
+            <span class='flex items-center justify-center'>
+              <svg class='mr-2 h-4 w-4 animate-spin' xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24'>
+                <circle class='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' stroke-width='4'></circle>
+                <path
+                  class='opacity-75'
+                  fill='currentColor'
+                  d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
+                ></path>
+              </svg>
+              Registering...
+            </span>
+          : 'Register'}
         </button>
       </form>
 
-      <div class='mt-6 border-t border-gray-900 pt-4 text-center text-sm'>
-        <span class='text-gray-400'>Already have an account?</span>{' '}
-        <A href='/login' class='text-accent-400 hover:text-accent-300 underline'>
-          Login here
+      <div class='mt-8 border-t border-gray-700 pt-6 text-center'>
+        <span class='text-cybertext-500'>Already have an account?</span>{' '}
+        <A href='/login' class='text-teal-400 transition-colors duration-200 hover:text-teal-300'>
+          Log in here
         </A>
       </div>
     </div>
