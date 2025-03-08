@@ -4,7 +4,6 @@ import { createSignal } from 'solid-js';
 interface LoginCredentials {
   email: string;
   password: string;
-  remember_me: boolean;
 }
 
 interface LoginResponse {
@@ -22,7 +21,6 @@ export default function Login() {
   const [password, setPassword] = createSignal<string>('');
   const [error, setError] = createSignal<string>('');
   const [isLoading, setIsLoading] = createSignal<boolean>(false);
-  const [rememberMe, setRememberMe] = createSignal<boolean>(false);
 
   const handleSubmit = async (e: Event) => {
     e.preventDefault();
@@ -32,7 +30,6 @@ export default function Login() {
     const credentials: LoginCredentials = {
       email: email(),
       password: password(),
-      remember_me: rememberMe(),
     };
 
     try {
