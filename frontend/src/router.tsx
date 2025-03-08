@@ -1,7 +1,7 @@
 import { RouteDefinition, Router } from '@solidjs/router';
 import { Component, ParentProps, lazy } from 'solid-js';
 
-import Nav from './components/Nav';
+// import Nav from './components/Nav';
 
 export type AppRouteDefinition = RouteDefinition & {
   protected?: boolean;
@@ -16,9 +16,9 @@ const NotFound = lazy(() => import('./pages/NotFound'));
 const Layout: Component<ParentProps> = props => {
   return (
     <>
-      <header>
+      {/* <header>
         <Nav />
-      </header>
+      </header> */}
 
       {props.children}
     </>
