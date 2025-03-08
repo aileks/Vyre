@@ -1,10 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Liter&family=PT+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Liter&display=swap');
 @import 'tailwindcss';
 
 @theme extend {
   /* Fonts */
   --font-sans: 'Liter', 'sans-serif';
-  --font-mono: 'PT Mono', 'monospace';
+  --font-mono: 'IBM Plex Mono', 'monospace';
 
   /* Primary Accent */
   --color-accent-50: oklch(0.98 0.01 285);
@@ -90,6 +90,19 @@
   --color-error-800: oklch(0.35 0.18 25);
   --color-error-900: oklch(0.25 0.12 25);
 
+  /* UI Colors */
+  --ui-bg-dark: #121212;
+  --ui-container-bg: #1e1e1e;
+  --ui-container-border: #333333;
+  --ui-text: #f0f0f0;
+  --ui-text-secondary: #aaaaaa;
+  --ui-accent: #9b59b6;
+  --ui-input-bg: #171717;
+  --ui-input-border: #333333;
+  --ui-error: #e74c3c;
+  --ui-success: #2ecc71;
+  --ui-warning: #e67e22;
+
   /* Chat Specific Colors */
   --color-chat-sender-bubble: var(--color-accent-600);
   --color-chat-sender-text: white;
@@ -97,7 +110,6 @@
   --color-chat-recipient-text: var(--color-navy-800);
   --color-chat-system-bubble: var(--color-gray-200);
   --color-chat-system-text: var(--color-gray-800);
-
   /* Status Indicators */
   --color-status-online: var(--color-success-500);
   --color-status-offline: var(--color-gray-400);
@@ -159,6 +171,6 @@
 
 body {
   @apply font-sans;
-  @apply bg-cream-50;
-  @apply text-navy-900;
+  @apply bg-[#121212];
+  @apply text-gray-100;
 }
