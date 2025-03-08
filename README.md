@@ -25,12 +25,12 @@ Check out the [Wiki](https://github.com/aileks/Vyre/wiki)!
 
 #### Backend
 
-- Language: Elixir because functional (and BEAM).
-- Framework: [Phoenix](https://phoenixframework.org/) because scalable.
-- ORM: Ecto because flexible.
+- **Language**: Elixir because functional (and BEAM).
+- **Framework**: [Phoenix](https://phoenixframework.org/) because scalable.
+- **ORM**: Ecto because flexible.
 
 #### Frontend
 
-- Language: TypeScript because type safety.
-- Library: [Solid.js](https://www.solidjs.com/) because signals.
-- Bundler & Runtime: [Bun](https://bun.sh/) because speedy.
+- **Language**: TypeScript because type safety.
+- **Library**: [Solid.js](https://www.solidjs.com/) because signals.
+- **Bundler & Runtime**: [Bun](https://bun.sh/) because speedy.
