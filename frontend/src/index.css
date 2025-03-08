@@ -6,171 +6,230 @@
   --font-sans: 'Liter', 'sans-serif';
   --font-mono: 'IBM Plex Mono', 'monospace';
 
-  /* Primary Accent */
-  --color-accent-50: oklch(0.98 0.01 285);
-  --color-accent-100: oklch(0.95 0.03 285);
-  --color-accent-200: oklch(0.9 0.06 285);
-  --color-accent-300: oklch(0.8 0.12 285);
-  --color-accent-400: oklch(0.7 0.18 285);
-  --color-accent-500: oklch(0.6 0.22 285);
-  --color-accent-600: oklch(0.5 0.24 285);
-  --color-accent-700: oklch(0.4 0.2 285);
-  --color-accent-800: oklch(0.3 0.15 285);
-  --color-accent-900: oklch(0.2 0.1 285);
+  /* Primary Accent - Violet (IRC-inspired) */
+  --color-violet-50: oklch(0.98 0.02 290);
+  --color-violet-100: oklch(0.95 0.04 290);
+  --color-violet-200: oklch(0.9 0.08 290);
+  --color-violet-300: oklch(0.8 0.14 290);
+  --color-violet-400: oklch(0.7 0.19 290);
+  --color-violet-500: oklch(0.6 0.25 290);
+  --color-violet-600: oklch(0.5 0.22 290);
+  --color-violet-700: oklch(0.4 0.18 290);
+  --color-violet-800: oklch(0.3 0.14 290);
+  --color-violet-900: oklch(0.2 0.1 290);
 
   /* Secondary Accent */
-  --color-turquois-50: oklch(0.98 0.01 195);
-  --color-turquois-100: oklch(0.95 0.03 195);
-  --color-turquois-200: oklch(0.9 0.06 195);
-  --color-turquois-300: oklch(0.8 0.1 195);
-  --color-turquois-400: oklch(0.7 0.15 195);
-  --color-turquois-500: oklch(0.6 0.18 195);
-  --color-turquois-600: oklch(0.5 0.2 195);
-  --color-turquois-700: oklch(0.4 0.18 195);
-  --color-turquois-800: oklch(0.3 0.12 195);
-  --color-turquois-900: oklch(0.2 0.08 195);
+  --color-teal-50: oklch(0.98 0.01 170);
+  --color-teal-100: oklch(0.95 0.03 170);
+  --color-teal-200: oklch(0.9 0.06 170);
+  --color-teal-300: oklch(0.8 0.1 170);
+  --color-teal-400: oklch(0.7 0.15 170);
+  --color-teal-500: oklch(0.6 0.19 170);
+  --color-teal-600: oklch(0.5 0.17 170);
+  --color-teal-700: oklch(0.4 0.14 170);
+  --color-teal-800: oklch(0.3 0.11 170);
+  --color-teal-900: oklch(0.2 0.08 170);
 
   /* Tertiary Accent */
-  --color-mustard-50: oklch(0.98 0.01 85);
-  --color-mustard-100: oklch(0.96 0.03 85);
-  --color-mustard-200: oklch(0.92 0.06 85);
-  --color-mustard-300: oklch(0.88 0.1 85);
-  --color-mustard-400: oklch(0.83 0.13 85);
-  --color-mustard-500: oklch(0.78 0.15 85);
-  --color-mustard-600: oklch(0.7 0.17 85);
-  --color-mustard-700: oklch(0.6 0.18 85);
-  --color-mustard-800: oklch(0.5 0.16 85);
-  --color-mustard-900: oklch(0.4 0.12 85);
+  --color-pink-50: oklch(0.98 0.02 350);
+  --color-pink-100: oklch(0.95 0.05 350);
+  --color-pink-200: oklch(0.92 0.09 350);
+  --color-pink-300: oklch(0.85 0.15 350);
+  --color-pink-400: oklch(0.75 0.19 350);
+  --color-pink-500: oklch(0.65 0.25 350);
+  --color-pink-600: oklch(0.55 0.23 350);
+  --color-pink-700: oklch(0.45 0.2 350);
+  --color-pink-800: oklch(0.35 0.15 350);
+  --color-pink-900: oklch(0.25 0.1 350);
 
-  /* For Dark Theme */
-  --color-navy-50: oklch(0.95 0.01 270);
-  --color-navy-100: oklch(0.9 0.01 270);
-  --color-navy-200: oklch(0.8 0.01 270);
-  --color-navy-300: oklch(0.7 0.02 270);
-  --color-navy-400: oklch(0.6 0.02 270);
-  --color-navy-500: oklch(0.5 0.02 270);
-  --color-navy-600: oklch(0.3 0.02 270);
-  --color-navy-700: oklch(0.2 0.02 270);
-  --color-navy-800: oklch(0.15 0.02 270);
-  --color-navy-900: oklch(0.1 0.01 270);
+  /* Complementary Color */
+  --color-electric-50: oklch(0.97 0.02 220);
+  --color-electric-100: oklch(0.94 0.05 220);
+  --color-electric-200: oklch(0.9 0.1 220);
+  --color-electric-300: oklch(0.82 0.15 220);
+  --color-electric-400: oklch(0.72 0.2 220);
+  --color-electric-500: oklch(0.62 0.24 220);
+  --color-electric-600: oklch(0.52 0.21 220);
+  --color-electric-700: oklch(0.42 0.18 220);
+  --color-electric-800: oklch(0.32 0.14 220);
+  --color-electric-900: oklch(0.22 0.1 220);
 
-  /* For Light Theme */
-  --color-cream-50: oklch(0.98 0.01 95);
-  --color-cream-100: oklch(0.97 0.01 95);
-  --color-cream-200: oklch(0.95 0.02 95);
-  --color-cream-300: oklch(0.93 0.02 95);
-  --color-cream-400: oklch(0.9 0.02 95);
-  --color-cream-500: oklch(0.85 0.03 95);
-  --color-cream-600: oklch(0.8 0.03 95);
-  --color-cream-700: oklch(0.75 0.04 95);
-  --color-cream-800: oklch(0.7 0.05 95);
-  --color-cream-900: oklch(0.65 0.06 95);
+  /* Main Theme Background */
+  --color-midnight-50: oklch(0.35 0.01 280);
+  --color-midnight-100: oklch(0.3 0.01 280);
+  --color-midnight-200: oklch(0.25 0.01 280);
+  --color-midnight-300: oklch(0.21 0.01 280);
+  --color-midnight-400: oklch(0.18 0.01 280);
+  --color-midnight-500: oklch(0.15 0.01 280);
+  --color-midnight-600: oklch(0.12 0.01 280);
+  --color-midnight-700: oklch(0.09 0.005 280);
+  --color-midnight-800: oklch(0.06 0.005 280);
+  --color-midnight-900: oklch(0.04 0 280);
+
+  /* Text Contrast Colors */
+  --color-cybertext-50: oklch(0.99 0.01 280);
+  --color-cybertext-100: oklch(0.97 0.02 280);
+  --color-cybertext-200: oklch(0.95 0.03 280);
+  --color-cybertext-300: oklch(0.93 0.04 280);
+  --color-cybertext-400: oklch(0.9 0.04 280);
+  --color-cybertext-500: oklch(0.85 0.03 280);
+  --color-cybertext-600: oklch(0.8 0.02 280);
+  --color-cybertext-700: oklch(0.75 0.02 280);
+  --color-cybertext-800: oklch(0.7 0.01 280);
+  --color-cybertext-900: oklch(0.65 0.01 280);
 
   /* Success Colors */
-  --color-success-50: oklch(0.97 0.02 145);
-  --color-success-100: oklch(0.94 0.04 145);
-  --color-success-200: oklch(0.89 0.07 145);
-  --color-success-300: oklch(0.8 0.12 145);
-  --color-success-400: oklch(0.7 0.15 145);
-  --color-success-500: oklch(0.65 0.18 145);
-  --color-success-600: oklch(0.55 0.2 145);
-  --color-success-700: oklch(0.45 0.18 145);
-  --color-success-800: oklch(0.35 0.15 145);
-  --color-success-900: oklch(0.25 0.1 145);
+  --color-success-50: oklch(0.97 0.03 135);
+  --color-success-100: oklch(0.94 0.06 135);
+  --color-success-200: oklch(0.89 0.1 135);
+  --color-success-300: oklch(0.82 0.15 135);
+  --color-success-400: oklch(0.75 0.2 135);
+  --color-success-500: oklch(0.68 0.23 135);
+  --color-success-600: oklch(0.58 0.2 135);
+  --color-success-700: oklch(0.48 0.17 135);
+  --color-success-800: oklch(0.38 0.14 135);
+  --color-success-900: oklch(0.28 0.1 135);
 
   /* Error Colors */
-  --color-error-50: oklch(0.98 0.01 25);
-  --color-error-100: oklch(0.96 0.03 25);
-  --color-error-200: oklch(0.93 0.06 25);
-  --color-error-300: oklch(0.85 0.12 25);
-  --color-error-400: oklch(0.75 0.18 25);
-  --color-error-500: oklch(0.65 0.22 25);
-  --color-error-600: oklch(0.55 0.25 25);
-  --color-error-700: oklch(0.45 0.22 25);
-  --color-error-800: oklch(0.35 0.18 25);
-  --color-error-900: oklch(0.25 0.12 25);
+  --color-error-50: oklch(0.97 0.02 30);
+  --color-error-100: oklch(0.95 0.05 30);
+  --color-error-200: oklch(0.92 0.1 30);
+  --color-error-300: oklch(0.85 0.15 30);
+  --color-error-400: oklch(0.75 0.2 30);
+  --color-error-500: oklch(0.65 0.25 30);
+  --color-error-600: oklch(0.55 0.23 30);
+  --color-error-700: oklch(0.45 0.2 30);
+  --color-error-800: oklch(0.35 0.15 30);
+  --color-error-900: oklch(0.25 0.1 30);
+
+  /* Warning Colors */
+  --color-warning-50: oklch(0.97 0.02 60);
+  --color-warning-100: oklch(0.95 0.05 60);
+  --color-warning-200: oklch(0.92 0.1 60);
+  --color-warning-300: oklch(0.85 0.15 60);
+  --color-warning-400: oklch(0.76 0.2 60);
+  --color-warning-500: oklch(0.67 0.22 60);
+  --color-warning-600: oklch(0.57 0.2 60);
+  --color-warning-700: oklch(0.47 0.18 60);
+  --color-warning-800: oklch(0.37 0.15 60);
+  --color-warning-900: oklch(0.27 0.1 60);
+
+  /* Gray Shades */
+  --color-gray-50: oklch(0.98 0.005 285);
+  --color-gray-100: oklch(0.93 0.005 285);
+  --color-gray-200: oklch(0.85 0.005 285);
+  --color-gray-300: oklch(0.75 0.005 285);
+  --color-gray-400: oklch(0.65 0.01 285);
+  --color-gray-500: oklch(0.55 0.01 285);
+  --color-gray-600: oklch(0.45 0.01 285);
+  --color-gray-700: oklch(0.35 0.01 285);
+  --color-gray-800: oklch(0.25 0.005 285);
+  --color-gray-900: oklch(0.15 0.005 285);
 
   /* UI Colors */
-  --ui-bg-dark: #121212;
-  --ui-container-bg: #1e1e1e;
-  --ui-container-border: #333333;
-  --ui-text: #f0f0f0;
-  --ui-text-secondary: #aaaaaa;
-  --ui-accent: #9b59b6;
-  --ui-input-bg: #171717;
-  --ui-input-border: #333333;
-  --ui-error: #e74c3c;
-  --ui-success: #2ecc71;
-  --ui-warning: #e67e22;
+  --ui-bg-dark: var(--color-midnight-800);
+  --ui-container-bg: var(--color-midnight-700);
+  --ui-container-border: var(--color-gray-700);
+  --ui-text: var(--color-cybertext-200);
+  --ui-text-secondary: var(--color-cybertext-600);
+  --ui-accent: var(--color-violet-500);
+  --ui-input-bg: var(--color-midnight-900);
+  --ui-input-border: var(--color-violet-800);
+  --ui-error: var(--color-error-500);
+  --ui-success: var(--color-success-500);
+  --ui-warning: var(--color-warning-500);
 
   /* Chat Specific Colors */
-  --color-chat-sender-bubble: var(--color-accent-600);
-  --color-chat-sender-text: white;
-  --color-chat-recipient-bubble: var(--color-cream-200);
-  --color-chat-recipient-text: var(--color-navy-800);
-  --color-chat-system-bubble: var(--color-gray-200);
-  --color-chat-system-text: var(--color-gray-800);
+  --color-chat-sender-bubble: var(--color-violet-600);
+  --color-chat-sender-text: var(--color-cybertext-100);
+  --color-chat-recipient-bubble: var(--color-midnight-600);
+  --color-chat-recipient-text: var(--color-cybertext-300);
+  --color-chat-system-bubble: var(--color-gray-700);
+  --color-chat-system-text: var(--color-violet-200);
+
   /* Status Indicators */
   --color-status-online: var(--color-success-500);
-  --color-status-offline: var(--color-gray-400);
-  --color-status-away: var(--color-amber-500);
+  --color-status-offline: var(--color-gray-600);
+  --color-status-away: var(--color-warning-500);
   --color-status-busy: var(--color-error-500);
-
-  /* Gray Overrides */
-  --color-gray-50: oklch(0.98 0.005 270);
-  --color-gray-100: oklch(0.93 0.005 270);
-  --color-gray-200: oklch(0.85 0.005 270);
-  --color-gray-300: oklch(0.75 0.005 270);
-  --color-gray-400: oklch(0.65 0.01 270);
-  --color-gray-500: oklch(0.55 0.01 270);
-  --color-gray-600: oklch(0.45 0.01 270);
-  --color-gray-700: oklch(0.35 0.01 270);
-  --color-gray-800: oklch(0.25 0.005 270);
-  --color-gray-900: oklch(0.15 0.005 270);
 }
-
-/* @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *)); */
 
 /* Chat Utilities */
 @utility chat-bubble-sender {
   background-color: var(--color-chat-sender-bubble);
   color: var(--color-chat-sender-text);
-  border-radius: 1rem 1rem 0 1rem;
-  padding: 0.75rem 1rem;
+  border-radius: 0.5rem 0.5rem 0 0.5rem;
+  padding: 0.5rem 0.75rem;
   max-width: 80%;
   margin-left: auto;
+  font-family: var(--font-mono);
+  border-left: 2px solid var(--color-violet-400);
+  border-top: 1px solid var(--color-violet-300);
 }
 
 @utility chat-bubble-recipient {
   background-color: var(--color-chat-recipient-bubble);
   color: var(--color-chat-recipient-text);
-  border-radius: 1rem 1rem 1rem 0;
-  padding: 0.75rem 1rem;
+  border-radius: 0.5rem 0.5rem 0.5rem 0;
+  padding: 0.5rem 0.75rem;
   max-width: 80%;
   margin-right: auto;
+  font-family: var(--font-mono);
+  border-right: 2px solid var(--color-midnight-400);
+  border-top: 1px solid var(--color-midnight-500);
 }
 
 @utility chat-bubble-system {
   background-color: var(--color-chat-system-bubble);
   color: var(--color-chat-system-text);
-  border-radius: 0.5rem;
-  padding: 0.5rem 0.75rem;
+  border-radius: 0.25rem;
+  padding: 0.25rem 0.5rem;
   max-width: 90%;
-  margin: 0 auto;
+  margin: 0.5rem auto;
   font-style: italic;
   text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  border-left: 1px solid var(--color-gray-600);
+  border-right: 1px solid var(--color-gray-600);
 }
 
 /* Status Utilities */
 @utility status-indicator {
   display: inline-block;
-  width: 0.75rem;
-  height: 0.75rem;
-  border-radius: 9999px;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  position: relative;
+  margin-right: 0.25rem;
+}
+
+@utility status-indicator-online {
+  background-color: var(--color-status-online);
+  box-shadow: 0 0 5px var(--color-status-online);
+}
+
+@utility status-indicator-offline {
+  background-color: var(--color-status-offline);
+}
+
+@utility status-indicator-away {
+  background-color: var(--color-status-away);
+}
+
+@utility status-indicator-busy {
+  background-color: var(--color-status-busy);
+  box-shadow: 0 0 5px var(--color-status-busy);
+}
+
+/* IRC-style Nickname */
+@utility irc-nickname {
+  font-weight: 600;
+  margin-right: 0.5rem;
 }
 
 body {
   @apply font-sans;
-  @apply bg-[#121212];
-  @apply text-gray-100;
+  @apply bg-midnight-800;
+  @apply text-cybertext-200;
 }

@@ -44,7 +44,7 @@ export default function Register() {
     };
 
     try {
-      const response = await fetch('/api/register', {
+      const res = await fetch('/api/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -52,9 +52,9 @@ export default function Register() {
         body: JSON.stringify(credentials),
       });
 
-      const data: RegisterResponse = await response.json();
+      const data: RegisterResponse = await res.json();
 
-      if (!response.ok) {
+      if (!res.ok) {
         throw new Error(data.error || 'Registration failed');
       }
 
@@ -69,7 +69,7 @@ export default function Register() {
   };
 
   return (
-    <div class='mx-auto my-12 max-w-md rounded border border-[#333333] bg-[#1e1e1e] p-7'>
+    <div class='mx-auto my-12 max-w-md rounded border border-gray-900 bg-gray-900 p-7'>
       <div class='text-accent-500 mb-3 text-2xl font-semibold'>Register</div>
       <div class='mb-6 text-gray-400'>Create a new account</div>
 
@@ -80,6 +80,7 @@ export default function Register() {
           <label for='name' class='mb-2 block text-gray-300'>
             Username
           </label>
+
           <input
             id='name'
             name='name'
@@ -88,7 +89,7 @@ export default function Register() {
             required
             value={name()}
             onInput={(e: InputEvent) => setName((e.target as HTMLInputElement).value)}
-            class='focus:border-accent-500 w-full rounded border border-[#333333] bg-[#171717] px-3 py-2 text-white focus:outline-none'
+            class='focus:border-accent-500 w-full rounded border border-gray-900 bg-gray-900 px-3 py-2 text-white focus:outline-none'
             placeholder='username'
           />
         </div>
@@ -97,6 +98,7 @@ export default function Register() {
           <label for='email' class='mb-2 block text-gray-300'>
             Email
           </label>
+
           <input
             id='email'
             name='email'
@@ -105,7 +107,7 @@ export default function Register() {
             required
             value={email()}
             onInput={(e: InputEvent) => setEmail((e.target as HTMLInputElement).value)}
-            class='focus:border-accent-500 w-full rounded border border-[#333333] bg-[#171717] px-3 py-2 text-white focus:outline-none'
+            class='focus:border-accent-500 w-full rounded border border-gray-900 bg-gray-900 px-3 py-2 text-white focus:outline-none'
             placeholder='your@email.com'
           />
         </div>
@@ -114,6 +116,7 @@ export default function Register() {
           <label for='password' class='mb-2 block text-gray-300'>
             Password
           </label>
+
           <input
             id='password'
             name='password'
@@ -122,7 +125,7 @@ export default function Register() {
             required
             value={password()}
             onInput={(e: InputEvent) => setPassword((e.target as HTMLInputElement).value)}
-            class='focus:border-accent-500 w-full rounded border border-[#333333] bg-[#171717] px-3 py-2 text-white focus:outline-none'
+            class='focus:border-accent-500 w-full rounded border border-gray-900 bg-gray-900 px-3 py-2 text-white focus:outline-none'
             placeholder='••••••••'
           />
         </div>
@@ -131,6 +134,7 @@ export default function Register() {
           <label for='password_confirmation' class='mb-2 block text-gray-300'>
             Confirm Password
           </label>
+
           <input
             id='password_confirmation'
             name='password_confirmation'
@@ -139,7 +143,7 @@ export default function Register() {
             required
             value={passwordConfirmation()}
             onInput={(e: InputEvent) => setPasswordConfirmation((e.target as HTMLInputElement).value)}
-            class='focus:border-accent-500 w-full rounded border border-[#333333] bg-[#171717] px-3 py-2 text-white focus:outline-none'
+            class='focus:border-accent-500 w-full rounded border border-gray-900 bg-gray-900 px-3 py-2 text-white focus:outline-none'
             placeholder='••••••••'
           />
         </div>
@@ -153,7 +157,7 @@ export default function Register() {
         </button>
       </form>
 
-      <div class='mt-6 border-t border-[#333333] pt-4 text-center text-sm'>
+      <div class='mt-6 border-t border-gray-900 pt-4 text-center text-sm'>
         <span class='text-gray-400'>Already have an account?</span>{' '}
         <A href='/login' class='text-accent-400 hover:text-accent-300 underline'>
           Login here
