@@ -26,6 +26,12 @@ defmodule ApiWeb.AuthController do
     end
   end
 
+  def logout(conn, _params) do
+    conn
+    |> put_status(:ok)
+    |> json(%{message: "Logged out successfully"})
+  end
+
   def me(conn, _params) do
     case conn.assigns[:current_user] do
       {:ok, user} -> render(conn, :user, %{user: user})

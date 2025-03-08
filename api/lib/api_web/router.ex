@@ -21,6 +21,7 @@ defmodule ApiWeb.Router do
     resources("/users", UserController)
     post("/register", AuthController, :register)
     post("/login", AuthController, :login)
+    delete("/logout", AuthController, :logout)
   end
 
   scope "/api", ApiWeb do
