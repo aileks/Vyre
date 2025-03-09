@@ -47,6 +47,7 @@ export interface AppState {
   user: User | null;
   token: string | null;
   expiresAt: number | null;
+  isLoading: boolean;
 }
 
 /*-----------------------------------------------------------------------------
@@ -68,6 +69,7 @@ const initialState: AppState = {
   user: null,
   token: tokenData ? tokenData.value : null,
   expiresAt: tokenData ? tokenData.expiresAt : 0,
+  isLoading: false,
 };
 
 export const [state, setState] = createStore<AppState>(initialState);
@@ -87,6 +89,7 @@ export const login = (user: User, token: string, expiresAt: number) => {
     user,
     token,
     expiresAt,
+    isLoading: false,
   });
 };
 
@@ -95,6 +98,7 @@ export const logout = () => {
     user: null,
     token: null,
     expiresAt: null,
+    isLoading: false,
   });
   localStorage.removeItem('token');
 };
@@ -112,25 +116,35 @@ export const logout = () => {
 export const register = async (
   userData: RegistrationData,
 ): Promise<AuthResult> => {
-  // Convert request data to snake_case for the API
-  const snakeCaseData = keysToSnakeCase(userData);
+  setState('isLoading', true);
 
-  const res = await fetch('/api/auth/register', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ user: snakeCaseData }),
-  });
+  try {
+    // Convert request data to snake_case for the API
+    const snakeCaseData = keysToSnakeCase(userData);
 
-  if (res.ok) {
-    // Convert response data to camelCase for frontend use
-    const data = keysToCamelCase<SuccessResponse>(await res.json());
-    const { user, token, expiresAt } = data;
+    const res = await fetch('/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user: snakeCaseData }),
+    });
 
-    login(user, token, expiresAt);
-    return { user, token, expiresAt };
-  } else {
-    const error = keysToCamelCase<ErrorResponse>(await res.json());
-    return error;
+    if (res.ok) {
+      // Convert response data to camelCase for frontend use
+      const data = keysToCamelCase<SuccessResponse>(await res.json());
+      const { user, token, expiresAt } = data;
+
+      login(user, token, expiresAt);
+      return { user, token, expiresAt };
+    } else {
+      const error = keysToCamelCase<ErrorResponse>(await res.json());
+      // Set loading state to false on error
+      setState('isLoading', false);
+      return error;
+    }
+  } catch (error) {
+    // Set loading state to false on error
+    setState('isLoading', false);
+    return { error: { message: 'Network error occurred' } };
   }
 };
 
@@ -143,24 +157,35 @@ export const register = async (
 export const doLogin = async (
   credentials: LoginCredentials,
 ): Promise<AuthResult> => {
-  const { email, password, rememberMe } = credentials;
+  // Set loading state to true at the start of the operation
+  setState('isLoading', true);
 
-  const res = await fetch('/api/auth/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ user: { email, password, rememberMe } }),
-  });
+  try {
+    const { email, password, rememberMe } = credentials;
 
-  if (res.ok) {
-    // Convert all response data to camelCase
-    const data = keysToCamelCase<SuccessResponse>(await res.json());
-    const { user, token, expiresAt } = data;
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user: { email, password, rememberMe } }),
+    });
 
-    login(user, token, expiresAt);
-    return { user, token, expiresAt };
-  } else {
-    const error = keysToCamelCase<ErrorResponse>(await res.json());
-    return error;
+    if (res.ok) {
+      // Convert all response data to camelCase
+      const data = keysToCamelCase<SuccessResponse>(await res.json());
+      const { user, token, expiresAt } = data;
+
+      login(user, token, expiresAt);
+      return { user, token, expiresAt };
+    } else {
+      const error = keysToCamelCase<ErrorResponse>(await res.json());
+      // Set loading state to false on error
+      setState('isLoading', false);
+      return error;
+    }
+  } catch (error) {
+    // Set loading state to false on error
+    setState('isLoading', false);
+    return { error: { message: 'Network error occurred' } };
   }
 };
 
@@ -169,9 +194,17 @@ export const doLogin = async (
  *
  * @returns Promise that resolves when the logout is complete
  */
+
 export const doLogout = async (): Promise<void> => {
-  await fetch('/api/auth/logout', { method: 'DELETE' });
-  logout();
+  setState('isLoading', true);
+
+  try {
+    await fetch('/api/auth/logout', { method: 'DELETE' });
+    logout();
+  } catch (error) {
+    console.error(error);
+    setState('isLoading', false);
+  }
 };
 
 /**
@@ -181,15 +214,21 @@ export const doLogout = async (): Promise<void> => {
  * @returns Promise that resolves when session validation is complete
  */
 export const fetchSession = async (): Promise<void> => {
-  const tokenData = localStorage.getItem('token');
-  if (!tokenData) return;
+  setState('isLoading', true);
 
   try {
+    const tokenData = localStorage.getItem('token');
+    if (!tokenData) {
+      setState('isLoading', false);
+      return;
+    }
+
     const parsedData = JSON.parse(tokenData) as TokenData;
 
     const { value: token, expiresAt } = parsedData;
 
     if (!token || !expiresAt) {
+      setState('isLoading', false);
       return;
     }
 
@@ -197,6 +236,7 @@ export const fetchSession = async (): Promise<void> => {
 
     if (now > expiresAt) {
       localStorage.removeItem('token');
+      setState('isLoading', false);
       return;
     }
 
@@ -218,5 +258,6 @@ export const fetchSession = async (): Promise<void> => {
     }
   } catch (error) {
     localStorage.removeItem('token');
+    setState('isLoading', false);
   }
 };
