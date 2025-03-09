@@ -30,14 +30,14 @@ defmodule Api.Accounts.User do
 
   defp validate_email(changeset) do
     changeset
-    |> validate_format(:email, ~r/^[^\s]+@[^\s]+$/, message: "must have the @ sign and no spaces")
+    |> validate_format(:email, ~r/^[^\s]+@[^\s]+$/, message: "Must have the @ sign and no spaces")
     |> validate_length(:email, max: 160)
   end
 
   defp validate_username(changeset) do
     changeset
     |> validate_format(:username, ~r/^[a-z0-9_-]+$/i,
-      message: "only letters, numbers, underscores and dashes"
+      message: "Only letters, numbers, underscores and dashes"
     )
     |> validate_length(:username, min: 3, max: 30)
   end

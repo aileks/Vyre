@@ -69,7 +69,7 @@ const initialState: AppState = {
   user: null,
   token: tokenData ? tokenData.value : null,
   expiresAt: tokenData ? tokenData.expiresAt : 0,
-  isLoading: false,
+  isLoading: false, // FIXME: This will cause issues; probably best to do something else
 };
 
 export const [state, setState] = createStore<AppState>(initialState);
@@ -116,7 +116,7 @@ export const logout = () => {
 export const register = async (
   userData: RegistrationData,
 ): Promise<AuthResult> => {
-  setState('isLoading', true);
+  // setState('isLoading', true);
 
   try {
     // Convert request data to snake_case for the API
@@ -137,13 +137,11 @@ export const register = async (
       return { user, token, expiresAt };
     } else {
       const error = keysToCamelCase<ErrorResponse>(await res.json());
-      // Set loading state to false on error
-      setState('isLoading', false);
+      // setState('isLoading', false);
       return error;
     }
   } catch (error) {
-    // Set loading state to false on error
-    setState('isLoading', false);
+    // setState('isLoading', false);
     return { error: { message: 'Network error occurred' } };
   }
 };
@@ -158,7 +156,7 @@ export const doLogin = async (
   credentials: LoginCredentials,
 ): Promise<AuthResult> => {
   // Set loading state to true at the start of the operation
-  setState('isLoading', true);
+  // setState('isLoading', true);
 
   try {
     const { email, password, rememberMe } = credentials;
@@ -178,13 +176,11 @@ export const doLogin = async (
       return { user, token, expiresAt };
     } else {
       const error = keysToCamelCase<ErrorResponse>(await res.json());
-      // Set loading state to false on error
-      setState('isLoading', false);
+      // setState('isLoading', false);
       return error;
     }
   } catch (error) {
-    // Set loading state to false on error
-    setState('isLoading', false);
+    // setState('isLoading', false);
     return { error: { message: 'Network error occurred' } };
   }
 };

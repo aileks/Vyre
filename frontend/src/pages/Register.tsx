@@ -39,7 +39,8 @@ export default function Register() {
     const res: AuthResult = await register(credentials);
 
     if ('error' in res) {
-      setError(res.error.message || 'Registration failed');
+      setError(res.error.message!);
+      console.log('LOGGING ERROR AFTER BEING SET:\n', error());
       setIsLoading(false);
       return;
     }
@@ -53,6 +54,9 @@ export default function Register() {
       <div class='bg-midnight-700 shadow-midnight-900/50 w-full max-w-md rounded-xs border border-gray-700 p-5 shadow-lg sm:p-7'>
         <div class='mb-4 text-2xl font-bold tracking-wide text-pink-400 sm:text-4xl'>
           Register
+        </div>
+        <div style='position: fixed; bottom: 10px; right: 10px; background: #333; color: white; padding: 5px;'>
+          Error state: {error() ? `"${error()}"` : 'none'}
         </div>
 
         {error() && (

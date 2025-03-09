@@ -4,6 +4,10 @@ defmodule ApiWeb.ErrorJSON do
 
   See config/config.exs.
   """
+  def render("400.json", %{error: message}) do
+    %{error: %{message: message}}
+  end
+
   def render("404.json", _assigns) do
     %{error: %{message: "Not Found"}}
   end
