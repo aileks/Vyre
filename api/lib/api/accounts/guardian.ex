@@ -20,8 +20,9 @@ defmodule Api.Accounts.Guardian do
   end
 
   def create_token(user) do
-    {:ok, token, _claims} = encode_and_sign(user, %{}, ttl: {1, :hour})
-    token
+    {:ok, token, claims} = encode_and_sign(user, %{}, ttl: {1, :hour})
+    exp = claims["exp"]
+    {token, exp}
   end
 
   def create_refresh_token(user, _claims \\ %{}) do

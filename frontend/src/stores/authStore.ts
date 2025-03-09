@@ -5,13 +5,12 @@ export interface User {
   status: string;
   email: string;
   username: string;
-  display_name: string;
-  avatar_url: string | null;
+  displayName: string;
+  avatarUrl?: string | null;
 }
 
 export interface AppState {
   user: User | null;
-  isAuthenticated: boolean;
   token: string | null;
 }
 
@@ -20,7 +19,6 @@ const token =
 
 const initialState: AppState = {
   user: null,
-  isAuthenticated: false,
   token: token,
 };
 
@@ -32,18 +30,13 @@ export const login = (
   user: User,
   token: string,
   rememberMe: boolean = false,
-  expiryOverride?: number,
+  expiresAt?: number,
 ) => {
-  let expiry: number;
-  if (expiryOverride) {
-    expiry = expiryOverride;
-  } else {
+  if (!expiresAt) {
     if (rememberMe) {
-      // 30 days
-      expiry = Date.now() + 30 * 24 * 60 * 60 * 1000;
+      expiresAt = new Date().getTime() + 1000 * 60 * 60 * 24 * 30;
     } else {
-      // 1 hour
-      expiry = Date.now() + 60 * 60 * 1000;
+      expiresAt = new Date().getTime() + 1000 * 60 * 60;
     }
   }
 
@@ -51,20 +44,18 @@ export const login = (
     'token',
     JSON.stringify({
       value: token,
-      expiry: expiry,
+      expiresAt,
     }),
   );
 
   setState({
     user,
-    isAuthenticated: true,
     token,
   });
 };
 export const logout = () => {
   setState({
     user: null,
-    isAuthenticated: false,
     token: null,
   });
 

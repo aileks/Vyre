@@ -1,27 +1,73 @@
-import { login, logout } from '../stores/authStore';
+import { User, login, logout } from '../stores/authStore';
+import { keysToCamelCase, keysToSnakeCase } from './caseTransformer';
 
-export const register = async (userData: any) => {
-  const res = await fetch('/api/auth/register', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ user: userData }),
-  });
+interface RegistrationData {
+  email: string;
+  password: string;
+  username?: string;
+}
 
-  if (res.ok) {
-    const { user, token } = await res.json();
-    login(user, token, false);
-    return { user, token };
-  } else {
-    const error = await res.json();
-    return { error };
-  }
-};
-
-export const doLogin = async (credentials: {
+interface LoginCredentials {
   email: string;
   password: string;
   rememberMe: boolean;
-}) => {
+}
+
+interface TokenData {
+  value: string;
+  expiry: number;
+}
+
+interface SuccessResponse {
+  user: User;
+  token: string;
+  expiresAt?: number;
+}
+
+interface ErrorResponse {
+  error: {
+    message?: string;
+  };
+}
+
+type AuthResult = Promise<SuccessResponse | ErrorResponse>;
+
+/**
+ * Registers a new user with the provided data.
+ *
+ * @param userData - User registration information
+ * @returns Promise resolving to either the authenticated user data with token or an error
+ */
+export const register = async (userData: RegistrationData): AuthResult => {
+  // Convert request data to snake_case for the API
+  const snakeCaseData = keysToSnakeCase(userData);
+
+  const res = await fetch('/api/auth/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ user: snakeCaseData }),
+  });
+
+  if (res.ok) {
+    // Convert response data to camelCase for frontend use
+    const data = keysToCamelCase<SuccessResponse>(await res.json());
+    const { user, token, expiresAt } = data;
+
+    login(user, token, false, expiresAt);
+    return { user, token, expiresAt };
+  } else {
+    const error = keysToCamelCase<ErrorResponse>(await res.json());
+    return error;
+  }
+};
+
+/**
+ * Authenticates a user with email and password.
+ *
+ * @param credentials - Object containing login credentials and remember preference
+ * @returns Promise resolving to either the authenticated user data with token or an error
+ */
+export const doLogin = async (credentials: LoginCredentials): AuthResult => {
   const { email, password, rememberMe } = credentials;
 
   const res = await fetch('/api/auth/login', {
@@ -31,26 +77,41 @@ export const doLogin = async (credentials: {
   });
 
   if (res.ok) {
-    const { user, token } = await res.json();
-    login(user, token, rememberMe);
-    return { user, token };
+    // Convert all response data to camelCase
+    const data = keysToCamelCase<SuccessResponse>(await res.json());
+    const { user, token, expiresAt } = data;
+
+    // Use the expiresAt value directly
+    login(user, token, rememberMe, expiresAt);
+    return { user, token, expiresAt };
   } else {
-    const error = await res.json();
-    return { error };
+    const error = keysToCamelCase<ErrorResponse>(await res.json());
+    return error;
   }
 };
 
-export const doLogout = async () => {
+/**
+ * Handles logging out the current user and updating the app state.
+ *
+ * @returns Promise that resolves when the logout is complete
+ */
+export const doLogout = async (): Promise<void> => {
   await fetch('/api/auth/logout', { method: 'DELETE' });
   logout();
 };
 
-export const fetchSession = async () => {
+/**
+ * Retrieves and validates the user's session from localStorage.
+ * If a valid token is found, fetches the current user data from the API.
+ *
+ * @returns Promise that resolves when session validation is complete
+ */
+export const fetchSession = async (): Promise<void> => {
   const tokenData = localStorage.getItem('token');
   if (!tokenData) return;
 
   try {
-    const parsedData = JSON.parse(tokenData);
+    const parsedData = JSON.parse(tokenData) as TokenData;
     const { value: token, expiry } = parsedData;
 
     const now = new Date();
@@ -69,8 +130,11 @@ export const fetchSession = async () => {
     });
 
     if (res.ok) {
-      const { user } = await res.json();
-      // Pass in the original expiry so it’s preserved
+      // Convert the response data to camelCase
+      const data = keysToCamelCase<{ user: User }>(await res.json());
+      const { user } = data;
+
+      // Pass in the original expiry so it's preserved
       login(user, token, false, expiry);
     } else {
       logout();
