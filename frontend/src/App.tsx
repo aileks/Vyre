@@ -4,8 +4,8 @@ import AppRouter from './router';
 import { fetchSession } from './stores/authStore';
 
 export default function App() {
-  createEffect(() => {
-    fetchSession();
+  createEffect(async () => {
+    await fetchSession();
   });
 
   return (

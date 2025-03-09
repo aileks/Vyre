@@ -1,7 +1,8 @@
 import { A } from '@solidjs/router';
 import { useNavigate } from '@solidjs/router';
-import { createSignal } from 'solid-js';
+import { createEffect, createSignal } from 'solid-js';
 
+import { state } from '../stores/authStore';
 import { AuthResult, doLogin } from '../stores/authStore';
 
 export default function Login() {
@@ -11,6 +12,10 @@ export default function Login() {
   const [error, setError] = createSignal<string>('');
   const [isLoading, setIsLoading] = createSignal<boolean>(false);
   const [remember, setRemember] = createSignal<boolean>(false);
+
+  createEffect(() => {
+    if (state.user) navigate('/', { replace: true });
+  });
 
   const handleSubmit = async (e: Event) => {
     e.preventDefault();
@@ -27,9 +32,11 @@ export default function Login() {
 
     if ('error' in res) {
       setError(res.error.message || 'Login failed');
-    } else {
-      navigate('/', { replace: true });
+      setIsLoading(false);
+      return;
     }
+
+    navigate('/', { replace: true });
 
     setIsLoading(false);
   };
@@ -155,7 +162,13 @@ export default function Login() {
           Register here
         </A>
         <div class='text-cybertext-400 mt-3 flex items-center justify-center gap-1'>
-          <input type='checkbox' onChange={() => setRemember(!remember)} />
+          <input
+            type='checkbox'
+            checked={remember()}
+            onChange={() => {
+              setRemember(!remember());
+            }}
+          />
           Remember Me
         </div>
       </div>

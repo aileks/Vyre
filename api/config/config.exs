@@ -20,8 +20,6 @@ config :api, ApiWeb.Endpoint,
   pubsub_server: Api.PubSub,
   live_view: [signing_salt: "k3W7Q6qB"]
 
-config :api, Api.Accounts.Guardian, issuer: "api"
-
 config :api, Api.Accounts.Guardian,
   issuer: "api",
   secret_key: System.get_env("GUARDIAN_SECRET_KEY")

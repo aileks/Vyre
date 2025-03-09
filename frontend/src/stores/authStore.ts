@@ -17,13 +17,13 @@ export interface LoginCredentials {
 
 interface TokenData {
   value: string;
-  expiry: number;
+  expiresAt: number;
 }
 
 interface SuccessResponse {
   user: User;
   token: string;
-  expiresAt?: number;
+  expiresAt: number;
 }
 
 interface ErrorResponse {
@@ -46,38 +46,35 @@ export interface User {
 export interface AppState {
   user: User | null;
   token: string | null;
+  expiresAt: number | null;
 }
 
 /*-----------------------------------------------------------------------------
  * Auth Store State
  * Actions for managing the user's authentication state
  *-----------------------------------------------------------------------------*/
-const token =
+const storedToken =
   typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+let tokenData: TokenData | null = null;
+if (storedToken) {
+  try {
+    tokenData = JSON.parse(storedToken) as TokenData;
+  } catch (error) {
+    tokenData = null;
+  }
+}
 
 const initialState: AppState = {
   user: null,
-  token: token,
+  token: tokenData ? tokenData.value : null,
+  expiresAt: tokenData ? tokenData.expiresAt : 0,
 };
 
 export const [state, setState] = createStore<AppState>(initialState);
 
 export const useStore = () => [state, setState];
 
-export const login = (
-  user: User,
-  token: string,
-  rememberMe: boolean = false,
-  expiresAt?: number,
-) => {
-  if (!expiresAt) {
-    if (rememberMe) {
-      expiresAt = new Date().getTime() + 1000 * 60 * 60 * 24 * 30;
-    } else {
-      expiresAt = new Date().getTime() + 1000 * 60 * 60;
-    }
-  }
-
+export const login = (user: User, token: string, expiresAt: number) => {
   localStorage.setItem(
     'token',
     JSON.stringify({
@@ -89,6 +86,7 @@ export const login = (
   setState({
     user,
     token,
+    expiresAt,
   });
 };
 
@@ -96,8 +94,8 @@ export const logout = () => {
   setState({
     user: null,
     token: null,
+    expiresAt: null,
   });
-
   localStorage.removeItem('token');
 };
 
@@ -128,7 +126,7 @@ export const register = async (
     const data = keysToCamelCase<SuccessResponse>(await res.json());
     const { user, token, expiresAt } = data;
 
-    login(user, token, false, expiresAt);
+    login(user, token, expiresAt);
     return { user, token, expiresAt };
   } else {
     const error = keysToCamelCase<ErrorResponse>(await res.json());
@@ -150,7 +148,7 @@ export const doLogin = async (
   const res = await fetch('/api/auth/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ user: { email, password } }),
+    body: JSON.stringify({ user: { email, password, rememberMe } }),
   });
 
   if (res.ok) {
@@ -158,8 +156,7 @@ export const doLogin = async (
     const data = keysToCamelCase<SuccessResponse>(await res.json());
     const { user, token, expiresAt } = data;
 
-    // Use the expiresAt value directly
-    login(user, token, rememberMe, expiresAt);
+    login(user, token, expiresAt);
     return { user, token, expiresAt };
   } else {
     const error = keysToCamelCase<ErrorResponse>(await res.json());
@@ -189,11 +186,16 @@ export const fetchSession = async (): Promise<void> => {
 
   try {
     const parsedData = JSON.parse(tokenData) as TokenData;
-    const { value: token, expiry } = parsedData;
 
-    const now = new Date();
-    if (now.getTime() > expiry) {
-      // Token expired, clean up and return
+    const { value: token, expiresAt } = parsedData;
+
+    if (!token || !expiresAt) {
+      return;
+    }
+
+    const now = Date.now() / 1000;
+
+    if (now > expiresAt) {
       localStorage.removeItem('token');
       return;
     }
@@ -207,18 +209,14 @@ export const fetchSession = async (): Promise<void> => {
     });
 
     if (res.ok) {
-      // Convert the response data to camelCase
       const data = keysToCamelCase<{ user: User }>(await res.json());
       const { user } = data;
 
-      // Pass in the original expiry so it's preserved
-      login(user, token, false, expiry);
+      login(user, token, expiresAt);
     } else {
       logout();
     }
   } catch (error) {
-    // If there's any error parsing the token data, clean up
     localStorage.removeItem('token');
-    return;
   }
 };

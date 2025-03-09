@@ -1,6 +1,7 @@
 import { A, useNavigate } from '@solidjs/router';
-import { createSignal } from 'solid-js';
+import { createEffect, createSignal } from 'solid-js';
 
+import { state } from '../stores/authStore';
 import { AuthResult, RegistrationData, register } from '../stores/authStore';
 
 export default function Register() {
@@ -12,6 +13,10 @@ export default function Register() {
     createSignal<string>('');
   const [error, setError] = createSignal<string>('');
   const [isLoading, setIsLoading] = createSignal<boolean>(false);
+
+  createEffect(() => {
+    if (state.user) navigate('/', { replace: true });
+  });
 
   const handleSubmit = async (e: Event) => {
     e.preventDefault();

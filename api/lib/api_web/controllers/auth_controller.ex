@@ -16,9 +16,11 @@ defmodule ApiWeb.AuthController do
     end
   end
 
-  def login(conn, %{"user" => %{"email" => email, "password" => password}}) do
+  def login(conn, %{
+        "user" => %{"email" => email, "password" => password, "rememberMe" => remember_me}
+      }) do
     with {:ok, user} <- Accounts.authenticate_user(email, password) do
-      {token, exp} = Guardian.create_token(user)
+      {token, exp} = Guardian.create_token(user, remember_me)
 
       conn
       |> put_status(:ok)

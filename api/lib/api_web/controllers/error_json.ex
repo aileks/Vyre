@@ -5,27 +5,27 @@ defmodule ApiWeb.ErrorJSON do
   See config/config.exs.
   """
   def render("404.json", _assigns) do
-    %{errors: %{message: "Not Found"}}
+    %{error: %{message: "Not Found"}}
   end
 
   def render("401.json", %{error: message}) do
-    %{errors: %{message: message}}
+    %{error: %{message: message}}
   end
 
   def render("401.json", _assigns) do
-    %{errors: %{message: "Unauthorized"}}
+    %{error: %{message: "Unauthorized"}}
   end
 
   def render("403.json", _assigns) do
-    %{errors: %{message: "Forbidden"}}
+    %{error: %{message: "Forbidden"}}
   end
 
   def render("422.json", %{changeset: changeset}) do
-    %{errors: translate_errors(changeset)}
+    %{error: translate_errors(changeset)}
   end
 
   def render("500.json", _assigns) do
-    %{errors: %{message: "Internal Server Error"}}
+    %{error: %{message: "Internal Server Error"}}
   end
 
   defp translate_errors(changeset) do
