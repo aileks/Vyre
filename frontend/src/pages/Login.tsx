@@ -2,7 +2,7 @@ import { A } from '@solidjs/router';
 import { useNavigate } from '@solidjs/router';
 import { createSignal } from 'solid-js';
 
-import { doLogin } from '../utils/authService';
+import { AuthResult, doLogin } from '../stores/authStore';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -23,9 +23,9 @@ export default function Login() {
       rememberMe: remember(),
     };
 
-    const res = await doLogin(credentials);
+    const res: AuthResult = await doLogin(credentials);
 
-    if (res.error) {
+    if ('error' in res) {
       setError(res.error.message || 'Login failed');
     } else {
       navigate('/', { replace: true });

@@ -3,7 +3,7 @@ import { A } from '@solidjs/router';
 import { state } from '../stores/authStore';
 
 // COMMENTED OUT FOR PROD
-// import { doLogout } from '../utils/authService';
+// import { doLogout } from '../stores/authStore';
 
 export default function Nav() {
   // COMMENTED OUT FOR PROD

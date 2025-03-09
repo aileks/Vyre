@@ -1,7 +1,7 @@
 import { Suspense, createEffect } from 'solid-js';
 
 import AppRouter from './router';
-import { fetchSession } from './utils/authService';
+import { fetchSession } from './stores/authStore';
 
 export default function App() {
   createEffect(() => {

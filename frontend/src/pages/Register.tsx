@@ -1,21 +1,15 @@
 import { A, useNavigate } from '@solidjs/router';
 import { createSignal } from 'solid-js';
 
-import { register } from '../utils/authService';
-
-export interface RegisterCredentials {
-  username: string;
-  display_name: string;
-  email: string;
-  password: string;
-}
+import { AuthResult, RegistrationData, register } from '../stores/authStore';
 
 export default function Register() {
   const navigate = useNavigate();
   const [username, setUsername] = createSignal<string>('');
   const [email, setEmail] = createSignal<string>('');
   const [password, setPassword] = createSignal<string>('');
-  const [passwordConfirmation, setPasswordConfirmation] = createSignal<string>('');
+  const [passwordConfirmation, setPasswordConfirmation] =
+    createSignal<string>('');
   const [error, setError] = createSignal<string>('');
   const [isLoading, setIsLoading] = createSignal<boolean>(false);
 
@@ -30,17 +24,17 @@ export default function Register() {
       return;
     }
 
-    const credentials: RegisterCredentials = {
+    const credentials: RegistrationData = {
       username: username(),
-      display_name: username(), // using username as display_name by default
+      displayName: username(), // using username as display_name by default
       email: email(),
       password: password(),
     };
 
-    const { error: registerError } = await register(credentials);
+    const res: AuthResult = await register(credentials);
 
-    if (registerError) {
-      setError(registerError);
+    if ('error' in res) {
+      setError(res.error.message || 'Registration failed');
       setIsLoading(false);
       return;
     }
@@ -51,7 +45,9 @@ export default function Register() {
 
   return (
     <div class='bg-midnight-700 shadow-midnight-900/50 mx-auto mt-64 max-w-lg rounded-xs border border-gray-700 p-7 shadow-lg'>
-      <div class='mb-4 text-4xl font-bold tracking-wide text-pink-400'>Register</div>
+      <div class='mb-4 text-4xl font-bold tracking-wide text-pink-400'>
+        Register
+      </div>
 
       {error() && (
         <div class='border-error-700 bg-midnight-800 text-error-400 mb-5 rounded-xs border p-3 text-sm'>
@@ -87,7 +83,9 @@ export default function Register() {
             autocomplete='name'
             required
             value={username()}
-            onInput={(e: InputEvent) => setUsername((e.target as HTMLInputElement).value)}
+            onInput={(e: InputEvent) =>
+              setUsername((e.target as HTMLInputElement).value)
+            }
             class='bg-midnight-900 text-cybertext-100 w-full rounded-xs border border-gray-700 px-3 py-2.5 transition-colors duration-200 focus:border-pink-500 focus:ring-1 focus:ring-pink-500/30 focus:outline-none'
             placeholder='user'
           />
@@ -104,7 +102,9 @@ export default function Register() {
             autocomplete='email'
             required
             value={email()}
-            onInput={(e: InputEvent) => setEmail((e.target as HTMLInputElement).value)}
+            onInput={(e: InputEvent) =>
+              setEmail((e.target as HTMLInputElement).value)
+            }
             class='bg-midnight-900 text-cybertext-100 w-full rounded-xs border border-gray-700 px-3 py-2.5 transition-colors duration-200 focus:border-pink-500 focus:ring-1 focus:ring-pink-500/30 focus:outline-none'
             placeholder='user@domain.com'
           />
@@ -121,7 +121,9 @@ export default function Register() {
             autocomplete='new-password'
             required
             value={password()}
-            onInput={(e: InputEvent) => setPassword((e.target as HTMLInputElement).value)}
+            onInput={(e: InputEvent) =>
+              setPassword((e.target as HTMLInputElement).value)
+            }
             class='bg-midnight-900 text-cybertext-100 w-full rounded-xs border border-gray-700 px-3 py-2.5 transition-colors duration-200 focus:border-pink-500 focus:ring-1 focus:ring-pink-500/30 focus:outline-none'
             placeholder='••••••••'
           />
@@ -129,7 +131,10 @@ export default function Register() {
         </div>
 
         <div>
-          <label for='password_confirmation' class='text-cybertext-300 mb-2 block'>
+          <label
+            for='password_confirmation'
+            class='text-cybertext-300 mb-2 block'
+          >
             Confirm Password
           </label>
           <input
@@ -139,7 +144,9 @@ export default function Register() {
             autocomplete='new-password'
             required
             value={passwordConfirmation()}
-            onInput={(e: InputEvent) => setPasswordConfirmation((e.target as HTMLInputElement).value)}
+            onInput={(e: InputEvent) =>
+              setPasswordConfirmation((e.target as HTMLInputElement).value)
+            }
             class='bg-midnight-900 text-cybertext-100 w-full rounded-xs border border-gray-700 px-3 py-2.5 transition-colors duration-200 focus:border-pink-500 focus:ring-1 focus:ring-pink-500/30 focus:outline-none'
             placeholder='••••••••'
           />
@@ -152,8 +159,20 @@ export default function Register() {
         >
           {isLoading() ?
             <span class='flex items-center justify-center'>
-              <svg class='mr-2 h-4 w-4 animate-spin' xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24'>
-                <circle class='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' stroke-width='4'></circle>
+              <svg
+                class='mr-2 h-4 w-4 animate-spin'
+                xmlns='http://www.w3.org/2000/svg'
+                fill='none'
+                viewBox='0 0 24 24'
+              >
+                <circle
+                  class='opacity-25'
+                  cx='12'
+                  cy='12'
+                  r='10'
+                  stroke='currentColor'
+                  stroke-width='4'
+                ></circle>
                 <path
                   class='opacity-75'
                   fill='currentColor'
@@ -168,7 +187,10 @@ export default function Register() {
 
       <div class='mt-8 border-t border-gray-700 pt-6 text-center'>
         <span class='text-cybertext-500'>Already have an account?</span>{' '}
-        <A href='/login' class='text-teal-400 transition-colors duration-200 hover:text-teal-300'>
+        <A
+          href='/login'
+          class='text-teal-400 transition-colors duration-200 hover:text-teal-300'
+        >
           Log in here
         </A>
       </div>
