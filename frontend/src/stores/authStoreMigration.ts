@@ -244,7 +244,6 @@ export const logout = async (): Promise<void> => {
 
 /**
  * Refreshes the current session by validating the token and fetching user data.
- * If the token exists but is invalid, it will log the user out.
  *
  * @returns Promise resolving to the user object if successful, otherwise null
  */
@@ -272,7 +271,7 @@ export const refreshSession = async (): Promise<User | null> => {
 
     return data.user;
   } else {
-    // Token is invalid
+    // Something went wrong
     clearStoredToken();
     setAuth(
       reconcile({
@@ -280,7 +279,7 @@ export const refreshSession = async (): Promise<User | null> => {
         user: null,
         token: null,
         expiresAt: null,
-        error: 'Session expired',
+        error: 'Invalid session',
       }),
     );
 
