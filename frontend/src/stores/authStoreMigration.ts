@@ -47,9 +47,6 @@ const getInitialState = (): AuthState => {
   };
 };
 
-/*-----------------------------------------------------------------------------
- * Raw State
- *-----------------------------------------------------------------------------*/
 export const [auth, setAuth] = createStore<AuthState>(getInitialState());
 
 // Create derived state signals
