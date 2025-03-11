@@ -25,10 +25,6 @@ const getInitialState = (): AuthState => {
     error: null,
   };
 
-  if (typeof window === 'undefined') {
-    return defaultState;
-  }
-
   try {
     const storedToken = localStorage.getItem('token');
     if (!storedToken) {
