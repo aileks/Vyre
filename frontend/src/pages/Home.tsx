@@ -1,6 +1,6 @@
 import { A } from '@solidjs/router';
 
-import { state } from '../stores/authStore';
+import { isAuthenticated } from '../stores/authStore';
 
 export default function Home() {
   return (
@@ -64,7 +64,7 @@ export default function Home() {
           </div>
 
           <div class='flex flex-col justify-center gap-4 md:flex-row'>
-            {state.user ?
+            {isAuthenticated() ?
               <div class='bg-electric-600/20 text-cybertext-400 border-electric-700 rounded-xs border px-6 py-3 text-center font-mono'>
                 <span class='text-success-300 text-lg'>✓</span> Thanks for
                 pre-registering!

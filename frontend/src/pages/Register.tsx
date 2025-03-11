@@ -1,8 +1,7 @@
 import { A, useNavigate } from '@solidjs/router';
 import { createEffect, createSignal } from 'solid-js';
 
-import { state } from '../stores/authStore';
-import { register } from '../stores/authStore';
+import { isAuthenticated, isLoading, register } from '../stores/authStore';
 import { AuthResult, RegistrationData } from '../types';
 
 export default function Register() {
@@ -13,20 +12,17 @@ export default function Register() {
   const [passwordConfirmation, setPasswordConfirmation] =
     createSignal<string>('');
   const [error, setError] = createSignal<string>('');
-  const [isLoading, setIsLoading] = createSignal<boolean>(false);
 
   createEffect(() => {
-    if (state.user) navigate('/', { replace: true });
+    if (isAuthenticated()) navigate('/', { replace: true });
   });
 
   const handleSubmit = async (e: Event) => {
     e.preventDefault();
-    setIsLoading(true);
     setError('');
 
     if (password() !== passwordConfirmation()) {
       setError('Passwords do not match');
-      setIsLoading(false);
       return;
     }
 
@@ -41,13 +37,10 @@ export default function Register() {
 
     if ('error' in res) {
       setError(res.error.message!);
-      console.log('LOGGING ERROR AFTER BEING SET:\n', error());
-      setIsLoading(false);
       return;
     }
 
     navigate('/', { replace: true });
-    setIsLoading(false);
   };
 
   return (

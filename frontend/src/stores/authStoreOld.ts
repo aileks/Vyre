@@ -1,0 +1,227 @@
+import { createStore } from 'solid-js/store';
+
+import {
+  AuthResult,
+  ErrorResponse,
+  LoginCredentials,
+  RegistrationData,
+  SuccessResponse,
+  TokenData,
+  User,
+} from '../types';
+import { keysToCamelCase, keysToSnakeCase } from '../utils/caseTransformer';
+
+interface AuthState {
+  user: User | null;
+  token: string | null;
+  expiresAt: number | null;
+  isLoading: boolean;
+}
+
+/*-----------------------------------------------------------------------------
+ * Auth Store State
+ * Actions for managing the user's authentication state
+ *-----------------------------------------------------------------------------*/
+const storedToken =
+  typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+let tokenData: TokenData | null = null;
+if (storedToken) {
+  try {
+    tokenData = JSON.parse(storedToken) as TokenData;
+  } catch (error) {
+    tokenData = null;
+  }
+}
+
+const initialState: AuthState = {
+  user: null,
+  token: tokenData ? tokenData.value : null,
+  expiresAt: tokenData ? tokenData.expiresAt : 0,
+  isLoading: false, // FIXME: This will cause issues; probably best to do something else
+};
+
+export const [state, setState] = createStore<AuthState>(initialState);
+
+export const useStore = () => [state, setState];
+
+export const login = (user: User, token: string, expiresAt: number) => {
+  localStorage.setItem(
+    'token',
+    JSON.stringify({
+      value: token,
+      expiresAt,
+    }),
+  );
+
+  setState({
+    user,
+    token,
+    expiresAt,
+    isLoading: false,
+  });
+};
+
+export const logout = () => {
+  setState({
+    user: null,
+    token: null,
+    expiresAt: null,
+    isLoading: false,
+  });
+  localStorage.removeItem('token');
+};
+
+/*-----------------------------------------------------------------------------
+ * Auth Service "Thunks"
+ * Functions for handling user registration, login, logout and session mgmt
+ *-----------------------------------------------------------------------------*/
+/**
+ * Registers a new user with the provided data.
+ *
+ * @param userData - User registration information
+ * @returns Promise resolving to either the authenticated user data with token or an error
+ */
+export const register = async (
+  userData: RegistrationData,
+): Promise<AuthResult> => {
+  // setState('isLoading', true);
+
+  try {
+    // Convert request data to snake_case for the API
+    const snakeCaseData = keysToSnakeCase(userData);
+
+    const res = await fetch('/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user: snakeCaseData }),
+    });
+
+    if (res.ok) {
+      // Convert response data to camelCase for frontend use
+      const data = keysToCamelCase<SuccessResponse>(await res.json());
+      const { user, token, expiresAt } = data;
+
+      login(user, token, expiresAt);
+      return { user, token, expiresAt };
+    } else {
+      const error = keysToCamelCase<ErrorResponse>(await res.json());
+      // setState('isLoading', false);
+      return error;
+    }
+  } catch (error) {
+    // setState('isLoading', false);
+    return { error: { message: 'Network error occurred' } };
+  }
+};
+
+/**
+ * Authenticates a user with email and password.
+ *
+ * @param credentials - Object containing login credentials and remember preference
+ * @returns Promise resolving to either the authenticated user data with token or an error
+ */
+export const doLogin = async (
+  credentials: LoginCredentials,
+): Promise<AuthResult> => {
+  // Set loading state to true at the start of the operation
+  // setState('isLoading', true);
+
+  try {
+    const { email, password, rememberMe } = credentials;
+
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user: { email, password, rememberMe } }),
+    });
+
+    if (res.ok) {
+      // Convert all response data to camelCase
+      const data = keysToCamelCase<SuccessResponse>(await res.json());
+      const { user, token, expiresAt } = data;
+
+      login(user, token, expiresAt);
+      return { user, token, expiresAt };
+    } else {
+      const error = keysToCamelCase<ErrorResponse>(await res.json());
+      // setState('isLoading', false);
+      return error;
+    }
+  } catch (error) {
+    // setState('isLoading', false);
+    return { error: { message: 'Network error occurred' } };
+  }
+};
+
+/**
+ * Handles logging out the current user and updating the app state.
+ *
+ * @returns Promise that resolves when the logout is complete
+ */
+
+export const doLogout = async (): Promise<void> => {
+  setState('isLoading', true);
+
+  try {
+    await fetch('/api/auth/logout', { method: 'DELETE' });
+    logout();
+  } catch (error) {
+    console.error(error);
+    setState('isLoading', false);
+  }
+};
+
+/**
+ * Retrieves and validates the user's session from localStorage.
+ * If a valid token is found, fetches the current user data from the API.
+ *
+ * @returns Promise that resolves when session validation is complete
+ */
+export const fetchSession = async (): Promise<void> => {
+  setState('isLoading', true);
+
+  try {
+    const tokenData = localStorage.getItem('token');
+    if (!tokenData) {
+      setState('isLoading', false);
+      return;
+    }
+
+    const parsedData = JSON.parse(tokenData) as TokenData;
+
+    const { value: token, expiresAt } = parsedData;
+
+    if (!token || !expiresAt) {
+      setState('isLoading', false);
+      return;
+    }
+
+    const now = Date.now() / 1000;
+
+    if (now > expiresAt) {
+      localStorage.removeItem('token');
+      setState('isLoading', false);
+      return;
+    }
+
+    // Token is valid, proceed with the request
+    const res = await fetch('/api/auth/me', {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (res.ok) {
+      const data = keysToCamelCase<{ user: User }>(await res.json());
+      const { user } = data;
+
+      login(user, token, expiresAt);
+    } else {
+      logout();
+    }
+  } catch (error) {
+    localStorage.removeItem('token');
+    setState('isLoading', false);
+  }
+};

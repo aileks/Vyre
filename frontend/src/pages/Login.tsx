@@ -2,7 +2,7 @@ import { A } from '@solidjs/router';
 import { useNavigate } from '@solidjs/router';
 import { createEffect, createSignal } from 'solid-js';
 
-import { doLogin, state } from '../stores/authStore';
+import { isAuthenticated, isLoading, login } from '../stores/authStore';
 import { AuthResult } from '../types';
 
 export default function Login() {
@@ -10,16 +10,14 @@ export default function Login() {
   const [email, setEmail] = createSignal<string>('');
   const [password, setPassword] = createSignal<string>('');
   const [error, setError] = createSignal<string>('');
-  const [isLoading, setIsLoading] = createSignal<boolean>(false);
   const [remember, setRemember] = createSignal<boolean>(false);
 
   createEffect(() => {
-    if (state.user) navigate('/', { replace: true });
+    if (isAuthenticated()) navigate('/', { replace: true });
   });
 
   const handleSubmit = async (e: Event) => {
     e.preventDefault();
-    setIsLoading(true);
     setError('');
 
     const credentials = {
@@ -28,17 +26,14 @@ export default function Login() {
       rememberMe: remember(),
     };
 
-    const res: AuthResult = await doLogin(credentials);
+    const res: AuthResult = await login(credentials);
 
     if ('error' in res) {
       setError(res.error.message || 'Login failed');
-      setIsLoading(false);
       return;
     }
 
     navigate('/', { replace: true });
-
-    setIsLoading(false);
   };
 
   return (

@@ -1,16 +1,12 @@
-import { Show, Suspense, createEffect } from 'solid-js';
+import { Show, Suspense } from 'solid-js';
 
 import AppRouter from './router';
-import { fetchSession, state } from './stores/authStore';
+import { isLoading } from './stores/authStore';
 
 export default function App() {
-  createEffect(async () => {
-    await fetchSession();
-  });
-
   return (
     <Suspense fallback={<LoadingSpinner />}>
-      <Show when={!state.isLoading} fallback={<LoadingSpinner />}>
+      <Show when={isLoading} fallback={<LoadingSpinner />}>
         <AppRouter />
       </Show>
     </Suspense>
