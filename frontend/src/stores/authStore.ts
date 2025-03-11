@@ -11,7 +11,7 @@ import {
 } from '../types';
 import { keysToCamelCase, keysToSnakeCase } from '../utils/caseTransformer';
 
-interface AppState {
+interface AuthState {
   user: User | null;
   token: string | null;
   expiresAt: number | null;
@@ -33,14 +33,14 @@ if (storedToken) {
   }
 }
 
-const initialState: AppState = {
+const initialState: AuthState = {
   user: null,
   token: tokenData ? tokenData.value : null,
   expiresAt: tokenData ? tokenData.expiresAt : 0,
   isLoading: false, // FIXME: This will cause issues; probably best to do something else
 };
 
-export const [state, setState] = createStore<AppState>(initialState);
+export const [state, setState] = createStore<AuthState>(initialState);
 
 export const useStore = () => [state, setState];
 

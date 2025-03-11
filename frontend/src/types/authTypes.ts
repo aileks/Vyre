@@ -1,3 +1,5 @@
+type AuthStatus = 'idle' | 'loading' | 'authenticated' | 'error';
+
 export interface User {
   id: string;
   status: string;
@@ -35,6 +37,14 @@ export interface ErrorResponse {
   error: {
     message?: string;
   };
+}
+
+export interface AuthState {
+  status: AuthStatus;
+  user: User | null;
+  token: string | null;
+  expiresAt: number | null;
+  error: string | null;
 }
 
 export type AuthResult = SuccessResponse | ErrorResponse;
