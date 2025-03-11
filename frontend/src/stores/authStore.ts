@@ -68,18 +68,16 @@ export const currentError = () => auth.error;
  * Token Management
  *-----------------------------------------------------------------------------*/
 const setStoredToken = (token: string, expiresAt: number) => {
-  if (typeof window !== 'undefined') {
-    const stringifiedToken = JSON.stringify({
-      value: token,
-      expiresAt,
-    });
+  const stringifiedToken = JSON.stringify({
+    value: token,
+    expiresAt,
+  });
 
-    localStorage.setItem('token', stringifiedToken);
-  }
+  localStorage.setItem('token', stringifiedToken);
 };
 
 const clearStoredToken = () => {
-  if (typeof window !== 'undefined') localStorage.removeItem('token');
+  localStorage.removeItem('token');
 };
 
 // Set up token expiration
