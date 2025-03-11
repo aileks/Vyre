@@ -2,7 +2,8 @@ import { A, useNavigate } from '@solidjs/router';
 import { createEffect, createSignal } from 'solid-js';
 
 import { state } from '../stores/authStore';
-import { AuthResult, RegistrationData, register } from '../stores/authStore';
+import { register } from '../stores/authStore';
+import { AuthResult, RegistrationData } from '../types';
 
 export default function Register() {
   const navigate = useNavigate();

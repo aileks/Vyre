@@ -1,49 +1,17 @@
 import { createStore } from 'solid-js/store';
 
+import {
+  AuthResult,
+  ErrorResponse,
+  LoginCredentials,
+  RegistrationData,
+  SuccessResponse,
+  TokenData,
+  User,
+} from '../types';
 import { keysToCamelCase, keysToSnakeCase } from '../utils/caseTransformer';
 
-export interface RegistrationData {
-  email: string;
-  password: string;
-  username: string;
-  displayName?: string;
-}
-
-export interface LoginCredentials {
-  email: string;
-  password: string;
-  rememberMe: boolean;
-}
-
-interface TokenData {
-  value: string;
-  expiresAt: number;
-}
-
-interface SuccessResponse {
-  user: User;
-  token: string;
-  expiresAt: number;
-}
-
-interface ErrorResponse {
-  error: {
-    message?: string;
-  };
-}
-
-export type AuthResult = SuccessResponse | ErrorResponse;
-
-export interface User {
-  id: string;
-  status: string;
-  email: string;
-  username: string;
-  displayName: string;
-  avatarUrl?: string | null;
-}
-
-export interface AppState {
+interface AppState {
   user: User | null;
   token: string | null;
   expiresAt: number | null;
