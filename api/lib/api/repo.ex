@@ -7,14 +7,12 @@ defmodule Api.Repo do
     if config[:adapter] == Ecto.Adapters.Postgres do
       db_schema = System.get_env("DB_SCHEMA") || "vyre"
 
-      parameters = Map.new(config[:parameters] || %{})
-      parameters = Map.put(parameters, "search_path", "#{db_schema},public")
-
       config =
         config
-        |> Keyword.put(:after_connect, {__MODULE__, :set_search_path, [db_schema]})
-        |> Keyword.put(:parameters, parameters)
-        |> Keyword.put(:migration_source, "schema_migrations")
+        |> Keyword.put(:search_path, [db_schema])
+        |> Keyword.update(:parameters, [search_path: db_schema], fn params ->
+          Keyword.put_new(params, :search_path, db_schema)
+        end)
         |> Keyword.put(:migration_default_prefix, db_schema)
 
       {:ok, config}
