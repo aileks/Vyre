@@ -1,7 +1,6 @@
 defmodule ApiWeb.ErrorJSON do
   @moduledoc """
   This module is invoked by your endpoint in case of errors on JSON requests.
-
   See config/config.exs.
   """
   def render("400.json", %{error: message}) do
@@ -25,22 +24,34 @@ defmodule ApiWeb.ErrorJSON do
   end
 
   def render("422.json", %{changeset: changeset}) do
-    %{error: translate_errors(changeset)}
+    %{error: %{message: get_first_error(changeset)}}
   end
 
   def render("500.json", _assigns) do
     %{error: %{message: "Internal Server Error"}}
   end
 
-  defp translate_errors(changeset) do
-    Ecto.Changeset.traverse_errors(changeset, fn {msg, opts} ->
-      translate_error({msg, opts})
+  defp get_first_error(changeset) do
+    changeset
+    |> extract_errors()
+    |> List.last()
+  end
+
+  defp extract_errors(changeset) do
+    errors =
+      Ecto.Changeset.traverse_errors(changeset, fn {msg, opts} ->
+        translate_error({msg, opts})
+      end)
+
+    errors
+    |> Enum.flat_map(fn {_field, messages} ->
+      if is_list(messages), do: messages, else: [messages]
     end)
   end
 
   defp translate_error({msg, opts}) do
     Enum.reduce(opts, msg, fn {key, value}, acc ->
-      String.replace(acc, "%{#{key}}", fn _ -> to_string(value) end)
+      String.replace(acc, "%{#{key}}", to_string(value))
     end)
   end
 end

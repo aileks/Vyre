@@ -20,7 +20,7 @@ defmodule Api.Accounts.User do
     has_many(:servers, through: [:server_memberships, :server])
     has_many(:sent_private_messages, Api.Messages.PrivateMessage, foreign_key: :sender_id)
     has_many(:received_private_messages, Api.Messages.PrivateMessage, foreign_key: :receiver_id)
-    many_to_many(:roles, Api.Servers.Role, join_through: Api.Servers.UserRole)
+    many_to_many(:roles, Api.Roles.Role, join_through: Api.Roles.UserRole)
     has_many(:friendships, Api.Friends.Friend, foreign_key: :user_id)
     has_many(:friend_requests, Api.Friends.Friend, foreign_key: :friend_id)
   end
@@ -53,7 +53,22 @@ defmodule Api.Accounts.User do
 
   defp validate_password(changeset) do
     changeset
-    |> validate_length(:password, min: 8, max: 80)
+    |> validate_length(:password,
+      min: 8,
+      max: 80,
+      message: "Password must be at least 8 characters"
+    )
+
+    # |> validate_format(:password, ~r/[A-Z]/,
+    #   message: "Password must contain at least one uppercase letter"
+    # )
+    # |> validate_format(:password, ~r/[a-z]/,
+    #   message: "Password must contain at least one lowercase letter"
+    # )
+    # |> validate_format(:password, ~r/[0-9]/, message: "Password must contain at least one number")
+    # |> validate_format(:password, ~r/[^A-Za-z0-9]/,
+    #   message: "Password must contain at least one special character"
+    # )
   end
 
   defp hash_password(changeset) do

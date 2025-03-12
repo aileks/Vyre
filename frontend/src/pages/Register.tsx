@@ -38,6 +38,7 @@ export default function Register() {
     const res: AuthResult = await register(credentials);
 
     if ('error' in res) {
+      console.log('LOGGING RES', res);
       setError(res.error.message!);
       return;
     }
@@ -142,7 +143,6 @@ export default function Register() {
               class='bg-midnight-900 text-cybertext-100 w-full rounded-xs border border-gray-700 px-3 py-2 transition-colors duration-200 focus:border-pink-500 focus:ring-1 focus:ring-pink-500/30 focus:outline-none sm:py-2.5'
               placeholder='••••••••'
             />
-            <div class='mt-1 text-xs text-gray-400'>Minimum 8 characters</div>
           </div>
 
           <div>
