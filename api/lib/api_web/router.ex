@@ -17,8 +17,17 @@ defmodule ApiWeb.Router do
 
   scope "/api", ApiWeb do
     pipe_through(:api)
-
+    # NOTE: Not protected for testing
     resources("/users", UserController)
+    resources("/servers", ServerController)
+    resources("/servers/:server_id/channels", ChannelController, except: [:new, :edit])
+
+    pipe_through(:auth)
+    post("/friends/send_request", FriendController, :send_request)
+    post("/friends/accept_request", FriendController, :accept_request)
+    delete("/friends/decline_request", FriendController, :decline_request)
+    get("/friends/list", FriendController, :list_friends)
+    get("/friends/pending_requests", FriendController, :list_pending_requests)
   end
 
   scope "/api/auth", ApiWeb do
