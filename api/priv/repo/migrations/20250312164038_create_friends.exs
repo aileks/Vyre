@@ -1,8 +1,9 @@
 defmodule Api.Repo.Migrations.CreateFriends do
   use Ecto.Migration
+  import Api.SchemaHelper
 
   def change do
-    create table(:friends, primary_key: false) do
+    create table(:friends, primary_key: false, prefix: schema_prefix()) do
       add(:id, :binary_id, primary_key: true)
       add(:status, :string, default: "pending")
       add(:user_id, references(:users, on_delete: :delete_all, type: :binary_id))

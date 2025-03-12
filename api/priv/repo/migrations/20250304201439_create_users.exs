@@ -1,8 +1,9 @@
 defmodule Api.Repo.Migrations.CreateUsers do
   use Ecto.Migration
+  import Api.SchemaHelper
 
   def change do
-    create table(:users, primary_key: false) do
+    create table(:users, primary_key: false, prefix: schema_prefix()) do
       add(:id, :binary_id, primary_key: true)
       add(:username, :string, null: false)
       add(:display_name, :string, null: false)

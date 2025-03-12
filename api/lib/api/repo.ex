@@ -6,14 +6,16 @@ defmodule Api.Repo do
   def init(_type, config) do
     if config[:adapter] == Ecto.Adapters.Postgres do
       db_schema = System.get_env("DB_SCHEMA") || "vyre"
-      IO.puts("Using schema: #{db_schema}")
 
-      Keyword.update(config, :parameters, [search_path: db_schema], fn params ->
+      config
+      |> Keyword.update(:parameters, [search_path: db_schema], fn params ->
         Keyword.put_new(params, :search_path, db_schema)
       end)
+      |> Keyword.put(:migration_source, "#{db_schema}_schema_migrations")
+      |> Keyword.put(:migration_default_prefix, db_schema)
+      |> then(&{:ok, &1})
     else
-      config
+      {:ok, config}
     end
-    |> then(&{:ok, &1})
   end
 end
