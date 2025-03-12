@@ -4,15 +4,16 @@ defmodule Api.Repo do
     adapter: if(Mix.env() == :prod, do: Ecto.Adapters.Postgres, else: Ecto.Adapters.SQLite3)
 
   def init(_type, config) do
-    updated_config =
-      if config[:adapter] == Ecto.Adapters.Postgres do
-        Keyword.update(config, :parameters, [search_path: "vyre"], fn params ->
-          Keyword.put_new(params, :search_path, "vyre")
-        end)
-      else
-        config
-      end
+    if config[:adapter] == Ecto.Adapters.Postgres do
+      db_schema = System.get_env("DB_SCHEMA") || "vyre"
+      IO.puts("Using schema: #{db_schema}")
 
-    {:ok, updated_config}
+      Keyword.update(config, :parameters, [search_path: db_schema], fn params ->
+        Keyword.put_new(params, :search_path, db_schema)
+      end)
+    else
+      config
+    end
+    |> then(&{:ok, &1})
   end
 end
