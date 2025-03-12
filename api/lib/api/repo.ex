@@ -9,7 +9,6 @@ defmodule Api.Repo do
 
       config =
         config
-        |> Keyword.put(:search_path, [db_schema])
         |> Keyword.update(:parameters, [search_path: db_schema], fn params ->
           Keyword.put_new(params, :search_path, db_schema)
         end)
