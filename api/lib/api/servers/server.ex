@@ -10,9 +10,9 @@ defmodule Api.Servers.Server do
     field(:description, :string)
     field(:icon_url, :string)
     field(:created_at, :utc_datetime)
-    field(:owner_id, :binary_id)
-
     timestamps(type: :utc_datetime)
+
+    belongs_to(:owner, Api.Accounts.User, foreign_key: :owner_id)
   end
 
   @doc false

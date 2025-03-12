@@ -12,8 +12,10 @@ defmodule Api.Accounts.User do
     field(:password_hash, :string)
     field(:display_name, :string)
     field(:avatar_url, :string)
-    field(:status, :string, default: "active")
-    timestamps()
+    field(:status, :string, default: "offline")
+    timestamps(type: :utc_datetime)
+
+    has_many(:owned_servers, Api.Servers.Server, foreign_key: :owner_id)
   end
 
   def changeset(user, attrs) do
@@ -45,7 +47,6 @@ defmodule Api.Accounts.User do
   defp validate_password(changeset) do
     changeset
     |> validate_length(:password, min: 8, max: 80)
-    |> prepare_changes(&hash_password/1)
   end
 
   defp hash_password(changeset) do
