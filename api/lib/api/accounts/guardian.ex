@@ -13,7 +13,7 @@ defmodule Api.Accounts.Guardian do
   end
 
   def resource_from_claims(%{"sub" => id}) do
-    case Api.Accounts.get_user(id) do
+    case Accounts.get_user(id) do
       {:ok, resource} -> {:ok, resource}
       {:error, _reason} -> {:error, :resource_not_found}
     end
