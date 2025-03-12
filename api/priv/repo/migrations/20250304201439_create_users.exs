@@ -2,7 +2,7 @@ defmodule Api.Repo.Migrations.CreateUsers do
   use Ecto.Migration
 
   def change do
-    create table(:users, primary_key: false, prefix: schema_prefix()) do
+    create table(:users, primary_key: false, prefix: System.get_env("DB_SCHEMA")) do
       add(:id, :binary_id, primary_key: true)
       add(:username, :string, null: false)
       add(:display_name, :string, null: false)

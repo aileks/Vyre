@@ -2,7 +2,7 @@ defmodule Api.Repo.Migrations.CreateServerMembers do
   use Ecto.Migration
 
   def change do
-    create table(:server_members, primary_key: false, prefix: schema_prefix()) do
+    create table(:server_members, primary_key: false, prefix: System.get_env("DB_SCHEMA")) do
       add(:id, :binary_id, primary_key: true)
       add(:role, :string)
       add(:joined_at, :utc_datetime)
