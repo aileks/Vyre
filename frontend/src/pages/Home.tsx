@@ -53,7 +53,7 @@ export default function Home() {
 
               <div class='flex'>
                 <span class='w-24 shrink-0 text-gray-500'>[PROGRESS]</span>
-                <span class='text-teal-300'>8% complete</span>
+                <span class='text-teal-300'>13% complete</span>
               </div>
 
               <div class='flex'>
