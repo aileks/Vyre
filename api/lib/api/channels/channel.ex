@@ -14,8 +14,8 @@ defmodule Api.Channels.Channel do
     field(:type, :string, default: "text")
     timestamps(type: :utc_datetime)
 
-    belongs_to(:server, Api.Servers.Server, foreign_key: :server_id, type: :binary_id)
-    has_many(:messages, Api.Messages.Message, foreign_key: :message_id, type: :binary_id)
+    belongs_to(:server, Api.Servers.Server, foreign_key: :server_id)
+    has_many(:messages, Api.Messages.Message)
   end
 
   def changeset(channel, attrs) do

@@ -9,9 +9,9 @@ defmodule Api.Roles.UserRole do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "user_roles" do
-    belongs_to(:user, Api.Accounts.User, foreign_key: :user_id, type: :binary_id)
-    belongs_to(:role, Api.Roles.Role, foreign_key: :role_id, type: :binary_id)
-    belongs_to(:server, Api.Servers.Server, foreign_key: :server_id, type: :binary_id)
+    belongs_to(:user, Api.Accounts.User, foreign_key: :user_id)
+    belongs_to(:role, Api.Roles.Role)
+    belongs_to(:server, Api.Servers.Server, foreign_key: :server_id)
 
     timestamps(type: :utc_datetime)
   end

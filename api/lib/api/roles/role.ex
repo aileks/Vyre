@@ -13,7 +13,7 @@ defmodule Api.Roles.Role do
     field(:mentionable, :boolean, default: false)
     timestamps(type: :utc_datetime)
 
-    belongs_to(:server, Api.Servers.Server, foreign_key: :server_id, type: :binary_id)
+    belongs_to(:server, Api.Servers.Server, foreign_key: :server_id)
     many_to_many(:users, Api.Accounts.User, join_through: Api.Roles.UserRole)
   end
 

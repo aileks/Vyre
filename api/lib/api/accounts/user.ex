@@ -21,6 +21,8 @@ defmodule Api.Accounts.User do
     has_many(:sent_private_messages, Api.Messages.PrivateMessage, foreign_key: :sender_id)
     has_many(:received_private_messages, Api.Messages.PrivateMessage, foreign_key: :receiver_id)
     many_to_many(:roles, Api.Servers.Role, join_through: Api.Servers.UserRole)
+    has_many(:friendships, Api.Friends.Friend, foreign_key: :user_id)
+    has_many(:friend_requests, Api.Friends.Friend, foreign_key: :friend_id)
   end
 
   def changeset(user, attrs) do
