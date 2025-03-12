@@ -9,7 +9,7 @@ defmodule Api.Repo.Migrations.CreateUsers do
       add(:email, :string, null: false)
       add(:password_hash, :string, null: false)
       add(:avatar_url, :string)
-      add(:status, :string)
+      add(:status, :string, default: "offline")
       timestamps(type: :utc_datetime)
     end
 

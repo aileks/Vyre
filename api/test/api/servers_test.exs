@@ -62,4 +62,60 @@ defmodule Api.ServersTest do
       assert %Ecto.Changeset{} = Servers.change_server(server)
     end
   end
+
+  describe "server_members" do
+    alias Api.Servers.ServerMember
+
+    import Api.ServersFixtures
+
+    @invalid_attrs %{role: nil, joined_at: nil}
+
+    test "list_server_members/0 returns all server_members" do
+      server_member = server_member_fixture()
+      assert Servers.list_server_members() == [server_member]
+    end
+
+    test "get_server_member!/1 returns the server_member with given id" do
+      server_member = server_member_fixture()
+      assert Servers.get_server_member!(server_member.id) == server_member
+    end
+
+    test "create_server_member/1 with valid data creates a server_member" do
+      valid_attrs = %{role: "some role", joined_at: ~U[2025-03-11 15:37:00Z]}
+
+      assert {:ok, %ServerMember{} = server_member} = Servers.create_server_member(valid_attrs)
+      assert server_member.role == "some role"
+      assert server_member.joined_at == ~U[2025-03-11 15:37:00Z]
+    end
+
+    test "create_server_member/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Servers.create_server_member(@invalid_attrs)
+    end
+
+    test "update_server_member/2 with valid data updates the server_member" do
+      server_member = server_member_fixture()
+      update_attrs = %{role: "some updated role", joined_at: ~U[2025-03-12 15:37:00Z]}
+
+      assert {:ok, %ServerMember{} = server_member} = Servers.update_server_member(server_member, update_attrs)
+      assert server_member.role == "some updated role"
+      assert server_member.joined_at == ~U[2025-03-12 15:37:00Z]
+    end
+
+    test "update_server_member/2 with invalid data returns error changeset" do
+      server_member = server_member_fixture()
+      assert {:error, %Ecto.Changeset{}} = Servers.update_server_member(server_member, @invalid_attrs)
+      assert server_member == Servers.get_server_member!(server_member.id)
+    end
+
+    test "delete_server_member/1 deletes the server_member" do
+      server_member = server_member_fixture()
+      assert {:ok, %ServerMember{}} = Servers.delete_server_member(server_member)
+      assert_raise Ecto.NoResultsError, fn -> Servers.get_server_member!(server_member.id) end
+    end
+
+    test "change_server_member/1 returns a server_member changeset" do
+      server_member = server_member_fixture()
+      assert %Ecto.Changeset{} = Servers.change_server_member(server_member)
+    end
+  end
 end

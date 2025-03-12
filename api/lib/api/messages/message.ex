@@ -5,22 +5,30 @@ defmodule Api.Messages.Message do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "messages" do
-    field(:timestamp, :utc_datetime)
     field(:content, :string)
     field(:edited, :boolean, default: false)
     field(:mentions_everyone, :boolean, default: false)
-    field(:user_id, :binary_id)
-    field(:channel_id, :binary_id)
+    field(:timestamp, :utc_datetime, default: DateTime.utc_now() |> DateTime.truncate(:second))
     timestamps(type: :utc_datetime)
 
-    belongs_to(:user, Api.Accounts.User, foreign_key: :user_id)
-    belongs_to(:channel, Api.Channels.Channel, foreign_key: :channel_id)
+    belongs_to(:user, Api.Accounts.User)
+    belongs_to(:channel, Api.Channels.Channel)
   end
 
-  @doc false
   def changeset(message, attrs) do
     message
-    |> cast(attrs, [:content, :timestamp, :edited, :mentions_everyone])
-    |> validate_required([:content, :timestamp, :edited, :mentions_everyone])
+    |> cast(attrs, [:content, :mentions_everyone, :user_id, :channel_id])
+    |> validate_required([:content, :user_id, :channel_id])
+    |> validate_length(:content, min: 1, max: 2000)
+    |> foreign_key_constraint(:user_id)
+    |> foreign_key_constraint(:channel_id)
+  end
+
+  def edit_changeset(message, attrs) do
+    message
+    |> cast(attrs, [:content, :mentions_everyone])
+    |> validate_required([:content])
+    |> validate_length(:content, min: 1, max: 2000)
+    |> put_change(:edited, true)
   end
 end

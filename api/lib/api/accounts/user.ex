@@ -12,9 +12,16 @@ defmodule Api.Accounts.User do
     field(:display_name, :string)
     field(:avatar_url, :string)
     field(:status, :string, default: "offline")
+    field(:created_at, :utc_datetime, default: DateTime.utc_now() |> DateTime.truncate(:second))
     timestamps(type: :utc_datetime)
 
     has_many(:owned_servers, Api.Servers.Server, foreign_key: :owner_id)
+    has_many(:messages, Api.Messages.Message)
+    has_many(:server_memberships, Api.Servers.ServerMember)
+    has_many(:servers, through: [:server_memberships, :server])
+    has_many(:sent_private_messages, Api.Messages.PrivateMessage, foreign_key: :sender_id)
+    has_many(:received_private_messages, Api.Messages.PrivateMessage, foreign_key: :receiver_id)
+    many_to_many(:roles, Api.Servers.Role, join_through: Api.Servers.UserRole)
   end
 
   def changeset(user, attrs) do
@@ -61,5 +68,35 @@ defmodule Api.Accounts.User do
 
   def registration_changeset(user, attrs) do
     changeset(user, attrs)
+  end
+
+  def update_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:display_name, :avatar_url, :status])
+    |> validate_inclusion(:status, ["online", "offline", "idle", "do_not_disturb"])
+  end
+
+  # def password_changeset(user, attrs) do
+  #   user
+  #   |> cast(attrs, [:password])
+  #   |> validate_required([:password])
+  #   |> validate_password()
+  #   |> hash_password()
+  # end
+
+  @doc """
+  Gets all private messages for a user, both sent and received.
+  Returns a query that can be further composed.
+  """
+  def all_private_messages(%__MODULE__{} = user) do
+    user_id = user.id
+
+    import Ecto.Query
+
+    from(p in Api.Messages.PrivateMessage,
+      where: p.sender_id == ^user_id or p.receiver_id == ^user_id,
+      order_by: [desc: p.timestamp],
+      select: p
+    )
   end
 end

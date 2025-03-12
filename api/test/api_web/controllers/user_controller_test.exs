@@ -31,7 +31,7 @@ defmodule ApiWeb.UserControllerTest do
       username = unique_user_username()
       avatar_url = "https://example.com/avatar.jpg"
       display_name = "Test User"
-      status = "active"
+      status = "online"
 
       attrs = %{
         status: status,
@@ -71,7 +71,7 @@ defmodule ApiWeb.UserControllerTest do
       username = unique_user_username()
       avatar_url = "https://example.com/updated.jpg"
       display_name = "Updated User"
-      status = "inactive"
+      status = "offline"
 
       update_attrs = %{
         status: status,

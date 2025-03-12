@@ -4,51 +4,39 @@ defmodule Api.Channels.Channel do
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
+  # Future proofing
+  @channel_types ["text", "voice", "announcement"]
+
   schema "channels" do
-    field(:name, :string, null: false)
-    field(:type, :string, default: "text")
+    field(:name, :string)
     field(:description, :string)
     field(:topic, :string)
-    field(:server_id, :binary_id)
-    field(:pm_user_id, :binary_id)
+    field(:type, :string, default: "text")
     timestamps(type: :utc_datetime)
 
-    belongs_to(:server, Api.Servers.Server, foreign_key: :server_id)
-    belongs_to(:pm_user, Api.Accounts.User, foreign_key: :pm_user_id)
+    belongs_to(:server, Api.Servers.Server)
     has_many(:messages, Api.Messaging.Message)
   end
 
   def changeset(channel, attrs) do
     channel
-    |> cast(attrs, [:name, :description, :topic, :type, :server_id, :pm_user_id])
-    |> validate_required([:name, :type])
-    |> validate_pm_or_server()
-    |> validate_type()
-  end
-
-  # Validate that a channel is either a PM channel or belongs to a server
-  defp validate_pm_or_server(changeset) do
-    type = get_field(changeset, :type)
-    server_id = get_field(changeset, :server_id)
-    pm_user_id = get_field(changeset, :pm_user_id)
-
-    case {type, server_id, pm_user_id} do
-      {"private", nil, pm_user_id} when not is_nil(pm_user_id) ->
-        changeset
-
-      {_type, server_id, _} when not is_nil(server_id) ->
-        changeset
-
-      _ ->
-        add_error(
-          changeset,
-          :base,
-          "Channel must either belong to a server or be a private message channel"
-        )
-    end
-  end
-
-  defp validate_type(changeset) do
-    validate_inclusion(changeset, :type, ["text", "voice", "private"])
+    |> cast(attrs, [:name, :description, :topic, :type, :server_id])
+    |> validate_required([:name, :server_id, :type])
+    |> validate_length(:name, min: 1, max: 100)
+    |> validate_length(:topic,
+      max: 200,
+      message: "Topic is too long (maximum is 200 characters)"
+    )
+    |> validate_length(:description,
+      max: 500,
+      message: "Description is too long (maximum is 500 characters)"
+    )
+    |> validate_inclusion(:type, @channel_types,
+      message: "must be one of: #{Enum.join(@channel_types, ", ")}"
+    )
+    |> foreign_key_constraint(:server_id, message: "Server does not exist")
+    |> unique_constraint([:server_id, :name],
+      message: "A channel with this name already exists in this server"
+    )
   end
 end

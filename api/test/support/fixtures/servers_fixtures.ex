@@ -25,4 +25,19 @@ defmodule Api.ServersFixtures do
 
     server
   end
+
+  @doc """
+  Generate a server_member.
+  """
+  def server_member_fixture(attrs \\ %{}) do
+    {:ok, server_member} =
+      attrs
+      |> Enum.into(%{
+        joined_at: ~U[2025-03-11 15:37:00Z],
+        role: "some role"
+      })
+      |> Api.Servers.create_server_member()
+
+    server_member
+  end
 end

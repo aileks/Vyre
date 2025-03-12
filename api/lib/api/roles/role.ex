@@ -11,16 +11,22 @@ defmodule Api.Roles.Role do
     field(:color, :string)
     field(:hoist, :boolean, default: false)
     field(:mentionable, :boolean, default: false)
-    field(:server_id, :binary_id)
     timestamps(type: :utc_datetime)
 
-    belongs_to(:server, Api.Servers.Server, foreign_key: :server_id)
+    belongs_to(:server, Api.Servers.Server)
+    many_to_many(:users, Api.Accounts.User, join_through: Api.Roles.UserRole)
   end
 
-  @doc false
   def changeset(role, attrs) do
     role
+    |> cast(attrs, [:name, :color, :permissions, :position, :hoist, :mentionable, :server_id])
+    |> validate_required([:name, :color, :permissions, :position, :server_id])
+    |> foreign_key_constraint(:server_id)
+  end
+
+  def update_changeset(role, attrs) do
+    role
     |> cast(attrs, [:name, :color, :permissions, :position, :hoist, :mentionable])
-    |> validate_required([:name, :color, :permissions, :position, :hoist, :mentionable])
+    |> validate_required([:name])
   end
 end
