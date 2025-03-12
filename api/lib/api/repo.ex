@@ -9,11 +9,11 @@ defmodule Api.Repo do
 
       config =
         config
-        |> Keyword.put(:search_path, db_schema)
+        |> Keyword.put(:search_path, [db_schema])
         |> Keyword.update(:parameters, [search_path: db_schema], fn params ->
           Keyword.put_new(params, :search_path, db_schema)
         end)
-        |> Keyword.put(:migration_source, "#{db_schema}_schema_migrations")
+        |> Keyword.put(:migration_source, "vyre_schema_migrations")
         |> Keyword.put(:migration_default_prefix, db_schema)
 
       {:ok, config}
