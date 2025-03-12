@@ -1,6 +1,5 @@
 defmodule Api.Repo.Migrations.CreateChannels do
   use Ecto.Migration
-  import Api.SchemaHelper
 
   def change do
     create table(:channels, primary_key: false, prefix: schema_prefix()) do

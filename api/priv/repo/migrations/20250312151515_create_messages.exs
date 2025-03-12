@@ -1,6 +1,5 @@
 defmodule Api.Repo.Migrations.CreateMessages do
   use Ecto.Migration
-  import Api.SchemaHelper
 
   def change do
     create table(:messages, primary_key: false, prefix: schema_prefix()) do

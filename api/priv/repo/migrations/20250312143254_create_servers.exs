@@ -1,6 +1,5 @@
 defmodule Api.Repo.Migrations.CreateServers do
   use Ecto.Migration
-  import Api.SchemaHelper
 
   def change do
     create table(:servers, primary_key: false, prefix: schema_prefix()) do

@@ -1,6 +1,5 @@
 defmodule Api.Repo.Migrations.CreatePrivateMessages do
   use Ecto.Migration
-  import Api.SchemaHelper
 
   def change do
     create table(:private_messages, primary_key: false, prefix: schema_prefix()) do

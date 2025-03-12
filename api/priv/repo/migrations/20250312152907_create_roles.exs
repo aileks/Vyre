@@ -1,6 +1,5 @@
 defmodule Api.Repo.Migrations.CreateRoles do
   use Ecto.Migration
-  import Api.SchemaHelper
 
   def change do
     create table(:roles, primary_key: false, prefix: schema_prefix()) do
