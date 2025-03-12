@@ -1,6 +1,6 @@
 import { A } from '@solidjs/router';
 import { useNavigate } from '@solidjs/router';
-import { createEffect, createSignal } from 'solid-js';
+import { Show, createEffect, createSignal } from 'solid-js';
 
 import { useAuth } from '../context/authContext';
 import { AuthResult } from '../types';
@@ -45,8 +45,7 @@ export default function Login() {
           Login
         </div>
 
-        {/* TODO: Use Show component here */}
-        {error() && (
+        <Show when={error()}>
           <div class='border-error-700 bg-midnight-800 text-error-400 mb-5 rounded-xs border p-3 text-sm'>
             <div class='flex items-center'>
               <svg
@@ -67,7 +66,7 @@ export default function Login() {
               <span class='text-wrap'>{error()}</span>
             </div>
           </div>
-        )}
+        </Show>
 
         <form onSubmit={handleSubmit} class='space-y-4 sm:space-y-5'>
           <div>

@@ -1,4 +1,4 @@
-import { JSX, createContext, useContext } from 'solid-js';
+import { Component, ParentProps, createContext, useContext } from 'solid-js';
 
 import {
   currentError,
@@ -23,9 +23,9 @@ interface AuthContextValue {
   refreshSession: () => Promise<User | null>;
 }
 
-const AuthContext = createContext<AuthContextValue | null>(null);
+const AuthContext = createContext<AuthContextValue>();
 
-export const AuthProvider = (props: { children: JSX.Element }) => {
+export const AuthProvider: Component<ParentProps> = props => {
   return (
     <AuthContext.Provider
       value={{

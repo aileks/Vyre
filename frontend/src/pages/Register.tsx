@@ -1,5 +1,5 @@
 import { A, useNavigate } from '@solidjs/router';
-import { createEffect, createSignal } from 'solid-js';
+import { Show, createEffect, createSignal } from 'solid-js';
 
 import { useAuth } from '../context/authContext';
 import { AuthResult, RegistrationData } from '../types';
@@ -55,8 +55,7 @@ export default function Register() {
           Error state: {error() ? `"${error()}"` : 'none'}
         </div>
 
-        {/* TODO: Use Show component here */}
-        {error() && (
+        <Show when={error()}>
           <div class='border-error-700 bg-midnight-800 text-error-400 mb-5 rounded-xs border p-3 text-sm'>
             <div class='flex items-center'>
               <svg
@@ -76,7 +75,7 @@ export default function Register() {
               <span class='text-wrap'>{error()}</span>
             </div>
           </div>
-        )}
+        </Show>
 
         <form onSubmit={handleSubmit} class='space-y-3 sm:space-y-4'>
           <div>
