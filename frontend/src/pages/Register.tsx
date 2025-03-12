@@ -30,7 +30,7 @@ export default function Register() {
 
     const credentials: RegistrationData = {
       username: username(),
-      displayName: username(), // using username as display_name by default
+      displayName: username(), // using username as displayName by default
       email: email(),
       password: password(),
     };
@@ -38,7 +38,6 @@ export default function Register() {
     const res: AuthResult = await register(credentials);
 
     if ('error' in res) {
-      console.log('LOGGING RES', res);
       setError(res.error.message!);
       return;
     }
