@@ -2,15 +2,17 @@ import { A } from '@solidjs/router';
 import { useNavigate } from '@solidjs/router';
 import { createEffect, createSignal } from 'solid-js';
 
-import { isAuthenticated, isLoading, login } from '../stores/authStore';
+import { useAuth } from '../context/authContext';
 import { AuthResult } from '../types';
 
 export default function Login() {
-  const navigate = useNavigate();
   const [email, setEmail] = createSignal<string>('');
   const [password, setPassword] = createSignal<string>('');
   const [error, setError] = createSignal<string>('');
   const [remember, setRemember] = createSignal<boolean>(false);
+
+  const navigate = useNavigate();
+  const { isAuthenticated, isLoading, login } = useAuth();
 
   createEffect(() => {
     if (isAuthenticated()) navigate('/', { replace: true });

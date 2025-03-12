@@ -1,8 +1,10 @@
 import { A } from '@solidjs/router';
 
-import { isAuthenticated } from '../stores/authStore';
+import { useAuth } from '../context/authContext';
 
 export default function Home() {
+  const { isAuthenticated } = useAuth();
+
   return (
     <div class='container mx-auto mt-32 max-w-6xl px-4 py-16'>
       <div class='bg-midnight-800 shadow-midnight-900/50 mb-12 overflow-hidden rounded-xs border border-gray-700 shadow-md'>

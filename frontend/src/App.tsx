@@ -1,15 +1,15 @@
-import { Show, Suspense } from 'solid-js';
+import { Suspense } from 'solid-js';
 
+import { AuthProvider } from './context/authContext';
 import AppRouter from './router';
-import { isLoading } from './stores/authStore';
 
 export default function App() {
   return (
-    <Suspense fallback={<LoadingSpinner />}>
-      <Show when={isLoading} fallback={<LoadingSpinner />}>
+    <AuthProvider>
+      <Suspense fallback={<LoadingSpinner />}>
         <AppRouter />
-      </Show>
-    </Suspense>
+      </Suspense>
+    </AuthProvider>
   );
 }
 
