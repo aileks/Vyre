@@ -9,8 +9,8 @@ defmodule Api.Servers.ServerMember do
     field(:nickname, :string)
     timestamps(type: :utc_datetime)
 
-    belongs_to(:user, Api.Accounts.User)
-    belongs_to(:server, Api.Servers.Server)
+    belongs_to(:user, Api.Accounts.User, foreign_key: :user_id, type: :binary_id)
+    belongs_to(:server, Api.Servers.Server, foreign_key: :server_id, type: :binary_id)
     many_to_many(:roles, Api.Roles.Role, join_through: "server_member_roles")
   end
 

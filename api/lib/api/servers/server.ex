@@ -10,9 +10,9 @@ defmodule Api.Servers.Server do
     field(:icon_url, :string)
     timestamps(type: :utc_datetime)
 
-    belongs_to(:owner, Api.Accounts.User)
-    has_many(:channels, Api.Channels.Channel)
-    has_many(:roles, Api.Roles.Role)
+    belongs_to(:owner, Api.Accounts.User, foreign_key: :owner_id, type: :binary_id)
+    has_many(:channels, Api.Channels.Channel, foreign_key: :channel_id, type: :binary_id)
+    has_many(:roles, Api.Roles.Role, foreign_key: :role_id, type: :binary_id)
     has_many(:server_members, Api.Servers.ServerMember)
     has_many(:users, through: [:server_members, :user])
   end

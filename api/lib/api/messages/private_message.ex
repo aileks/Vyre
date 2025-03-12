@@ -10,8 +10,8 @@ defmodule Api.Messages.PrivateMessage do
     field(:edited, :boolean, default: false)
     timestamps(type: :utc_datetime)
 
-    belongs_to(:sender, Api.Accounts.User)
-    belongs_to(:receiver, Api.Accounts.User)
+    belongs_to(:sender, Api.Accounts.User, foreign_key: :sender_id, type: :binary_id)
+    belongs_to(:receiver, Api.Accounts.User, foreign_key: :receiver_id, type: :binary_id)
   end
 
   def changeset(private_message, attrs) do

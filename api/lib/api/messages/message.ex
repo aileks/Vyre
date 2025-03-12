@@ -10,8 +10,8 @@ defmodule Api.Messages.Message do
     field(:mentions_everyone, :boolean, default: false)
     timestamps(type: :utc_datetime)
 
-    belongs_to(:user, Api.Accounts.User)
-    belongs_to(:channel, Api.Channels.Channel)
+    belongs_to(:user, Api.Accounts.User, foreign_key: :user_id, type: :binary_id)
+    belongs_to(:channel, Api.Channels.Channel, foreign_key: :channel_id, type: :binary_id)
   end
 
   def changeset(message, attrs) do
