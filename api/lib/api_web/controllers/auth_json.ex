@@ -12,7 +12,7 @@ defmodule ApiWeb.AuthJSON do
     }
   end
 
-  def user_with_token(%{user: user, token: {token_string, expiry}, conn: _conn}) do
+  def user_with_token(%{user: user, token: token, expiry: expiry} = _params) do
     %{
       user: %{
         id: user.id,
@@ -22,7 +22,7 @@ defmodule ApiWeb.AuthJSON do
         display_name: user.display_name,
         avatar_url: user.avatar_url
       },
-      token: token_string,
+      token: token,
       expires_at: expiry
     }
   end
