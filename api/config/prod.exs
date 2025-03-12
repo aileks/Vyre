@@ -14,6 +14,8 @@ config :logger, level: :info
 config :api, Api.Repo,
   adapter: Ecto.Adapters.Postgres,
   show_sensitive_data_on_connection_error: true,
+  parameters: [search_path: System.get_env("DB_SCHEMA")],
+  migration_default_prefix: System.get_env("DB_SCHEMA"),
   url: database_url,
   ssl: [
     verify: :verify_peer,
