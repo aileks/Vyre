@@ -3,7 +3,7 @@ FROM elixir:1.18-alpine
 ARG MIX_ENV
 ARG GUARDIAN_SECRET_KEY
 ARG DATABASE_URL
-ARG SCHEMA
+ARG DB_SCHEMA
 
 RUN apk add --no-cache build-base openssl ncurses-libs postgresql-dev postgresql-client \
     libstdc++ ca-certificates curl
