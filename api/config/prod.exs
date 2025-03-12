@@ -13,6 +13,7 @@ config :logger, level: :info
 
 config :api, Api.Repo,
   adapter: Ecto.Adapters.Postgres,
+  show_sensitive_data_on_connection_error: true,
   url: database_url,
   ssl: [
     verify: :verify_peer,
