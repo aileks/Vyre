@@ -7,6 +7,8 @@ database_url =
     For example: ecto://USER:PASS@HOST/DATABASE
     """
 
+db_schema = System.get_env("DB_SCHEMA") || raise "environment variable DB_SCHEMA is missing"
+
 config :api, Api.Accounts.Guardian, secret_key: System.get_env("GUARDIAN_SECRET_KEY")
 
 config :logger, level: :info
@@ -14,8 +16,8 @@ config :logger, level: :info
 config :api, Api.Repo,
   adapter: Ecto.Adapters.Postgres,
   show_sensitive_data_on_connection_error: true,
-  parameters: [search_path: System.get_env("DB_SCHEMA")],
-  migration_default_prefix: System.get_env("DB_SCHEMA"),
+  parameters: [search_path: db_schema],
+  migration_default_prefix: db_schema,
   url: database_url,
   ssl: [
     verify: :verify_peer,
