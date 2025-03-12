@@ -2,6 +2,7 @@ defmodule Api.Channels.Channel do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @schema_prefix Api.SchemaHelper.schema_prefix()
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   # Future proofing

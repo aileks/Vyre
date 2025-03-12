@@ -2,6 +2,7 @@ defmodule Api.Servers.ServerMember do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @schema_prefix Api.SchemaHelper.schema_prefix()
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "server_members" do

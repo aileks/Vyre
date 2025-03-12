@@ -6,6 +6,7 @@ defmodule Api.Roles.UserRole do
   alias Api.Repo
   alias Api.Roles.Role
 
+  @schema_prefix Api.SchemaHelper.schema_prefix()
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "user_roles" do
