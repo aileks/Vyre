@@ -4,7 +4,7 @@ defmodule ApiWeb.FriendController do
   alias Api.Friends
   alias Api.Friends.Friend
 
-  action_fallback ApiWeb.FallbackController
+  action_fallback(ApiWeb.FallbackController)
 
   def index(conn, _params) do
     friends = Friends.list_friends()
@@ -39,5 +39,40 @@ defmodule ApiWeb.FriendController do
     with {:ok, %Friend{}} <- Friends.delete_friend(friend) do
       send_resp(conn, :no_content, "")
     end
+  end
+
+  # ---------------------------------------------- #
+  #          Friend Request Service Logic          #
+  # ---------------------------------------------- #
+
+  def send_request(conn, %{"friend_id" => friend_id}) do
+    case Friends.send_friend_request(conn.assigns.current_user.id, friend_id) do
+      {:ok, _friend_request} -> json(conn, %{message: "Friend request sent"})
+      {:error, error} -> json(conn, %{error: error}, 400)
+    end
+  end
+
+  def accept_request(conn, %{"friend_id" => friend_id}) do
+    case Friends.accept_friend_request(conn.assigns.current_user.id, friend_id) do
+      {:ok, _friendship} -> json(conn, %{message: "Friend request accepted"})
+      {:error, error} -> json(conn, %{error: error}, 400)
+    end
+  end
+
+  def decline_request(conn, %{"friend_id" => friend_id}) do
+    case Friends.decline_friend_request(conn.assigns.current_user.id, friend_id) do
+      {:ok, _} -> json(conn, %{message: "Friend request declined"})
+      {:error, error} -> json(conn, %{error: error}, 400)
+    end
+  end
+
+  def list_friends(conn, _params) do
+    friends = Friends.get_friends(conn.assigns.current_user.id)
+    json(conn, friends)
+  end
+
+  def list_pending_requests(conn, _params) do
+    requests = Friends.get_pending_friend_requests(conn.assigns.current_user.id)
+    json(conn, requests)
   end
 end

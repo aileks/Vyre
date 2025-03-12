@@ -5,15 +5,19 @@ defmodule Api.Friends.Friend do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "friends" do
+    # "pending" or "accepted"
+    field(:status, :string, default: "pending")
+    timestamps(type: :utc_datetime)
+
     belongs_to(:user, Api.Accounts.User, foreign_key: :user_id)
     belongs_to(:friend, Api.Accounts.User, foreign_key: :friend_id)
-
-    timestamps(type: :utc_datetime)
   end
 
   def changeset(friend, attrs) do
     friend
-    |> cast(attrs, [:user_id, :friend_id])
-    |> validate_required([:user_id, :friend_id])
+    |> cast(attrs, [:user_id, :friend_id, :status])
+    |> validate_required([:user_id, :friend_id, :status])
+    |> validate_inclusion(:status, ["pending", "accepted"])
+    |> unique_constraint([:user_id, :friend_id], message: "You've already sent a friend request")
   end
 end

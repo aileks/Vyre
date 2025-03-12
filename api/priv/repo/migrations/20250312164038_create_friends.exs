@@ -3,14 +3,16 @@ defmodule Api.Repo.Migrations.CreateFriends do
 
   def change do
     create table(:friends, primary_key: false) do
-      add :id, :binary_id, primary_key: true
-      add :user_id, references(:users, on_delete: :nothing, type: :binary_id)
-      add :friend_id, references(:users, on_delete: :nothing, type: :binary_id)
+      add(:id, :binary_id, primary_key: true)
+      add(:status, :string, default: "pending")
+      add(:user_id, references(:users, on_delete: :delete_all, type: :binary_id))
+      add(:friend_id, references(:users, on_delete: :delete_all, type: :binary_id))
 
       timestamps(type: :utc_datetime)
     end
 
-    create index(:friends, [:user_id])
-    create index(:friends, [:friend_id])
+    create(index(:friends, [:user_id]))
+    create(index(:friends, [:friend_id]))
+    create(unique_index(:friends, [:user_id, :friend_id], name: :unique_friendship))
   end
 end
