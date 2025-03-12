@@ -7,5 +7,3 @@ services:
       dockerfile: ./Dockerfile
     ports:
       - "4000:4000"
-    environment:
-      MIX_ENV: prod

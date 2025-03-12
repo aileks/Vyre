@@ -53,6 +53,7 @@ export default function Register() {
           Error state: {error() ? `"${error()}"` : 'none'}
         </div>
 
+        {/* TODO: Use Show component here */}
         {error() && (
           <div class='border-error-700 bg-midnight-800 text-error-400 mb-5 rounded-xs border p-3 text-sm'>
             <div class='flex items-center'>
