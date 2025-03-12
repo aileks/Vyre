@@ -4,7 +4,6 @@ defmodule Api.Servers.Server do
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
-
   schema "servers" do
     field(:name, :string)
     field(:description, :string)
