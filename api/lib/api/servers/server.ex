@@ -8,7 +8,6 @@ defmodule Api.Servers.Server do
     field(:name, :string)
     field(:description, :string)
     field(:icon_url, :string)
-    field(:created_at, :utc_datetime, default: DateTime.utc_now() |> DateTime.truncate(:second))
     timestamps(type: :utc_datetime)
 
     belongs_to(:owner, Api.Accounts.User)

@@ -18,7 +18,7 @@ defmodule ApiWeb.ServerMemberJSON do
   defp data(%ServerMember{} = server_member) do
     %{
       id: server_member.id,
-      role: server_member.role,
+      roles: server_member.roles,
       joined_at: server_member.joined_at
     }
   end

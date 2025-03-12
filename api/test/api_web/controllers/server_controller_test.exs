@@ -8,16 +8,14 @@ defmodule ApiWeb.ServerControllerTest do
   @create_attrs %{
     name: "some name",
     description: "some description",
-    icon_url: "some icon_url",
-    created_at: ~U[2025-03-11 14:32:00Z]
+    icon_url: "some icon_url"
   }
   @update_attrs %{
     name: "some updated name",
     description: "some updated description",
-    icon_url: "some updated icon_url",
-    created_at: ~U[2025-03-12 14:32:00Z]
+    icon_url: "some updated icon_url"
   }
-  @invalid_attrs %{name: nil, description: nil, icon_url: nil, created_at: nil}
+  @invalid_attrs %{name: nil, description: nil, icon_url: nil}
 
   setup %{conn: conn} do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
@@ -83,9 +81,9 @@ defmodule ApiWeb.ServerControllerTest do
       conn = delete(conn, ~p"/api/servers/#{server}")
       assert response(conn, 204)
 
-      assert_error_sent 404, fn ->
+      assert_error_sent(404, fn ->
         get(conn, ~p"/api/servers/#{server}")
-      end
+      end)
     end
   end
 

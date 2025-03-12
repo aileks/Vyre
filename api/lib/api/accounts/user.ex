@@ -12,7 +12,6 @@ defmodule Api.Accounts.User do
     field(:display_name, :string)
     field(:avatar_url, :string)
     field(:status, :string, default: "offline")
-    field(:created_at, :utc_datetime, default: DateTime.utc_now() |> DateTime.truncate(:second))
     timestamps(type: :utc_datetime)
 
     has_many(:owned_servers, Api.Servers.Server, foreign_key: :owner_id)

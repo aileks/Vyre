@@ -8,7 +8,7 @@ defmodule Api.ServersTest do
 
     import Api.ServersFixtures
 
-    @invalid_attrs %{name: nil, description: nil, icon_url: nil, created_at: nil}
+    @invalid_attrs %{name: nil, description: nil, icon_url: nil}
 
     test "list_servers/0 returns all servers" do
       server = server_fixture()
@@ -21,13 +21,16 @@ defmodule Api.ServersTest do
     end
 
     test "create_server/1 with valid data creates a server" do
-      valid_attrs = %{name: "some name", description: "some description", icon_url: "some icon_url", created_at: ~U[2025-03-11 14:32:00Z]}
+      valid_attrs = %{
+        name: "some name",
+        description: "some description",
+        icon_url: "some icon_url"
+      }
 
       assert {:ok, %Server{} = server} = Servers.create_server(valid_attrs)
       assert server.name == "some name"
       assert server.description == "some description"
       assert server.icon_url == "some icon_url"
-      assert server.created_at == ~U[2025-03-11 14:32:00Z]
     end
 
     test "create_server/1 with invalid data returns error changeset" do
@@ -36,13 +39,17 @@ defmodule Api.ServersTest do
 
     test "update_server/2 with valid data updates the server" do
       server = server_fixture()
-      update_attrs = %{name: "some updated name", description: "some updated description", icon_url: "some updated icon_url", created_at: ~U[2025-03-12 14:32:00Z]}
+
+      update_attrs = %{
+        name: "some updated name",
+        description: "some updated description",
+        icon_url: "some updated icon_url"
+      }
 
       assert {:ok, %Server{} = server} = Servers.update_server(server, update_attrs)
       assert server.name == "some updated name"
       assert server.description == "some updated description"
       assert server.icon_url == "some updated icon_url"
-      assert server.created_at == ~U[2025-03-12 14:32:00Z]
     end
 
     test "update_server/2 with invalid data returns error changeset" do
@@ -96,14 +103,19 @@ defmodule Api.ServersTest do
       server_member = server_member_fixture()
       update_attrs = %{role: "some updated role", joined_at: ~U[2025-03-12 15:37:00Z]}
 
-      assert {:ok, %ServerMember{} = server_member} = Servers.update_server_member(server_member, update_attrs)
+      assert {:ok, %ServerMember{} = server_member} =
+               Servers.update_server_member(server_member, update_attrs)
+
       assert server_member.role == "some updated role"
       assert server_member.joined_at == ~U[2025-03-12 15:37:00Z]
     end
 
     test "update_server_member/2 with invalid data returns error changeset" do
       server_member = server_member_fixture()
-      assert {:error, %Ecto.Changeset{}} = Servers.update_server_member(server_member, @invalid_attrs)
+
+      assert {:error, %Ecto.Changeset{}} =
+               Servers.update_server_member(server_member, @invalid_attrs)
+
       assert server_member == Servers.get_server_member!(server_member.id)
     end
 

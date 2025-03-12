@@ -16,7 +16,6 @@ defmodule Api.ServersFixtures do
     {:ok, server} =
       attrs
       |> Enum.into(%{
-        created_at: ~U[2025-03-11 14:32:00Z],
         description: "some description",
         icon_url: "some icon_url",
         name: unique_server_name()

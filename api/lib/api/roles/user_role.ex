@@ -4,9 +4,7 @@ defmodule Api.Roles.UserRole do
   import Ecto.Changeset
   import Ecto.Query
   alias Api.Repo
-  alias Api.Accounts.User
   alias Api.Roles.Role
-  alias Api.Servers.Server
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -56,7 +54,7 @@ defmodule Api.Roles.UserRole do
           nil ->
             add_error(changeset, :role_id, "Role not found")
 
-          different_server_id ->
+          _different_server_id ->
             add_error(changeset, :role_id, "Role must belong to the specified server")
         end
     end
