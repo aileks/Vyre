@@ -3,17 +3,16 @@ defmodule Api.Repo.Migrations.CreatePrivateMessages do
 
   def change do
     create table(:private_messages, primary_key: false) do
-      add :id, :binary_id, primary_key: true
-      add :content, :text
-      add :timestamp, :utc_datetime
-      add :read, :boolean, default: false, null: false
-      add :sender_id, references(:users, on_delete: :nothing, type: :binary_id)
-      add :receiver_id, references(:users, on_delete: :nothing, type: :binary_id)
+      add(:id, :binary_id, primary_key: true)
+      add(:content, :text)
+      add(:read, :boolean, default: false, null: false)
+      add(:sender_id, references(:users, on_delete: :nothing, type: :binary_id))
+      add(:receiver_id, references(:users, on_delete: :nothing, type: :binary_id))
 
       timestamps(type: :utc_datetime)
     end
 
-    create index(:private_messages, [:sender_id])
-    create index(:private_messages, [:receiver_id])
+    create(index(:private_messages, [:sender_id]))
+    create(index(:private_messages, [:receiver_id]))
   end
 end

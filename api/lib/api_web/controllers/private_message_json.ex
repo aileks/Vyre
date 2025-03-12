@@ -19,7 +19,7 @@ defmodule ApiWeb.PrivateMessageJSON do
     %{
       id: private_message.id,
       content: private_message.content,
-      timestamp: private_message.timestamp,
+      timestamp: private_message.inserted_at,
       read: private_message.read
     }
   end

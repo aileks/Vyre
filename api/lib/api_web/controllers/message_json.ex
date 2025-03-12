@@ -19,7 +19,7 @@ defmodule ApiWeb.MessageJSON do
     %{
       id: message.id,
       content: message.content,
-      timestamp: message.timestamp,
+      timestamp: message.inserted_at,
       edited: message.edited,
       mentions_everyone: message.mentions_everyone
     }

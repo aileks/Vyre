@@ -8,7 +8,6 @@ defmodule Api.Messages.PrivateMessage do
     field(:content, :string)
     field(:read, :boolean, default: false)
     field(:edited, :boolean, default: false)
-    field(:timestamp, :utc_datetime, default: DateTime.utc_now() |> DateTime.truncate(:second))
     timestamps(type: :utc_datetime)
 
     belongs_to(:sender, Api.Accounts.User)
