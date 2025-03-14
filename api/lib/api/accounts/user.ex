@@ -59,17 +59,16 @@ defmodule Api.Accounts.User do
       max: 80,
       message: "Password must be at least 8 characters"
     )
-
-    # |> validate_format(:password, ~r/[A-Z]/,
-    #   message: "Password must contain at least one uppercase letter"
-    # )
-    # |> validate_format(:password, ~r/[a-z]/,
-    #   message: "Password must contain at least one lowercase letter"
-    # )
-    # |> validate_format(:password, ~r/[0-9]/, message: "Password must contain at least one number")
-    # |> validate_format(:password, ~r/[^A-Za-z0-9]/,
-    #   message: "Password must contain at least one special character"
-    # )
+    |> validate_format(:password, ~r/[A-Z]/,
+      message: "Password must contain at least one uppercase letter"
+    )
+    |> validate_format(:password, ~r/[a-z]/,
+      message: "Password must contain at least one lowercase letter"
+    )
+    |> validate_format(:password, ~r/[0-9]/, message: "Password must contain at least one number")
+    |> validate_format(:password, ~r/[^A-Za-z0-9]/,
+      message: "Password must contain at least one special character"
+    )
   end
 
   defp hash_password(changeset) do
