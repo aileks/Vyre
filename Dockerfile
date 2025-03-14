@@ -13,11 +13,11 @@ RUN curl -s -o /etc/ssl/certs/prod-ca-2021.crt https://supabase-downloads.s3-ap-
 
 WORKDIR /app
 
-COPY api/mix.exs api/mix.lock ./
+COPY backend/mix.exs backend/mix.lock ./
 
 RUN mix deps.get --only prod
 
-COPY api/ ./
+COPY backend/ ./
 
 RUN mix deps.compile
 RUN mix ecto.migrate --prefix ${DB_SCHEMA}
