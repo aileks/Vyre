@@ -224,21 +224,26 @@ export const login = async (
 export const logout = async (): Promise<void> => {
   setAuth('status', 'loading');
 
-  // TODO: Handle any errors more gracefully
-  if (auth.token) {
-    apiFetch('/api/auth/logout', { method: 'DELETE' }).catch(console.error);
+  try {
+    if (auth.token) {
+      await apiFetch('/api/auth/logout', { method: 'DELETE' }).catch(
+        console.error,
+      );
+    }
+  } catch (err) {
+    console.error('Logout failed:', err);
+  } finally {
+    clearStoredToken();
+    setAuth(
+      reconcile({
+        status: 'idle',
+        user: null,
+        token: null,
+        expiresAt: null,
+        error: null,
+      }),
+    );
   }
-
-  clearStoredToken();
-  setAuth(
-    reconcile({
-      status: 'idle',
-      user: null,
-      token: null,
-      expiresAt: null,
-      error: null,
-    }),
-  );
 };
 
 /**

@@ -6,7 +6,7 @@ import solid from 'vite-plugin-solid';
 export default defineConfig({
   plugins: [solid(), tailwindcss(), devtools()],
   build: {
-    outDir: '../api/priv/static',
+    outDir: '../backend/priv/static',
     target: 'esnext',
   },
 });

@@ -38,6 +38,7 @@ export default function Register() {
     const res: AuthResult = await register(credentials);
 
     if ('error' in res) {
+      console.log('LOGGING RES ERROR', res);
       setError(res.error.message!);
       return;
     }
