@@ -20,7 +20,7 @@ interface AuthContextValue {
   login: (credentials: LoginCredentials) => Promise<AuthResult>;
   logout: () => Promise<void>;
   register: (userData: RegistrationData) => Promise<AuthResult>;
-  setupSession: () => Promise<void>;
+  setupSession: () => Promise<User | null>;
 }
 
 const AuthContext = createContext<AuthContextValue>();

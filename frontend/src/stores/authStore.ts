@@ -1,4 +1,3 @@
-import { Session } from 'inspector/promises';
 import { batch, createEffect, createRoot, onCleanup } from 'solid-js';
 import { createStore, reconcile } from 'solid-js/store';
 
