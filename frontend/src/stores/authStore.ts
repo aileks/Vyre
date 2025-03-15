@@ -105,6 +105,9 @@ const apiFetch = async <T>(
   url: string,
   options: RequestInit = {},
 ): Promise<{ ok: boolean; data: T }> => {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10000);
+
   try {
     // Add auth token if available
     if (auth.token) {
@@ -120,6 +123,7 @@ const apiFetch = async <T>(
       ...options.headers,
     };
 
+    options.signal = controller.signal;
     const res = await fetch(url, options);
     const data = await res.json().catch(() => ({}));
 
@@ -134,6 +138,8 @@ const apiFetch = async <T>(
       ok: false,
       data: { error: { message: 'Network error occurred' } } as unknown as T,
     };
+  } finally {
+    clearTimeout(timeout);
   }
 };
 
