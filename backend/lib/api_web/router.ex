@@ -7,15 +7,15 @@ defmodule ApiWeb.Router do
   end
 
   pipeline :maybe_auth do
-    plug(ApiWeb.Auth.Pipeline)
+    plug(Api.Auth.Pipeline)
   end
 
   pipeline :auth do
-    plug(ApiWeb.Auth.AuthenticatedPipeline)
+    plug(Api.Auth.AuthenticatedPipeline)
   end
 
   pipeline :refresh do
-    plug(ApiWeb.Auth.RefreshablePipeline)
+    plug(Api.Auth.RefreshablePipeline)
   end
 
   pipeline :browser do

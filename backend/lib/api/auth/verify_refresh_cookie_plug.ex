@@ -1,4 +1,4 @@
-defmodule ApiWeb.Auth.VerifyRefreshCookiePlug do
+defmodule Api.Auth.VerifyRefreshCookiePlug do
   import Plug.Conn
 
   @doc """

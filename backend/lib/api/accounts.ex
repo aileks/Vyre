@@ -43,8 +43,6 @@ defmodule Api.Accounts do
     end
   end
 
-  # def get_user!(id), do: Repo.get!(User, id)
-
   @doc """
   Creates a user.
 

@@ -92,14 +92,6 @@ defmodule Api.Accounts.User do
     |> validate_inclusion(:status, ["online", "offline", "idle", "do_not_disturb"])
   end
 
-  # def password_changeset(user, attrs) do
-  #   user
-  #   |> cast(attrs, [:password])
-  #   |> validate_required([:password])
-  #   |> validate_password()
-  #   |> hash_password()
-  # end
-
   @doc """
   Gets all private messages for a user, both sent and received.
   Returns a query that can be further composed.

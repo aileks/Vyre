@@ -1,7 +1,7 @@
-defmodule ApiWeb.Auth.Pipeline do
+defmodule Api.Auth.Pipeline do
   use Guardian.Plug.Pipeline,
     otp_app: :api,
-    error_handler: ApiWeb.Auth.ErrorHandler,
+    error_handler: Api.Auth.ErrorHandler,
     module: Api.Guardian
 
   # If there is a session token, restrict it to an access token and validate it
@@ -17,10 +17,10 @@ defmodule ApiWeb.Auth.Pipeline do
   plug(Guardian.Plug.LoadResource, allow_blank: true)
 end
 
-defmodule ApiWeb.Auth.AuthenticatedPipeline do
+defmodule Api.Auth.AuthenticatedPipeline do
   use Guardian.Plug.Pipeline,
     otp_app: :api,
-    error_handler: ApiWeb.Auth.ErrorHandler,
+    error_handler: Api.Auth.ErrorHandler,
     module: Api.Guardian
 
   # Verify the token
@@ -35,12 +35,12 @@ defmodule ApiWeb.Auth.AuthenticatedPipeline do
   plug(Guardian.Plug.EnsureAuthenticated)
 end
 
-defmodule ApiWeb.Auth.RefreshablePipeline do
+defmodule Api.Auth.RefreshablePipeline do
   use Guardian.Plug.Pipeline,
     otp_app: :api,
-    error_handler: ApiWeb.Auth.ErrorHandler,
+    error_handler: Api.Auth.ErrorHandler,
     module: Api.Guardian
 
   # Check specifically for the refresh token in cookie
-  plug(ApiWeb.Auth.VerifyRefreshCookiePlug)
+  plug(Api.Auth.VerifyRefreshCookiePlug)
 end

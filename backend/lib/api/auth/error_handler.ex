@@ -1,4 +1,4 @@
-defmodule ApiWeb.Auth.ErrorHandler do
+defmodule Api.Auth.ErrorHandler do
   import Plug.Conn
   import Phoenix.Controller
 
