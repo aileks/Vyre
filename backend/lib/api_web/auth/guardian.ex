@@ -27,23 +27,19 @@ defmodule ApiWeb.Auth.Guardian do
     end
   end
 
-  def subject_for_token(resource, _claims) do
-    sub = to_string(resource.id)
+  def subject_for_token(%{id: id}, _claims) do
+    sub = to_string(id)
     {:ok, sub}
   end
 
-  def resource_from_claims(claims) do
-    id = claims["sub"]
+  def subject_for_token(_, _) do
+    {:error, :missing_id}
+  end
 
-    case Accounts.get_user(id) do
-      {:ok, user} ->
-        {:ok, user}
-
-      {:error, :not_found} ->
-        {:error, :not_found}
-
-      _error ->
-        {:error, :resource_not_found}
+  def resource_from_claims(%{"sub" => id}) do
+    case Accounts.get_user!(id) do
+      nil -> {:error, :not_found}
+      user -> {:ok, user}
     end
   end
 
@@ -52,8 +48,8 @@ defmodule ApiWeb.Auth.Guardian do
 
   Returns tuple with token string and expiration timestamp.
   """
+  # Set appropriate TTL based on remember_me flag
   def create_token(user, remember_me \\ false) do
-    # Set appropriate TTL based on remember_me flag
     ttl = if remember_me, do: {30, :days}, else: {1, :hour}
 
     case encode_and_sign(user, %{}, token_type: "access", ttl: ttl) do

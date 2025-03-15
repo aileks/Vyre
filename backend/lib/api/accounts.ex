@@ -29,18 +29,15 @@ defmodule Api.Accounts do
 
   ## Examples
 
-      iex> get_user(123)
+      iex> get_user!(123)
       %User{}
 
-      iex> get_user(456)
+      iex> get_user!(456)
       ** (Ecto.NoResultsError)
 
   """
-  def get_user(id) do
-    case Repo.get(User, id) do
-      nil -> {:error, :not_found}
-      user -> {:ok, user}
-    end
+  def get_user!(id) do
+    Repo.get(User, id)
   end
 
   @doc """
@@ -118,35 +115,55 @@ defmodule Api.Accounts do
   end
 
   @doc """
-  Gets a user by email.
+  Gets a single user.any() by email.
+
+  Returns 'nil' if the user doesn't exist.
+
+  ## Examples
+
+      iex> get_user_by_email!("user@example.com")
+      %User{}
+
+      iex> get_user_by_email!("unknown@example.com")
+      nil
+
   """
-  def get_user_by_email(email) when is_binary(email) do
+  def get_user_by_email!(email) when is_binary(email) do
     Repo.get_by(User, email: email)
   end
 
   @doc """
-  Gets a user by username.
+  Gets a single user.any() by username.
+
+  Returns 'nil' if the user doesn't exist.
+
+  ## Examples
+
+      iex> get_user_by_username!("username123")
+      %User{}
+
+      iex> get_user_by_username!("unknown")
+      nil
+
   """
-  def get_user_by_username(username) when is_binary(username) do
+  def get_user_by_username!(username) when is_binary(username) do
     Repo.get_by(User, username: username)
   end
 
   @doc """
   Authenticates a user.
+  Includes a failsafe for invalid credentials to prevent timing attacks.
   """
   def authenticate_user(email, password) do
-    user = get_user_by_email(email)
-
-    case user do
+    case get_user_by_email!(email) do
       nil ->
         Bcrypt.no_user_verify()
         {:error, :invalid_credentials}
 
       user ->
-        if Bcrypt.verify_pass(password, user.password_hash) do
-          {:ok, user}
-        else
-          {:error, :invalid_credentials}
+        case Bcrypt.verify_pass(password, user.password_hash) do
+          true -> {:ok, user}
+          false -> {:error, :invalid_credentials}
         end
     end
   end

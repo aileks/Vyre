@@ -21,20 +21,20 @@ defmodule ApiWeb.UserController do
   end
 
   def show(conn, %{"id" => id}) do
-    with {:ok, user} <- Accounts.get_user(id) do
+    with {:ok, user} <- Accounts.get_user!(id) do
       render(conn, :show, user: user)
     end
   end
 
   def update(conn, %{"id" => id, "user" => user_params}) do
-    with {:ok, %User{} = user} <- Accounts.get_user(id),
+    with {:ok, %User{} = user} <- Accounts.get_user!(id),
          {:ok, %User{} = user} <- Accounts.update_user(user, user_params) do
       render(conn, :show, user: user)
     end
   end
 
   def delete(conn, %{"id" => id}) do
-    with {:ok, %User{} = user} <- Accounts.get_user(id),
+    with {:ok, %User{} = user} <- Accounts.get_user!(id),
          {:ok, _deleted_user} <- Accounts.delete_user(user) do
       send_resp(conn, :no_content, "")
     end

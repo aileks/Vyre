@@ -71,15 +71,8 @@ defmodule Api.Accounts.User do
     )
   end
 
-  defp hash_password(changeset) do
-    password = get_change(changeset, :password)
-
-    if password do
-      changeset
-      |> put_change(:password_hash, Bcrypt.hash_pwd_salt(password))
-    else
-      changeset
-    end
+  defp hash_password(%Ecto.Changeset{valid?: true, changes: %{password: password}} = changeset) do
+    change(changeset, password_hash: Bcrypt.hash_pwd_salt(password))
   end
 
   def registration_changeset(user, attrs) do
