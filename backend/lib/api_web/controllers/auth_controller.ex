@@ -10,7 +10,7 @@ defmodule ApiWeb.AuthController do
     http_only: true,
     secure: Application.compile_env(:api, :env) != :dev,
     # 7 days
-    max_age: 60 * 60 * 24 * 7,
+    max_age: 604_800,
     same_site: "Lax",
     path: "/"
   ]
@@ -19,7 +19,7 @@ defmodule ApiWeb.AuthController do
     http_only: true,
     secure: Application.compile_env(:api, :env) != :dev,
     # 30 days
-    max_age: 60 * 60 * 24 * 30,
+    max_age: 2_592_000,
     same_site: "Lax",
     path: "/"
   ]
