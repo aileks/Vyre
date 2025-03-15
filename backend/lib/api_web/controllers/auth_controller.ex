@@ -81,21 +81,37 @@ defmodule ApiWeb.AuthController do
         # Extract the user from claims
         case Guardian.resource_from_claims(claims) do
           {:ok, user} ->
-            # Revoke the old refresh token first (this updates Guardian.DB)
-            Guardian.revoke(refresh_token)
+            # Add a check for token age to prevent frequent refreshes
+            token_age = current_time() - (claims["iat"] || 0)
+            # Only allow refresh if token is at least 60 seconds old
+            min_age_for_refresh = 60
 
-            # Create new tokens
-            {token, exp} = Guardian.create_token(user)
-            {new_refresh_token, refresh_exp} = Guardian.create_refresh_token(user)
+            if token_age < min_age_for_refresh do
+              # Return an error for too frequent refreshes
+              conn
+              |> put_status(:too_many_requests)
+              |> json(%{
+                error: "Too frequent token refreshes",
+                message: "Please wait before refreshing again",
+                retryAfter: min_age_for_refresh - token_age
+              })
+            else
+              # Revoke the old refresh token first (this updates Guardian.DB)
+              Guardian.revoke(refresh_token)
 
-            conn
-            |> put_status(:ok)
-            |> render(:refresh_token, %{
-              token: token,
-              refresh_token: new_refresh_token,
-              expires_at: exp,
-              refresh_expires_at: refresh_exp
-            })
+              # Create new tokens
+              {token, exp} = Guardian.create_token(user)
+              {new_refresh_token, refresh_exp} = Guardian.create_refresh_token(user)
+
+              conn
+              |> put_status(:ok)
+              |> render(:refresh_token, %{
+                token: token,
+                refresh_token: new_refresh_token,
+                expires_at: exp,
+                refresh_expires_at: refresh_exp
+              })
+            end
 
           {:error, reason} ->
             conn
@@ -108,5 +124,9 @@ defmodule ApiWeb.AuthController do
         |> put_status(:unauthorized)
         |> json(%{error: "Invalid refresh token: #{inspect(reason)}"})
     end
+  end
+
+  defp current_time do
+    DateTime.utc_now() |> DateTime.to_unix()
   end
 end

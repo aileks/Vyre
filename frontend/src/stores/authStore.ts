@@ -1,4 +1,4 @@
-import { batch, createEffect } from 'solid-js';
+import { batch, createEffect, createRoot, onCleanup } from 'solid-js';
 import { createStore, reconcile } from 'solid-js/store';
 
 import {
@@ -12,6 +12,10 @@ import {
   User,
 } from '../types';
 import { keysToCamelCase, keysToSnakeCase } from '../utils/caseTransformer';
+
+// Flags
+let tokenRefreshInProgress = false;
+// let userDataRefreshInProgress = false;
 
 /*-----------------------------------------------------------------------------
  * State Setup
@@ -78,9 +82,10 @@ const getInitialState = (): AuthState => {
 export const [auth, setAuth] = createStore<AuthState>(getInitialState());
 
 // Create derived state signals
-export const isAuthenticated = () => Boolean(auth.user && auth.token);
-export const isLoading = () => auth.status === 'loading';
 export const currentUser = () => auth.user;
+export const currentToken = () => auth.token;
+export const isAuthenticated = () => Boolean(currentUser() && currentToken());
+export const isLoading = () => auth.status === 'loading';
 export const currentError = () => auth.error;
 
 /*-----------------------------------------------------------------------------
@@ -111,65 +116,48 @@ const clearStoredToken = () => {
  *
  * @returns {Promise<boolean>} - True if the token was refreshed successfully, false otherwise
  */
-const refreshAccessToken = async (): Promise<boolean> => {
-  if (!auth.refreshToken) return false;
+export const refreshTokens = async (): Promise<boolean> => {
+  if (tokenRefreshInProgress) {
+    return false;
+  }
+
+  if (!auth.refreshToken) {
+    console.error('Cannot refresh token: No refresh token available');
+    setAuth('status', 'idle');
+    return false;
+  }
 
   try {
-    setAuth('status', 'loading');
+    tokenRefreshInProgress = true;
+
     const res = await fetch('/api/auth/refresh', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ refresh_token: auth.refreshToken }),
     });
 
-    if (!res.ok) {
-      clearStoredToken();
-      setAuth(
-        reconcile({
-          status: 'idle',
-          user: null,
-          token: null,
-          refreshToken: null,
-          expiresAt: null,
-          refreshExpiresAt: null,
-          error: 'Session expired',
-        }),
-      );
-      return false;
+    if (res.ok) {
+      const data = await res.json();
+
+      setAuth('token', data.access_token);
+      setAuth('refreshToken', data.refresh_token);
+      setAuth('expiresAt', data.expires_at);
+      setAuth('status', 'authenticated');
+
+      return true;
     }
 
-    const data = await res.json();
-    const { token, expiresAt, refreshToken, refreshExpiresAt } =
-      keysToCamelCase(data);
-
-    setStoredToken(token, expiresAt, refreshToken, refreshExpiresAt);
-
-    batch(() => {
-      setAuth('status', 'authenticated');
-      setAuth('token', token);
-      setAuth('refreshToken', refreshToken);
-      setAuth('expiresAt', expiresAt);
-      setAuth('refreshExpiresAt', refreshExpiresAt);
-    });
-
-    return true;
-  } catch (err) {
-    console.error('Failed to refresh token:', err);
-
-    clearStoredToken();
-    setAuth(
-      reconcile({
-        status: 'idle',
-        user: null,
-        token: null,
-        refreshToken: null,
-        expiresAt: null,
-        refreshExpiresAt: null,
-        error: 'Failed to refresh session',
-      }),
-    );
+    setAuth('status', 'idle');
 
     return false;
+  } catch (err) {
+    console.error('Error refreshing token:', err);
+
+    setAuth('status', 'error');
+
+    return false;
+  } finally {
+    tokenRefreshInProgress = false;
   }
 };
 
@@ -190,16 +178,11 @@ const apiFetch = async <T>(
   const timeout = setTimeout(() => controller.abort(), 10000);
 
   try {
-    // Try to refresh token first if needed
-    if (auth.status === 'refresh_needed' && auth.refreshToken) {
-      await refreshAccessToken();
-    }
-
     // Add auth token if available
-    if (auth.token) {
+    if (currentToken()) {
       options.headers = {
         ...options.headers,
-        Authorization: `Bearer ${auth.token}`,
+        Authorization: `Bearer ${currentToken()}`,
       };
     }
 
@@ -211,16 +194,6 @@ const apiFetch = async <T>(
 
     options.signal = controller.signal;
     const res = await fetch(url, options);
-
-    // Handle unauthorized responses by attempting token refresh
-    if (res.status === 401 && auth.refreshToken) {
-      const refreshed = await refreshAccessToken();
-      if (refreshed) {
-        // Retry the request with the new token
-        return apiFetch(url, options);
-      }
-    }
-
     const data = await res.json().catch(() => ({}));
     const transformedData = keysToCamelCase<T>(data);
 
@@ -228,7 +201,7 @@ const apiFetch = async <T>(
       ok: res.ok,
       data: transformedData,
     };
-  } catch (err) {
+  } catch (error) {
     return {
       ok: false,
       data: { error: { message: 'Network error occurred' } } as unknown as T,
@@ -237,6 +210,42 @@ const apiFetch = async <T>(
     clearTimeout(timeout);
   }
 };
+
+export const setupSession = async (): Promise<User | null> => {
+  console.log(
+    'Starting setupSession',
+    'token:',
+    Boolean(auth.token),
+    'user:',
+    Boolean(auth.user),
+    'status:',
+    auth.status,
+  );
+
+  // If we already have a user, nothing to do
+  if (currentUser()) {
+    console.log('Session already has user, returning');
+    return auth.user;
+  }
+
+  // If we have a token but no user, let's explicitly fetch the user
+  if (currentToken()) {
+    console.log('Have token but no user, fetching user data');
+    const user = await fetchUserData();
+    console.log('User data fetch result:', user);
+    return user;
+  }
+
+  console.log('No valid token found');
+  return null;
+};
+
+// const isTokenExpired = (): boolean => {
+//   if (!auth.expiresAt) return true;
+
+//   const now = Date.now() / 1000;
+//   return now >= auth.expiresAt;
+// };
 
 /*-----------------------------------------------------------------------------
  * Auth Actions
@@ -299,6 +308,8 @@ export const login = async (
     },
   );
 
+  console.log('LOGGING DATA FROM WITHIN login:', data);
+
   if (ok && 'user' in data) {
     const { user, token, expiresAt, refreshToken, refreshExpiresAt } = data;
 
@@ -330,7 +341,7 @@ export const logout = async (): Promise<void> => {
   setAuth('status', 'loading');
 
   try {
-    if (auth.token) {
+    if (currentToken()) {
       // Revoke the token on the server
       await apiFetch('/api/auth/logout', { method: 'DELETE' });
     }
@@ -357,105 +368,103 @@ export const logout = async (): Promise<void> => {
  *
  * @returns Promise resolving to the user object if successful, otherwise null
  */
-export const refreshSession = async (): Promise<User | null> => {
-  // If we need to refresh the token first
-  if (auth.status === 'refresh_needed' && auth.refreshToken) {
-    const refreshed = await refreshAccessToken();
-    if (!refreshed) return null;
-  }
-
-  if (!auth.token) {
-    setAuth('status', 'idle');
-    return null;
-  }
-
-  batch(() => {
-    setAuth('status', auth.user ? 'authenticated' : 'loading');
-    setAuth('error', null);
-  });
-
-  const { ok, data } = await apiFetch<{ user: User } | ErrorResponse>(
-    '/api/auth/me',
-  );
-
-  if (ok && 'user' in data) {
-    batch(() => {
-      setAuth('status', 'authenticated');
-      setAuth('user', data.user);
-      setAuth('error', null);
-    });
-
-    return data.user;
-  } else {
-    if (auth.refreshToken) {
-      const refreshed = await refreshAccessToken();
-      if (refreshed) {
-        // Try again after refresh
-        return refreshSession();
-      }
-    }
-
-    // Something has gone horribly wrong...
-    clearStoredToken();
-    setAuth(
-      reconcile({
-        status: 'idle',
-        user: null,
-        token: null,
-        refreshToken: null,
-        expiresAt: null,
-        refreshExpiresAt: null,
-        error: 'Invalid session',
-      }),
+export const fetchUserData = async (): Promise<User | null> => {
+  try {
+    console.log(
+      'Fetching user data with token:',
+      auth.token?.substring(0, 15) + '...',
     );
 
+    // Set status to loading
+    setAuth('status', 'loading');
+
+    // Explicitly call the /me endpoint to get user data
+    const response = await fetch('/api/auth/me', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${auth.token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    console.log('User data fetch response status:', response.status);
+
+    if (!response.ok) {
+      console.error('Failed to fetch user data:', response.status);
+      setAuth('status', 'error');
+      setAuth('error', `Failed to fetch user: ${response.statusText}`);
+      return null;
+    }
+
+    const data = await response.json();
+    console.log('User data received:', data);
+
+    // Transform data if needed
+    const userData = keysToCamelCase<{ user: User }>(data);
+
+    if (userData && userData.user) {
+      // Update auth state with user data
+      batch(() => {
+        setAuth('user', userData.user);
+        setAuth('status', 'authenticated');
+        setAuth('error', null);
+      });
+
+      console.log('User data updated in auth state');
+      return userData.user;
+    } else {
+      console.error('User data missing from response');
+      setAuth('status', 'error');
+      setAuth('error', 'User data missing from response');
+      return null;
+    }
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    setAuth('status', 'error');
+    setAuth(
+      'error',
+      error instanceof Error ? error.message : 'Unknown error fetching user',
+    );
     return null;
   }
 };
 
-// Fetch user data when we have a token but no user
-// NOTE: This usually only happens on initial mount
-createEffect(() => {
-  if (auth.token && !currentUser() && !isLoading()) {
-    refreshSession();
-  }
-});
+/*-----------------------------------------------------------------------------
+ * Reactive Effects
+ *-----------------------------------------------------------------------------*/
+createRoot(() => {
+  // Auto-refresh token before expiration
+  createEffect(() => {
+    if (!auth.expiresAt || !currentToken()) return;
 
-// Set up token expiration and refresh
-createEffect(() => {
-  if (!auth.expiresAt) {
-    // If we need a refresh and have a refresh token
+    const now = Date.now() / 1000;
+    const timeUntilExpiry = auth.expiresAt - now;
+
+    // If already expired, refresh immediately
+    if (timeUntilExpiry <= 0) {
+      refreshTokens();
+      return;
+    }
+
+    // Schedule refresh 30 seconds before expiration
+    const refreshTime = Math.max(timeUntilExpiry - 30, 0) * 1000;
+    const timerId = setTimeout(() => refreshTokens(), refreshTime);
+
+    // Clean up timer when dependencies change
+    onCleanup(() => clearTimeout(timerId));
+  });
+
+  // Auto-fetch user data when we have token but no user
+  createEffect(() => {
+    if (currentToken() && !currentUser() && auth.status === 'authenticated') {
+      fetchUserData();
+    }
+  });
+
+  // Handle refresh_needed status
+  createEffect(() => {
     if (auth.status === 'refresh_needed' && auth.refreshToken) {
-      refreshAccessToken();
+      refreshTokens();
     }
-    return;
-  }
-
-  const now = Date.now() / 1000;
-
-  // If token is expired
-  if (now > auth.expiresAt) {
-    // Try to refresh if we have a valid refresh token
-    if (
-      auth.refreshToken &&
-      auth.refreshExpiresAt &&
-      now < auth.refreshExpiresAt
-    ) {
-      refreshAccessToken();
-    } else {
-      logout();
-    }
-    return;
-  }
-
-  // Schedule token refresh when token is about to expire (1 minute before)
-  const refreshDelay = (auth.expiresAt - now - 60) * 1000;
-  if (refreshDelay > 0 && auth.refreshToken) {
-    const timeoutId = setTimeout(() => {
-      refreshAccessToken();
-    }, refreshDelay);
-
-    // Clean up the timeout if this effect reruns
-    return () => clearTimeout(timeoutId);
-  }
+  });
 });

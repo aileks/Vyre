@@ -5,6 +5,15 @@ import solid from 'vite-plugin-solid';
 
 export default defineConfig({
   plugins: [solid(), tailwindcss(), devtools()],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:4000',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
   build: {
     outDir: '../backend/priv/static',
     target: 'esnext',

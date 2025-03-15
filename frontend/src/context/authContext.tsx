@@ -7,7 +7,6 @@ import {
   isLoading,
   login,
   logout,
-  refreshSession,
   register,
 } from '../stores/authStore';
 import { AuthResult, LoginCredentials, RegistrationData, User } from '../types';
@@ -20,7 +19,6 @@ interface AuthContextValue {
   login: (credentials: LoginCredentials) => Promise<AuthResult>;
   logout: () => Promise<void>;
   register: (userData: RegistrationData) => Promise<AuthResult>;
-  refreshSession: () => Promise<User | null>;
 }
 
 const AuthContext = createContext<AuthContextValue>();
@@ -35,7 +33,6 @@ export const AuthProvider: Component<ParentProps> = props => {
         isLoading,
         login,
         logout,
-        refreshSession,
         register,
       }}
     >
