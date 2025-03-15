@@ -7,7 +7,7 @@ defmodule Api.Accounts do
   alias Api.Repo
 
   alias Api.Accounts.User
-  alias Api.Guardian
+  alias Api.Auth.Guardian
 
   @doc """
   Returns the list of users.
@@ -158,7 +158,7 @@ defmodule Api.Accounts do
   otherwise returns {:error, reason}.
   """
   def create_token(user) do
-    Api.Guardian.encode_and_sign(user)
+    Api.Auth.Guardian.encode_and_sign(user)
   end
 
   @doc """

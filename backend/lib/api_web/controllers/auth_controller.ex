@@ -2,7 +2,7 @@ defmodule ApiWeb.AuthController do
   use ApiWeb, :controller
 
   alias Api.Accounts
-  alias Api.Guardian
+  alias Api.Auth.Guardian
 
   action_fallback(ApiWeb.FallbackController)
 

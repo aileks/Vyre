@@ -1,5 +1,7 @@
-defmodule Api.Guardian do
+defmodule Api.Auth.Guardian do
   use Guardian, otp_app: :api
+
+  alias Api.Accounts
 
   def after_encode_and_sign(resource, claims, token, _options) do
     with {:ok, _} <- Guardian.DB.after_encode_and_sign(resource, claims["typ"], claims, token) do
@@ -31,9 +33,9 @@ defmodule Api.Guardian do
   end
 
   def resource_from_claims(claims) do
-    user_id = claims["sub"]
+    id = claims["sub"]
 
-    case Api.Accounts.get_user(user_id) do
+    case Api.Accounts.get_user(id) do
       {:ok, user} ->
         {:ok, user}
 

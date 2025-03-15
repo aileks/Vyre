@@ -37,7 +37,7 @@ if config_env() == :prod do
         """
       end
 
-  # config :api, Api.Guardian,
+  # config :api, Api.Auth.Guardian,
   #   issuer: "api",
   #   secret_key: guardian_secret_key
 

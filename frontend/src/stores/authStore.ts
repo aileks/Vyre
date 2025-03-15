@@ -178,7 +178,6 @@ export const setupSession = async (): Promise<User | null> => {
 
     return null;
   } catch (e) {
-    console.error('Error setting up session:', e);
     setAuth('status', 'error');
     return null;
   }
@@ -261,8 +260,6 @@ export const refreshSession = async (): Promise<boolean> => {
 
     return false;
   } catch (err) {
-    console.error('Error refreshing session:', err);
-
     // On error, try to restore from previous state
     if (auth.user) {
       setAuth('status', 'authenticated');
@@ -395,6 +392,8 @@ export const logout = async (): Promise<void> => {
     await apiFetch('/api/session', { method: 'DELETE' });
   } catch (err) {
     console.error('Logout failed:', err);
+    setAuth('status', 'error');
+    setAuth('error', 'Logout failed');
   } finally {
     // Clear state
     clearStoredState();
@@ -425,7 +424,6 @@ export const fetchUserData = async (): Promise<User | null> => {
     );
 
     if (!ok || !('user' in data)) {
-      console.error('Failed to fetch user data:', data);
       setAuth('status', 'idle');
       setAuth('user', null);
       return null;
@@ -444,7 +442,6 @@ export const fetchUserData = async (): Promise<User | null> => {
 
     return user;
   } catch (error) {
-    console.error('Error fetching user data:', error);
     setAuth('status', 'error');
     setAuth(
       'error',
@@ -474,7 +471,7 @@ const saveStateToStorage = () => {
       lastUpdated: Date.now(),
     };
 
-    sessionStorage.setItem('displayInfo', JSON.stringify(persistedState));
+    localStorage.setItem('displayInfo', JSON.stringify(persistedState));
   }
 };
 
@@ -483,7 +480,7 @@ const saveStateToStorage = () => {
  */
 const getStateFromStorage = () => {
   try {
-    const savedState = sessionStorage.getItem('displayInfo');
+    const savedState = localStorage.getItem('displayInfo');
     if (!savedState) return null;
 
     const parsedState = JSON.parse(savedState);
@@ -494,7 +491,6 @@ const getStateFromStorage = () => {
     }
     return null;
   } catch (e) {
-    console.error('Error retrieving auth state from storage:', e);
     return null;
   }
 };
@@ -503,7 +499,7 @@ const getStateFromStorage = () => {
  * Clears saved auth state from localStorage
  */
 const clearStoredState = () => {
-  sessionStorage.removeItem('displayInfo');
+  localStorage.removeItem('displayInfo');
 };
 
 /*-----------------------------------------------------------------------------

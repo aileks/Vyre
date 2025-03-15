@@ -9,7 +9,7 @@ database_url =
 
 db_schema = System.get_env("DB_SCHEMA") || raise "environment variable DB_SCHEMA is missing"
 
-# config :api, Api.Guardian, secret_key: System.get_env("GUARDIAN_SECRET_KEY")
+# config :api, Api.Auth.Guardian, secret_key: System.get_env("GUARDIAN_SECRET_KEY")
 
 config :logger, level: :info
 
