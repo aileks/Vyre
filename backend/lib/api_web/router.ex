@@ -33,6 +33,7 @@ defmodule ApiWeb.Router do
   scope "/api", ApiWeb do
     pipe_through([:api, :maybe_auth])
     get("/auth/me", AuthController, :me)
+    delete("/session", AuthController, :logout)
   end
 
   # Refresh Route
@@ -44,7 +45,6 @@ defmodule ApiWeb.Router do
   # Protected Routes
   scope "/api", ApiWeb do
     pipe_through([:api, :auth])
-    delete("/session", AuthController, :logout)
 
     resources("/users", UserController, except: [:new, :edit])
     # resources("/servers", ServerController)

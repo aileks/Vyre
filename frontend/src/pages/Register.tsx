@@ -2,18 +2,18 @@ import { A, useNavigate } from '@solidjs/router';
 import { Show, createEffect, createSignal } from 'solid-js';
 
 import { useAuth } from '../context/authContext';
-import { AuthResult, RegistrationData } from '../types';
+import { RegistrationData } from '../types';
 
 export default function Register() {
+  const { isAuthenticated, currentError, isLoading, register } = useAuth();
+  const navigate = useNavigate();
+
   const [username, setUsername] = createSignal<string>('');
   const [email, setEmail] = createSignal<string>('');
   const [password, setPassword] = createSignal<string>('');
   const [passwordConfirmation, setPasswordConfirmation] =
     createSignal<string>('');
-  const [error, setError] = createSignal<string>('');
-
-  const navigate = useNavigate();
-  const { isAuthenticated, isLoading, register } = useAuth();
+  const [error, setError] = createSignal<string | null>(null);
 
   createEffect(() => {
     if (isAuthenticated()) navigate('/', { replace: true });
@@ -35,14 +35,13 @@ export default function Register() {
       password: password(),
     };
 
-    const res: AuthResult = await register(credentials);
+    await register(credentials);
 
-    if ('error' in res) {
-      setError(res.error?.message!);
-      return;
+    if (isAuthenticated()) {
+      navigate('/', { replace: true });
+    } else {
+      setError(currentError());
     }
-
-    navigate('/', { replace: true });
   };
 
   return (

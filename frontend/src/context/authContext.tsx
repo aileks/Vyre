@@ -1,55 +1,36 @@
-import { Component, ParentProps, createContext, useContext } from 'solid-js';
+// authContext.ts
+import { ParentProps, createContext, useContext } from 'solid-js';
 
-import {
-  currentError,
-  currentUser,
-  isAuthenticated,
-  isLoading,
-  login,
-  logout,
-  register,
-  setupSession,
-} from '../stores/authStore';
-import { AuthResult, LoginCredentials, RegistrationData, User } from '../types';
+import { createAuthStore } from '../stores/authStore';
+import type { LoginCredentials, RegistrationData } from '../types';
 
-interface AuthContextValue {
+export interface AuthContextValue {
+  currentUser: ReturnType<typeof createAuthStore>['currentUser'];
   isAuthenticated: () => boolean;
-  currentUser: () => User | null;
-  isLoading: () => boolean;
-  currentError: () => string | null;
-  login: (credentials: LoginCredentials) => Promise<AuthResult>;
+  isLoading: ReturnType<typeof createAuthStore>['isLoading'];
+  currentError: ReturnType<typeof createAuthStore>['currentError'];
+  login: (credentials: LoginCredentials) => Promise<void>;
   logout: () => Promise<void>;
-  register: (userData: RegistrationData) => Promise<AuthResult>;
-  setupSession: () => Promise<User | null>;
+  register: (data: RegistrationData) => Promise<void>;
+  refetch: () => void;
 }
 
 const AuthContext = createContext<AuthContextValue>();
 
-export const AuthProvider: Component<ParentProps> = props => {
+export const AuthProvider = (props: ParentProps) => {
+  const authStore = createAuthStore();
+
   return (
-    <AuthContext.Provider
-      value={{
-        currentError,
-        currentUser,
-        isAuthenticated,
-        isLoading,
-        login,
-        logout,
-        register,
-        setupSession,
-      }}
-    >
+    <AuthContext.Provider value={authStore}>
       {props.children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = (): AuthContextValue => {
-  const context = useContext(AuthContext);
-
-  if (!context) {
+export const useAuth = () => {
+  const ctx = useContext(AuthContext);
+  if (!ctx) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
-
-  return context;
+  return ctx;
 };

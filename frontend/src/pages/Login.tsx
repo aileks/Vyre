@@ -3,16 +3,16 @@ import { useNavigate } from '@solidjs/router';
 import { Show, createEffect, createSignal } from 'solid-js';
 
 import { useAuth } from '../context/authContext';
-import { AuthResult } from '../types';
+import { LoginCredentials } from '../types';
 
 export default function Login() {
+  const navigate = useNavigate();
+  const { isAuthenticated, isLoading, login, currentError } = useAuth();
+
   const [email, setEmail] = createSignal<string>('');
   const [password, setPassword] = createSignal<string>('');
-  const [error, setError] = createSignal<string>('');
+  const [error, setError] = createSignal<string | null>(null);
   const [remember, setRemember] = createSignal<boolean>(false);
-
-  const navigate = useNavigate();
-  const { isAuthenticated, isLoading, login } = useAuth();
 
   createEffect(() => {
     if (isAuthenticated()) navigate('/', { replace: true });
@@ -20,22 +20,20 @@ export default function Login() {
 
   const handleSubmit = async (e: Event) => {
     e.preventDefault();
-    setError('');
+    setError(null);
 
-    const credentials = {
+    const credentials: LoginCredentials = {
       email: email(),
       password: password(),
       rememberMe: remember(),
     };
 
-    const res: AuthResult = await login(credentials);
-
-    if ('error' in res) {
-      setError(res.error?.message!);
-      return;
+    try {
+      await login(credentials);
+      navigate('/', { replace: true });
+    } catch (error) {
+      setError(currentError());
     }
-
-    navigate('/', { replace: true });
   };
 
   return (

@@ -40,14 +40,6 @@ export interface ErrorResponse {
   };
 }
 
-export interface AuthState {
-  status: AuthStatus;
-  user: User | null;
-  expiresAt?: number | null;
-  refreshExpiresAt?: number | null;
-  error: string | null;
-}
-
 export interface ApiAuthResponse {
   user: User;
   expiresAt?: string;
@@ -60,4 +52,10 @@ export interface ApiRefreshResponse {
   refreshExpiresAt: string;
 }
 
-export type AuthResult = SuccessResponse | ErrorResponse;
+export interface AuthState {
+  status: AuthStatus;
+  user: User | null;
+  error: string | null;
+}
+
+export type AuthResult = User | null;
