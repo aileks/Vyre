@@ -1,9 +1,21 @@
 import { A } from '@solidjs/router';
+import { Show } from 'solid-js';
 
 import { useAuth } from '../context/authContext';
 
+const Spinner = () => (
+  <div
+    class='inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]'
+    role='status'
+  >
+    <span class='!absolute !-m-px !h-px !w-px !overflow-hidden !border-0 !p-0 !whitespace-nowrap ![clip:rect(0,0,0,0)]'>
+      Loading...
+    </span>
+  </div>
+);
+
 export default function Home() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
 
   return (
     <div class='container mx-auto mt-32 max-w-6xl px-4 py-16'>
@@ -66,19 +78,36 @@ export default function Home() {
           </div>
 
           <div class='flex flex-col justify-center gap-4 md:flex-row'>
-            {/* TODO: Use Show component here */}
-            {isAuthenticated() ?
-              <div class='bg-electric-600/20 text-cybertext-400 border-electric-700 rounded-xs border px-6 py-3 text-center font-mono'>
-                <span class='text-success-300 text-lg'>✓</span> Thanks for
-                pre-registering!
-              </div>
-            : <A
-                href='/register'
-                class='bg-primary-600 text-cybertext-100 hover:bg-primary-500 focus:ring-primary-300 border-primary-400 rounded-xs border px-6 py-3 text-center font-mono transition-all duration-200 focus:ring-2 focus:outline-none'
+            <Show
+              when={!isLoading()}
+              fallback={
+                <button
+                  disabled
+                  class='bg-primary-600/80 text-cybertext-100 border-primary-400 cursor-wait rounded-xs border px-6 py-3 text-center font-mono transition-all duration-200 focus:ring-2 focus:outline-none'
+                >
+                  <span class='flex items-center justify-center gap-2'>
+                    <Spinner /> Loading...
+                  </span>
+                </button>
+              }
+            >
+              <Show
+                when={isAuthenticated()}
+                fallback={
+                  <A
+                    href='/register'
+                    class='bg-primary-600 text-cybertext-100 hover:bg-primary-500 focus:ring-primary-300 border-primary-400 rounded-xs border px-6 py-3 text-center font-mono transition-all duration-200 focus:ring-2 focus:outline-none'
+                  >
+                    Pre-Register
+                  </A>
+                }
               >
-                Pre-Register
-              </A>
-            }
+                <div class='bg-electric-600/20 text-cybertext-400 border-electric-700 rounded-xs border px-6 py-3 text-center font-mono'>
+                  <span class='text-success-500 text-lg'>✓</span> Thanks for
+                  pre-registering!
+                </div>
+              </Show>
+            </Show>
 
             <A
               href='https://github.com/aileks/Vyre'
