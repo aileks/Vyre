@@ -1,4 +1,4 @@
-defmodule Api.Auth.Guardian do
+defmodule ApiWeb.Auth.Guardian do
   use Guardian, otp_app: :api
 
   alias Api.Accounts
@@ -35,7 +35,7 @@ defmodule Api.Auth.Guardian do
   def resource_from_claims(claims) do
     id = claims["sub"]
 
-    case Api.Accounts.get_user(id) do
+    case Accounts.get_user(id) do
       {:ok, user} ->
         {:ok, user}
 

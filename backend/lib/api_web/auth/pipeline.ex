@@ -4,7 +4,7 @@ defmodule Api.Auth.Pipeline do
   use Guardian.Plug.Pipeline,
     otp_app: :api,
     error_handler: Api.Auth.ErrorHandler,
-    module: Api.Auth.Guardian
+    module: ApiWeb.Auth.Guardian
 
   # If there is an authorization header, it must be a Bearer token
   plug(Guardian.Plug.VerifyHeader, claims: @claims, scheme: "Bearer")
@@ -23,7 +23,7 @@ defmodule Api.Auth.AuthenticatedPipeline do
   use Guardian.Plug.Pipeline,
     otp_app: :api,
     error_handler: Api.Auth.ErrorHandler,
-    module: Api.Auth.Guardian
+    module: ApiWeb.Auth.Guardian
 
   # Verify the token
   plug(Guardian.Plug.VerifySession, claims: %{"typ" => "access"})
@@ -41,7 +41,7 @@ defmodule Api.Auth.RefreshablePipeline do
   use Guardian.Plug.Pipeline,
     otp_app: :api,
     error_handler: Api.Auth.ErrorHandler,
-    module: Api.Auth.Guardian
+    module: ApiWeb.Auth.Guardian
 
   # Check specifically for the refresh token in cookie
   plug(Api.Auth.VerifyRefreshCookiePlug)

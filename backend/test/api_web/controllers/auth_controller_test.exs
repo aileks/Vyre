@@ -164,7 +164,7 @@ defmodule ApiWeb.AuthControllerTest do
   # Helper function to create a user with a token for testing
   defp create_user_with_token(%{conn: conn}) do
     user = user_fixture()
-    {:ok, token, _claims} = Api.Auth.Guardian.encode_and_sign(user, %{}, ttl: {1, :hour})
+    {:ok, token, _claims} = ApiWeb.Auth.Guardian.encode_and_sign(user, %{}, ttl: {1, :hour})
     conn = conn |> put_req_header("authorization", "Bearer #{token}")
     {:ok, %{conn: conn, user: user, token: token}}
   end

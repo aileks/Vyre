@@ -13,7 +13,7 @@ defmodule Api.Auth.VerifyRefreshCookiePlug do
     # Now safely access the cookies
     with refresh_token when not is_nil(refresh_token) <- conn.cookies["_auth_refresh_token"],
          {:ok, claims} <-
-           Api.Auth.Guardian.decode_and_verify(refresh_token, %{"typ" => "refresh"}) do
+           ApiWeb.Auth.Guardian.decode_and_verify(refresh_token, %{"typ" => "refresh"}) do
       # Store this information for later use
       conn
       |> put_private(:api_auth_refresh_token, refresh_token)

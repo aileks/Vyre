@@ -16,7 +16,7 @@ config :api, ApiWeb.Endpoint,
   pubsub_server: Api.PubSub,
   live_view: [signing_salt: "k3W7Q6qB"]
 
-config :api, Api.Auth.Guardian,
+config :api, ApiWeb.Auth.Guardian,
   issuer: "api",
   secret_key: System.get_env("GUARDIAN_SECRET_KEY"),
   allowed_algos: ["HS512"],

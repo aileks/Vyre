@@ -37,10 +37,6 @@ if config_env() == :prod do
         """
       end
 
-  # config :api, Api.Auth.Guardian,
-  #   issuer: "api",
-  #   secret_key: guardian_secret_key
-
   host = System.get_env("PHX_HOST") || "vyre.app"
   port = String.to_integer(System.get_env("PORT") || "4000")
 
