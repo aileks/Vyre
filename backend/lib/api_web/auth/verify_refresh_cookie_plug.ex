@@ -21,7 +21,7 @@ defmodule ApiWeb.Auth.VerifyRefreshCookiePlug do
       nil ->
         conn
 
-      {:error, reason} ->
+      {:error, _reason} ->
         conn
     end
   end

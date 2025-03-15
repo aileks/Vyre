@@ -1,8 +1,6 @@
 defmodule Api.Guardian do
   use Guardian, otp_app: :api
 
-  alias Api.Accounts
-
   def after_encode_and_sign(resource, claims, token, _options) do
     with {:ok, _} <- Guardian.DB.after_encode_and_sign(resource, claims["typ"], claims, token) do
       {:ok, token}
@@ -27,15 +25,6 @@ defmodule Api.Guardian do
     end
   end
 
-  # def subject_for_token(%Accounts.User{} = user, _claims) do
-  #   sub = to_string(user.id)
-  #   {:ok, sub}
-  # end
-
-  # def subject_for_token(_resource, _claims) do
-  #   {:error, :unknown_resource}
-  # end
-
   def subject_for_token(resource, _claims) do
     sub = to_string(resource.id)
     {:ok, sub}
@@ -49,9 +38,9 @@ defmodule Api.Guardian do
         {:ok, user}
 
       {:error, :not_found} ->
-        {:error, :resource_not_found}
+        {:error, :not_found}
 
-      error ->
+      _error ->
         {:error, :resource_not_found}
     end
   end

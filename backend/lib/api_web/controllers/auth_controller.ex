@@ -141,7 +141,7 @@ defmodule ApiWeb.AuthController do
           refresh_expires_at: refresh_expires_at
         })
       else
-        error ->
+        _error ->
           conn
           |> delete_resp_cookie("_auth_token", @cookie_opts)
           |> delete_resp_cookie("_auth_refresh_token", @refresh_cookie_opts)
@@ -164,7 +164,7 @@ defmodule ApiWeb.AuthController do
             |> put_view(json: ApiWeb.AuthJSON)
             |> render(:user, %{user: user})
 
-          {:error, reason} ->
+          {:error, _reason} ->
             conn
             |> put_status(:unauthorized)
             |> put_view(json: ApiWeb.ErrorJSON)
