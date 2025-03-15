@@ -7,6 +7,7 @@ defmodule Api.Accounts do
   alias Api.Repo
 
   alias Api.Accounts.User
+  alias Api.Guardian
 
   @doc """
   Returns the list of users.
@@ -159,7 +160,7 @@ defmodule Api.Accounts do
   otherwise returns {:error, reason}.
   """
   def create_token(user) do
-    Api.Accounts.Guardian.encode_and_sign(user)
+    Api.Guardian.encode_and_sign(user)
   end
 
   @doc """
@@ -169,12 +170,11 @@ defmodule Api.Accounts do
   otherwise returns {:error, reason}.
   """
   def get_current_user(token) do
-    case Api.Accounts.Guardian.decode_and_verify(token) do
-      {:ok, claims} ->
-        Api.Accounts.Guardian.resource_from_claims(claims)
-
-      {:error, reason} ->
-        {:error, reason}
+    with {:ok, claims} <- Guardian.decode_and_verify(token),
+         {:ok, user} <- Guardian.resource_from_claims(claims) do
+      {:ok, user}
+    else
+      _error -> {:error, :invalid_token}
     end
   end
 end

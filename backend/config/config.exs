@@ -16,15 +16,19 @@ config :api, ApiWeb.Endpoint,
   pubsub_server: Api.PubSub,
   live_view: [signing_salt: "k3W7Q6qB"]
 
-config :api, Api.Accounts.Guardian,
+config :api, Api.Guardian,
   issuer: "api",
   secret_key: System.get_env("GUARDIAN_SECRET_KEY"),
-  # token_ttl: {1, :hour},
+  token_ttl: %{
+    access: {1, :hour},
+    refresh: {7, :days}
+  },
   hooks: GuardianDb
 
 config :guardian, Guardian.DB,
   repo: Api.Repo,
-  sweep_interval: 60
+  # Only track refresh tokens
+  token_types: [:refresh]
 
 # Set up CORS
 config :cors_plug,

@@ -37,17 +37,27 @@ defmodule ApiWeb.AuthJSON do
     }
   end
 
-  def refresh_token(%{
-        token: token,
-        expires_at: expires_at,
+  def tokens(%{
+        access_token: access_token,
         refresh_token: refresh_token,
+        expires_at: expires_at,
         refresh_expires_at: refresh_expires_at
       }) do
     %{
-      token: token,
+      access_token: access_token,
       refresh_token: refresh_token,
-      refresh_expires_at: refresh_expires_at,
-      expires_at: expires_at
+      expires_at: expires_at,
+      refresh_expires_at: refresh_expires_at
+    }
+  end
+
+  def tokens(%{
+        access_token: access_token,
+        refresh_token: refresh_token
+      }) do
+    %{
+      access_token: access_token,
+      refresh_token: refresh_token
     }
   end
 end

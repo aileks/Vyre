@@ -29,7 +29,7 @@ defmodule Api.Accounts.User do
   def changeset(user, attrs) do
     user
     |> cast(attrs, [:email, :username, :password, :display_name, :avatar_url, :status])
-    |> validate_required([:email, :username, :password])
+    |> validate_required([:email, :username, :password, :display_name])
     |> validate_email()
     |> validate_password()
     |> validate_username()

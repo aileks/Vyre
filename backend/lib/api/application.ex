@@ -7,6 +7,11 @@ defmodule Api.Application do
 
   @impl true
   def start(_type, _args) do
+    unless Mix.env() == :prod do
+      Dotenv.load()
+      Mix.Task.run("loadconfig")
+    end
+
     children = [
       ApiWeb.Telemetry,
       Api.Repo,
@@ -17,7 +22,8 @@ defmodule Api.Application do
       # Start a worker by calling: Api.Worker.start_link(arg)
       # {Api.Worker, arg},
       # Start to serve requests, typically the last entry
-      ApiWeb.Endpoint
+      ApiWeb.Endpoint,
+      {Guardian.DB.Sweeper, [interval: 60 * 60 * 1000]}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
