@@ -55,6 +55,7 @@ export interface ApiAuthResponse {
 }
 
 export interface ApiRefreshResponse {
+  user: User;
   expiresAt: string;
   refreshExpiresAt: string;
 }

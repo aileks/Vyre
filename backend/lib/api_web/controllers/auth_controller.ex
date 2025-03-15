@@ -126,6 +126,17 @@ defmodule ApiWeb.AuthController do
         |> put_resp_cookie("_auth_refresh_token", new_refresh_token, @refresh_cookie_opts)
         |> put_status(:ok)
         |> json(%{
+          user: %{
+            id: user.id,
+            email: user.email,
+            username: user.username,
+            password_hash: user.password_hash,
+            display_name: user.display_name,
+            avatar_url: user.avatar_url,
+            status: user.status
+          },
+          access_token: token,
+          refresh_token: new_refresh_token,
           expires_at: expiry,
           refresh_expires_at: refresh_expires_at
         })
@@ -146,7 +157,7 @@ defmodule ApiWeb.AuthController do
 
     case Guardian.Plug.current_resource(conn) do
       nil ->
-        case Guardian.extract_and_verify(conn) do
+        case Guardian.decode_and_verify(conn) do
           {:ok, user} ->
             conn
             |> put_status(:ok)

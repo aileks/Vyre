@@ -1,4 +1,4 @@
-// authStore.ts
+import { Session } from 'inspector/promises';
 import { batch, createEffect, createRoot, onCleanup } from 'solid-js';
 import { createStore, reconcile } from 'solid-js/store';
 
@@ -40,9 +40,8 @@ export const currentError = () => auth.error;
 export const currentToken = () => (isAuthenticated() ? 'cookie-auth' : null);
 
 /*-----------------------------------------------------------------------------
- * Helper Functions
+ * Session Utils
  *-----------------------------------------------------------------------------*/
-
 /**
  * Utility function to determine if the session is likely expired
  */
@@ -126,6 +125,66 @@ const apiFetch = async <T>(
   }
 };
 
+export const setupSession = async (): Promise<User | null> => {
+  // If we already have a user, nothing to do
+  if (currentUser()) return currentUser();
+
+  try {
+    // First check if we have stored state
+    const storedState = getStateFromStorage();
+
+    if (storedState && storedState.user) {
+      // Check if the stored state is still valid
+      const now = Math.floor(Date.now() / 1000);
+      const isExpired = now >= storedState.expiresAt;
+      const isRefreshExpired =
+        storedState.refreshExpiresAt ?
+          now >= storedState.refreshExpiresAt
+        : true;
+
+      if (!isExpired) {
+        // State is still valid, restore it
+        batch(() => {
+          setAuth('user', storedState.user);
+          setAuth('expiresAt', storedState.expiresAt);
+          setAuth('refreshExpiresAt', storedState.refreshExpiresAt);
+          setAuth('status', 'authenticated');
+        });
+
+        return storedState.user;
+      } else if (!isRefreshExpired) {
+        // Access token expired but refresh still valid
+        // Restore user data temporarily and trigger refresh
+        batch(() => {
+          setAuth('user', storedState.user);
+          setAuth('status', 'refresh_needed');
+        });
+
+        // Try to refresh the session
+        const refreshed = await refreshSession();
+        return refreshed ? auth.user : null;
+      }
+    }
+
+    // No valid stored state, try to fetch user data
+    const user = await fetchUserData();
+
+    if (user) return user;
+
+    // If no user but refresh not expired, try refresh
+    if (!isRefreshExpired()) {
+      const refreshed = await refreshSession();
+      return refreshed ? auth.user : null;
+    }
+
+    return null;
+  } catch (e) {
+    console.error('Error setting up session:', e);
+    setAuth('status', 'error');
+    return null;
+  }
+};
+
 /**
  * Refresh the session by calling the refresh endpoint
  *
@@ -136,6 +195,8 @@ export const refreshSession = async (): Promise<boolean> => {
 
   try {
     refreshInProgress = true;
+
+    // Now set loading status
     setAuth('status', 'loading');
 
     const { ok, data } = await apiFetch<ApiRefreshResponse | ErrorResponse>(
@@ -144,60 +205,91 @@ export const refreshSession = async (): Promise<boolean> => {
     );
 
     if (ok && 'expiresAt' in data) {
-      // Update state with new expiry times
-      const expiresAt = dateToTimestamp(data.expiresAt);
-      const refreshExpiresAt = dateToTimestamp(data.refreshExpiresAt);
+      const responseData = data as ApiRefreshResponse;
+      const expiresAt = dateToTimestamp(responseData.expiresAt);
+      const refreshExpiresAt = dateToTimestamp(responseData.refreshExpiresAt);
 
+      // Update state in a batch to prevent partial updates
       batch(() => {
         setAuth('expiresAt', expiresAt);
         setAuth('refreshExpiresAt', refreshExpiresAt);
+
+        // IMPORTANT: Only update user if present in response
+        // Otherwise maintain existing user data
+        if (responseData.user) {
+          setAuth('user', responseData.user);
+        }
+
+        // Set status at the end to avoid transitional states
         setAuth('status', 'authenticated');
       });
 
-      // Fetch user data to ensure it's up to date
-      await fetchUserData();
+      // If no user in the response AND we don't have user data, try to fetch it
+      if (!responseData.user && !auth.user) {
+        await fetchUserData();
+      }
+
       return true;
     }
 
-    // If refresh failed, clear the state
+    // Refresh failed but we have storage backup
+    const storedState = getStateFromStorage();
+    if (storedState && storedState.user) {
+      // Restore from storage but mark as needing refresh
+      batch(() => {
+        setAuth('user', storedState.user);
+        setAuth('expiresAt', storedState.expiresAt);
+        setAuth('refreshExpiresAt', storedState.refreshExpiresAt);
+        setAuth('status', 'authenticated');
+      });
+
+      return false;
+    }
+
+    // If we get here, refresh failed and we have no backup
     setAuth(
       reconcile({
         status: 'idle',
         user: null,
         expiresAt: null,
         refreshExpiresAt: null,
-        error: null,
+        error: 'Session expired. Please log in again.',
       }),
     );
+
+    // Clear stored state since we're logging out
+    clearStoredState();
 
     return false;
   } catch (err) {
     console.error('Error refreshing session:', err);
-    setAuth('status', 'error');
+
+    // On error, try to restore from previous state
+    if (auth.user) {
+      setAuth('status', 'authenticated');
+    } else {
+      // If no user in current state, try storage
+      const storedState = getStateFromStorage();
+      if (storedState && storedState.user) {
+        batch(() => {
+          setAuth('user', storedState.user);
+          setAuth('expiresAt', storedState.expiresAt);
+          setAuth('refreshExpiresAt', storedState.refreshExpiresAt);
+          setAuth('status', 'authenticated');
+        });
+      } else {
+        // No recovery possible
+        setAuth('status', 'error');
+        setAuth(
+          'error',
+          err instanceof Error ? err.message : 'Unknown refresh error',
+        );
+      }
+    }
+
     return false;
   } finally {
     refreshInProgress = false;
-  }
-};
-
-export const setupSession = async (): Promise<User | null> => {
-  // If we already have a user, nothing to do
-  if (currentUser()) return currentUser();
-
-  try {
-    // Try to fetch the user data to check if cookies are valid
-    const user = await fetchUserData();
-
-    // If session is expired but refresh token is valid, try refreshing
-    if (!user && !isRefreshExpired()) await refreshSession();
-
-    if (user) return user;
-
-    return null;
-  } catch (e) {
-    console.error('Error setting up session:', e);
-    setAuth('status', 'error');
-    return null;
   }
 };
 
@@ -306,6 +398,7 @@ export const logout = async (): Promise<void> => {
     console.error('Logout failed:', err);
   } finally {
     // Clear state
+    clearStoredState();
     setAuth(
       reconcile({
         status: 'idle',
@@ -363,9 +456,68 @@ export const fetchUserData = async (): Promise<User | null> => {
 };
 
 /*-----------------------------------------------------------------------------
+ * Storage Utils
+ *-----------------------------------------------------------------------------*/
+/**
+ * Saves the current auth state to localStorage for recovery
+ */
+const saveStateToStorage = () => {
+  if (currentUser() && auth.expiresAt) {
+    const persistedState = {
+      user: {
+        id: currentUser()?.id,
+        username: currentUser()?.username,
+        displayName: currentUser()?.displayName,
+        avatarUrl: currentUser()?.avatarUrl,
+      },
+      expiresAt: auth.expiresAt,
+      refreshExpiresAt: auth.refreshExpiresAt,
+      lastUpdated: Date.now(),
+    };
+
+    sessionStorage.setItem('displayInfo', JSON.stringify(persistedState));
+  }
+};
+
+/**
+ * Retrieves auth state from localStorage
+ */
+const getStateFromStorage = () => {
+  try {
+    const savedState = sessionStorage.getItem('displayInfo');
+    if (!savedState) return null;
+
+    const parsedState = JSON.parse(savedState);
+
+    // Validate state has minimum required fields
+    if (parsedState && parsedState.user && parsedState.expiresAt) {
+      return parsedState;
+    }
+    return null;
+  } catch (e) {
+    console.error('Error retrieving auth state from storage:', e);
+    return null;
+  }
+};
+
+/**
+ * Clears saved auth state from localStorage
+ */
+const clearStoredState = () => {
+  sessionStorage.removeItem('displayInfo');
+};
+
+/*-----------------------------------------------------------------------------
  * Reactive Effects
  *-----------------------------------------------------------------------------*/
 createRoot(() => {
+  createEffect(() => {
+    // Only save when we have a user and expiry time
+    if (auth.user && auth.expiresAt) {
+      saveStateToStorage();
+    }
+  });
+
   // Auto-refresh session before expiration
   createEffect(() => {
     if (!auth.expiresAt) return;
