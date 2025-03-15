@@ -16,15 +16,12 @@ export const valsToSnakeCase = (str: string): string => {
  * @param str - The snake_case string to convert
  * @returns The converted camelCase string
  */
+
 export const valsToCamelCase = (str: string): string => {
   if (!str) return str;
 
-  const normalizedStr = str.toLowerCase();
-
   // Convert all _x patterns to X
-  return normalizedStr.replace(/_([a-z0-9])/g, (_match, letter) =>
-    letter.toUpperCase(),
-  );
+  return str.replace(/_([a-z0-9])/g, (_match, letter) => letter.toUpperCase());
 };
 
 /**

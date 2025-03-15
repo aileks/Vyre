@@ -27,19 +27,11 @@ export interface LoginCredentials {
   rememberMe: boolean;
 }
 
-export interface TokenData {
-  value: string;
-  expiresAt: number;
-  refreshToken?: string;
-  refreshExpiresAt?: number;
-}
-
 export interface SuccessResponse {
   user: User;
-  token: string;
-  expiresAt: number;
+  expiresAt?: number | null;
   refreshToken?: string;
-  refreshExpiresAt?: number;
+  refreshExpiresAt?: number | null;
 }
 
 export interface ErrorResponse {
@@ -51,11 +43,20 @@ export interface ErrorResponse {
 export interface AuthState {
   status: AuthStatus;
   user: User | null;
-  token: string | null;
-  expiresAt: number | null;
-  refreshToken?: string | null;
+  expiresAt?: number | null;
   refreshExpiresAt?: number | null;
   error: string | null;
+}
+
+export interface ApiAuthResponse {
+  user: User;
+  expiresAt?: string;
+  refreshExpiresAt?: string;
+}
+
+export interface ApiRefreshResponse {
+  expiresAt: string;
+  refreshExpiresAt: string;
 }
 
 export type AuthResult = SuccessResponse | ErrorResponse;

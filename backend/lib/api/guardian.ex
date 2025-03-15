@@ -35,15 +35,24 @@ defmodule Api.Guardian do
   # def subject_for_token(_resource, _claims) do
   #   {:error, :unknown_resource}
   # end
-  #
-  def subject_for_token(user, _claims) do
-    {:ok, to_string(user.id)}
+
+  def subject_for_token(resource, _claims) do
+    sub = to_string(resource.id)
+    {:ok, sub}
   end
 
-  def resource_from_claims(%{"sub" => id}) do
-    case Accounts.get_user(id) do
-      {:ok, resource} -> {:ok, resource}
-      {:error, _reason} -> {:error, :resource_not_found}
+  def resource_from_claims(claims) do
+    user_id = claims["sub"]
+
+    case Api.Accounts.get_user(user_id) do
+      {:ok, user} ->
+        {:ok, user}
+
+      {:error, :not_found} ->
+        {:error, :resource_not_found}
+
+      error ->
+        {:error, :resource_not_found}
     end
   end
 

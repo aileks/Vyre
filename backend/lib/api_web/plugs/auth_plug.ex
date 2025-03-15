@@ -1,10 +1,10 @@
 defmodule ApiWeb.AuthPlug do
   use Guardian.Plug.Pipeline,
     otp_app: :api,
-    module: Api.Guardian,
-    error_handler: ApiWeb.Auth.ErrorHandler
+    error_handler: Api.Guardian.ErrorHandler,
+    module: Api.Guardian
 
-  plug(Guardian.Plug.VerifyHeader, claims: %{"typ" => "access"})
-  plug(Guardian.Plug.EnsureAuthenticated)
-  plug(Guardian.Plug.LoadResource, allow_blank: false)
+  plug(Guardian.Plug.VerifyHeader, scheme: "Bearer")
+  plug(Guardian.Plug.VerifyCookie, key: "_auth_token")
+  plug(Guardian.Plug.LoadResource, allow_blank: true)
 end

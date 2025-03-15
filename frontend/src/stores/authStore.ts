@@ -1,100 +1,79 @@
-import { batch, createEffect } from 'solid-js';
+// authStore.ts
+import { batch, createEffect, createRoot, onCleanup } from 'solid-js';
 import { createStore, reconcile } from 'solid-js/store';
 
 import {
+  ApiAuthResponse,
+  ApiRefreshResponse,
   AuthResult,
   AuthState,
   ErrorResponse,
   LoginCredentials,
   RegistrationData,
-  SuccessResponse,
-  TokenData,
   User,
 } from '../types';
 import { keysToCamelCase, keysToSnakeCase } from '../utils/caseTransformer';
+
+// Flags
+let refreshInProgress = false;
 
 /*-----------------------------------------------------------------------------
  * State Setup
  *-----------------------------------------------------------------------------*/
 const getInitialState = (): AuthState => {
-  const defaultState: AuthState = {
+  return {
     status: 'idle',
     user: null,
-    token: null,
     expiresAt: null,
+    refreshExpiresAt: null,
     error: null,
   };
-
-  try {
-    const storedToken = localStorage.getItem('token');
-    if (!storedToken) {
-      return defaultState;
-    }
-
-    const tokenData = JSON.parse(storedToken) as TokenData;
-
-    const now = Date.now() / 1000;
-    let expiresAt = tokenData.expiresAt;
-
-    // Check expiration
-    if (expiresAt && now > expiresAt) {
-      localStorage.removeItem('token');
-      return defaultState;
-    }
-
-    return {
-      status: 'authenticated',
-      user: null,
-      token: tokenData.value,
-      expiresAt,
-      error: null,
-    };
-  } catch (error) {
-    // If any error in parsing, clear the token
-    localStorage.removeItem('token');
-    return defaultState;
-  }
 };
 
 export const [auth, setAuth] = createStore<AuthState>(getInitialState());
 
 // Create derived state signals
-export const isAuthenticated = () => Boolean(auth.user && auth.token);
-export const isLoading = () => auth.status === 'loading';
 export const currentUser = () => auth.user;
+export const isAuthenticated = () => Boolean(currentUser());
+export const isLoading = () => auth.status === 'loading';
 export const currentError = () => auth.error;
+export const currentToken = () => (isAuthenticated() ? 'cookie-auth' : null);
 
 /*-----------------------------------------------------------------------------
- * Token Management
+ * Helper Functions
  *-----------------------------------------------------------------------------*/
-const setStoredToken = (token: string, expiresAt: number) => {
-  const stringifiedToken = JSON.stringify({
-    value: token,
-    expiresAt,
-  });
 
-  localStorage.setItem('token', stringifiedToken);
+/**
+ * Utility function to determine if the session is likely expired
+ */
+export const isSessionExpired = () => {
+  if (!auth.expiresAt) return true;
+
+  const now = Math.floor(Date.now() / 1000);
+  return now >= auth.expiresAt;
 };
 
-const clearStoredToken = () => {
-  localStorage.removeItem('token');
+/**
+ * Utility function to determine if the refresh token is likely expired
+ */
+export const isRefreshExpired = () => {
+  if (!auth.refreshExpiresAt) return true;
+
+  const now = Math.floor(Date.now() / 1000);
+  return now >= auth.refreshExpiresAt;
 };
 
-// Set up token expiration
-createEffect(() => {
-  if (!auth.expiresAt) return;
-
-  const now = Date.now() / 1000; // Convert to seconds
-
-  if (now > auth.expiresAt) {
-    logout();
-    return;
-  }
-});
+/**
+ * Converts ISO date string to timestamp (seconds)
+ */
+const dateToTimestamp = (dateStr?: string): number | null => {
+  if (!dateStr) return null;
+  return Math.floor(new Date(dateStr).getTime() / 1000);
+};
 
 /**
  * Fetches data from the API with proper error handling and response transformation.
- * Automatically adds authentication token and handles common headers.
+ * Uses cookies for authentication and handles common headers.
  *
  * @param url - The API endpoint URL
  * @param options - Fetch options including method, body, headers, etc.
@@ -109,24 +88,28 @@ const apiFetch = async <T>(
   const timeout = setTimeout(() => controller.abort(), 10000);
 
   try {
-    // Add auth token if available
-    if (auth.token) {
-      options.headers = {
-        ...options.headers,
-        Authorization: `Bearer ${auth.token}`,
-      };
-    }
-
     // Add default headers
     options.headers = {
       'Content-Type': 'application/json',
       ...options.headers,
     };
 
+    // Add credentials to include cookies in the request
+    options.credentials = 'include';
     options.signal = controller.signal;
+
+    // Transform request body if needed
+    if (options.body && typeof options.body === 'string') {
+      try {
+        const bodyObj = JSON.parse(options.body);
+        options.body = JSON.stringify(keysToSnakeCase(bodyObj));
+      } catch (e) {
+        // If parsing fails, use the original body
+      }
+    }
+
     const res = await fetch(url, options);
     const data = await res.json().catch(() => ({}));
-
     const transformedData = keysToCamelCase<T>(data);
 
     return {
@@ -143,6 +126,81 @@ const apiFetch = async <T>(
   }
 };
 
+/**
+ * Refresh the session by calling the refresh endpoint
+ *
+ * @returns {Promise<boolean>} - True if the session was refreshed successfully
+ */
+export const refreshSession = async (): Promise<boolean> => {
+  if (refreshInProgress) return false;
+
+  try {
+    refreshInProgress = true;
+    setAuth('status', 'loading');
+
+    const { ok, data } = await apiFetch<ApiRefreshResponse | ErrorResponse>(
+      '/api/session/refresh',
+      { method: 'POST' },
+    );
+
+    if (ok && 'expiresAt' in data) {
+      // Update state with new expiry times
+      const expiresAt = dateToTimestamp(data.expiresAt);
+      const refreshExpiresAt = dateToTimestamp(data.refreshExpiresAt);
+
+      batch(() => {
+        setAuth('expiresAt', expiresAt);
+        setAuth('refreshExpiresAt', refreshExpiresAt);
+        setAuth('status', 'authenticated');
+      });
+
+      // Fetch user data to ensure it's up to date
+      await fetchUserData();
+      return true;
+    }
+
+    // If refresh failed, clear the state
+    setAuth(
+      reconcile({
+        status: 'idle',
+        user: null,
+        expiresAt: null,
+        refreshExpiresAt: null,
+        error: null,
+      }),
+    );
+
+    return false;
+  } catch (err) {
+    console.error('Error refreshing session:', err);
+    setAuth('status', 'error');
+    return false;
+  } finally {
+    refreshInProgress = false;
+  }
+};
+
+export const setupSession = async (): Promise<User | null> => {
+  // If we already have a user, nothing to do
+  if (currentUser()) return currentUser();
+
+  try {
+    // Try to fetch the user data to check if cookies are valid
+    const user = await fetchUserData();
+
+    // If session is expired but refresh token is valid, try refreshing
+    if (!user && !isRefreshExpired()) await refreshSession();
+
+    if (user) return user;
+
+    return null;
+  } catch (e) {
+    console.error('Error setting up session:', e);
+    setAuth('status', 'error');
+    return null;
+  }
+};
+
 /*-----------------------------------------------------------------------------
  * Auth Actions
  *-----------------------------------------------------------------------------*/
@@ -152,31 +210,36 @@ export const register = async (
   setAuth('status', 'loading');
   setAuth('error', null);
 
-  const snakeCaseData = keysToSnakeCase(userData);
-  const { ok, data } = await apiFetch<SuccessResponse | ErrorResponse>(
+  const { ok, data } = await apiFetch<ApiAuthResponse | ErrorResponse>(
     '/api/auth/register',
     {
       method: 'POST',
-      body: JSON.stringify({ user: snakeCaseData }),
+      body: JSON.stringify({ user: userData }),
     },
   );
 
   if (ok && 'user' in data) {
-    const { user, token, expiresAt } = data;
+    // We need to cast data to ApiAuthResponse to access its properties safely
+    const responseData = data as ApiAuthResponse;
+    const user = responseData.user;
+    const expiresAt = dateToTimestamp(responseData.expiresAt);
+    const refreshExpiresAt = dateToTimestamp(responseData.refreshExpiresAt);
 
-    // Update storage and state
-    setStoredToken(token, expiresAt);
     setAuth(
       reconcile({
         status: 'authenticated',
         user,
-        token,
         expiresAt,
+        refreshExpiresAt,
         error: null,
       }),
     );
 
-    return { user, token, expiresAt };
+    return {
+      user,
+      expiresAt: expiresAt,
+      refreshExpiresAt,
+    };
   } else {
     const errorData = data as ErrorResponse;
     batch(() => {
@@ -194,8 +257,8 @@ export const login = async (
   setAuth('status', 'loading');
   setAuth('error', null);
 
-  const { ok, data } = await apiFetch<SuccessResponse | ErrorResponse>(
-    '/api/auth/login',
+  const { ok, data } = await apiFetch<ApiAuthResponse | ErrorResponse>(
+    '/api/session',
     {
       method: 'POST',
       body: JSON.stringify({ user: credentials }),
@@ -203,21 +266,27 @@ export const login = async (
   );
 
   if (ok && 'user' in data) {
-    const { user, token, expiresAt } = data;
+    // We need to cast data to ApiAuthResponse to access its properties safely
+    const responseData = data as ApiAuthResponse;
+    const user = responseData.user;
+    const expiresAt = dateToTimestamp(responseData.expiresAt);
+    const refreshExpiresAt = dateToTimestamp(responseData.refreshExpiresAt);
 
-    // Update storage and state
-    setStoredToken(token, expiresAt);
+    // Update state
     setAuth(
       reconcile({
         status: 'authenticated',
         user,
-        token,
         expiresAt,
+        refreshExpiresAt,
         error: null,
       }),
     );
-
-    return { user, token, expiresAt };
+    return {
+      user,
+      expiresAt: expiresAt,
+      refreshExpiresAt,
+    };
   } else {
     const errorData = data as ErrorResponse;
     setAuth('status', 'error');
@@ -231,21 +300,18 @@ export const logout = async (): Promise<void> => {
   setAuth('status', 'loading');
 
   try {
-    if (auth.token) {
-      await apiFetch('/api/auth/logout', { method: 'DELETE' }).catch(
-        console.error,
-      );
-    }
+    // Call logout endpoint to clear cookies on server
+    await apiFetch('/api/session', { method: 'DELETE' });
   } catch (err) {
     console.error('Logout failed:', err);
   } finally {
-    clearStoredToken();
+    // Clear state
     setAuth(
       reconcile({
         status: 'idle',
         user: null,
-        token: null,
         expiresAt: null,
+        refreshExpiresAt: null,
         error: null,
       }),
     );
@@ -253,54 +319,78 @@ export const logout = async (): Promise<void> => {
 };
 
 /**
- * Refreshes the current session by validating the token and fetching user data.
+ * Fetches the current user data from the API
  *
  * @returns Promise resolving to the user object if successful, otherwise null
  */
-export const refreshSession = async (): Promise<User | null> => {
-  if (!auth.token) {
-    setAuth('status', 'idle');
-    return null;
-  }
+export const fetchUserData = async (): Promise<User | null> => {
+  try {
+    setAuth('status', 'loading');
 
-  batch(() => {
-    setAuth('status', auth.user ? 'authenticated' : 'loading');
-    setAuth('error', null);
-  });
+    const { ok, data } = await apiFetch<ApiAuthResponse | ErrorResponse>(
+      '/api/auth/me',
+      { method: 'GET' },
+    );
 
-  const { ok, data } = await apiFetch<{ user: User } | ErrorResponse>(
-    '/api/auth/me',
-  );
+    if (!ok || !('user' in data)) {
+      console.error('Failed to fetch user data:', data);
+      setAuth('status', 'idle');
+      setAuth('user', null);
+      return null;
+    }
 
-  if (ok && 'user' in data) {
+    // We need to cast data to ApiAuthResponse to access its properties safely
+    const responseData = data as ApiAuthResponse;
+    const user = responseData.user;
+
+    // Update auth state with user data
     batch(() => {
+      setAuth('user', user);
       setAuth('status', 'authenticated');
-      setAuth('user', data.user);
       setAuth('error', null);
     });
 
-    return data.user;
-  } else {
-    // Something went wrong
-    clearStoredToken();
+    return user;
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    setAuth('status', 'error');
     setAuth(
-      reconcile({
-        status: 'idle',
-        user: null,
-        token: null,
-        expiresAt: null,
-        error: 'Invalid session',
-      }),
+      'error',
+      error instanceof Error ? error.message : 'Unknown error fetching user',
     );
-
     return null;
   }
 };
 
-// Fetch user data when we have a token but no user
-// NOTE: This usually only happens on initial mount
-createEffect(() => {
-  if (auth.token && !currentUser() && !isLoading()) {
-    refreshSession();
-  }
+/*-----------------------------------------------------------------------------
+ * Reactive Effects
+ *-----------------------------------------------------------------------------*/
+createRoot(() => {
+  // Auto-refresh session before expiration
+  createEffect(() => {
+    if (!auth.expiresAt) return;
+
+    const now = Date.now() / 1000;
+    const timeUntilExpiry = auth.expiresAt - now;
+
+    // If already expired, refresh immediately
+    if (timeUntilExpiry <= 0) {
+      refreshSession();
+      return;
+    }
+
+    // Schedule refresh 30 seconds before expiration
+    const refreshTime = Math.max(timeUntilExpiry - 30, 0) * 1000;
+    const timerId = setTimeout(() => refreshSession(), refreshTime);
+
+    // Clean up timer
+    onCleanup(() => clearTimeout(timerId));
+  });
+
+  // Handle refresh_needed status
+  createEffect(() => {
+    if (auth.status === 'refresh_needed') {
+      refreshSession();
+    }
+  });
 });

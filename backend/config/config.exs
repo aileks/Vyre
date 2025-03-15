@@ -19,6 +19,7 @@ config :api, ApiWeb.Endpoint,
 config :api, Api.Guardian,
   issuer: "api",
   secret_key: System.get_env("GUARDIAN_SECRET_KEY"),
+  allowed_algos: ["HS512"],
   token_ttl: %{
     access: {1, :hour},
     refresh: {7, :days}
@@ -34,7 +35,9 @@ config :guardian, Guardian.DB,
 config :cors_plug,
   origin: ["http://localhost:4000", "http://localhost:5173"],
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-  headers: ["Authorization", "Content-Type", "Accept", "Origin", "User-Agent"]
+  headers: ["Authorization", "Content-Type", "Accept", "Origin", "User-Agent"],
+  credentials: true,
+  max_age: 86400
 
 # Configures Elixir's Logger
 config :logger, :console,

@@ -6,61 +6,59 @@ defmodule ApiWeb.Router do
     plug(:accepts, ["json"])
   end
 
+  pipeline :maybe_auth do
+    plug(ApiWeb.Auth.Pipeline)
+  end
+
   pipeline :auth do
-    plug(:accepts, ["json"])
-    plug(ApiWeb.AuthPlug)
+    plug(ApiWeb.Auth.AuthenticatedPipeline)
+  end
+
+  pipeline :refresh do
+    plug(ApiWeb.Auth.RefreshablePipeline)
   end
 
   pipeline :browser do
     plug(:accepts, ["html"])
   end
 
+  # Public Routes
   scope "/api", ApiWeb do
     pipe_through(:api)
-    # NOTE: Not protected for testing
-    resources("/users", UserController)
-    resources("/servers", ServerController)
-    resources("/servers/:server_id/channels", ChannelController, except: [:new, :edit])
-
-    pipe_through(:auth)
-    post("/friends/send_request", FriendController, :send_request)
-    post("/friends/accept_request", FriendController, :accept_request)
-    delete("/friends/decline_request", FriendController, :decline_request)
-    get("/friends/list", FriendController, :list_friends)
-    get("/friends/pending_requests", FriendController, :list_pending_requests)
+    post("/auth/register", AuthController, :register)
+    post("/session", AuthController, :login)
   end
 
-  scope "/api/auth", ApiWeb do
-    # Public auth routs
-    pipe_through(:api)
-    post("/register", AuthController, :register)
-    post("/login", AuthController, :login)
-    delete("/logout", AuthController, :logout)
-    post("/refresh", AuthController, :refresh)
-
-    # Protected auth routes
-    pipe_through(:auth)
-    get("/me", AuthController, :me)
+  # Semi-authenticated Routes
+  scope "/api", ApiWeb do
+    pipe_through([:api, :maybe_auth])
+    get("/auth/me", AuthController, :me)
   end
 
+  # Refresh Route
+  scope "/api", ApiWeb do
+    pipe_through([:api, :refresh])
+    post("/session/refresh", AuthController, :refresh)
+  end
+
+  # Protected Routes
+  scope "/api", ApiWeb do
+    pipe_through([:api, :auth])
+    delete("/session", AuthController, :logout)
+
+    resources("/users", UserController, except: [:new, :edit])
+    # resources("/servers", ServerController)
+    # resources("/servers/:server_id/channels", ChannelController, except: [:new, :edit])
+    # post("/friends/send_request", FriendController, :send_request)
+    # post("/friends/accept_request", FriendController, :accept_request)
+    # delete("/friends/decline_request", FriendController, :decline_request)
+    # get("/friends/list", FriendController, :list_friends)
+    # get("/friends/pending_requests", FriendController, :list_pending_requests)
+  end
+
+  # Catch-All for Routes
   scope "/", ApiWeb do
     pipe_through(:browser)
     get("/*path", PageController, :index)
-  end
-
-  def handle_errors(conn, %{reason: %Ecto.NoResultsError{} = _reason}) do
-    conn
-    |> put_status(:not_found)
-    |> put_view(json: ApiWeb.ErrorJSON)
-    |> render("404.json", %{message: "Resource not found"})
-    |> halt()
-  end
-
-  def handle_errors(conn, _) do
-    conn
-    |> put_status(:internal_server_error)
-    |> put_view(json: ApiWeb.ErrorJSON)
-    |> render("500.json")
-    |> halt()
   end
 end

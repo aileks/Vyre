@@ -31,7 +31,7 @@ export default function Login() {
     const res: AuthResult = await login(credentials);
 
     if ('error' in res) {
-      setError(res.error.message || 'Login failed');
+      setError(res.error?.message!);
       return;
     }
 
