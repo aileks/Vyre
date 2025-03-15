@@ -1,15 +1,10 @@
-import { Suspense, onMount } from 'solid-js';
+import { Suspense } from 'solid-js';
 
 import SpinnerFallback from './components/SpinnerFallback';
 import { AuthProvider } from './context/authContext';
 import AppRouter from './router';
-import { setupSession } from './stores/authStore';
 
 export default function App() {
-  onMount(async () => {
-    await setupSession();
-  });
-
   return (
     <AuthProvider>
       <Suspense fallback={<SpinnerFallback />}>
