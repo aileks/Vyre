@@ -1,9 +1,5 @@
 import Config
 
-# if File.exists?("../../.env") do
-#   Dotenv.load!(filename: "../../.env")
-# end
-
 config :api,
   ecto_repos: [Api.Repo],
   generators: [timestamp_type: :utc_datetime, binary_id: true]
@@ -22,7 +18,13 @@ config :api, ApiWeb.Endpoint,
 
 config :api, Api.Accounts.Guardian,
   issuer: "api",
-  secret_key: System.get_env("GUARDIAN_SECRET_KEY")
+  secret_key: System.get_env("GUARDIAN_SECRET_KEY"),
+  # token_ttl: {1, :hour},
+  hooks: GuardianDb
+
+config :guardian, Guardian.DB,
+  repo: Api.Repo,
+  sweep_interval: 60
 
 # Set up CORS
 config :cors_plug,

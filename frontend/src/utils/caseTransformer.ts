@@ -17,7 +17,14 @@ export const valsToSnakeCase = (str: string): string => {
  * @returns The converted camelCase string
  */
 export const valsToCamelCase = (str: string): string => {
-  return str.replace(/_([a-z])/g, (_match, letter) => letter.toUpperCase());
+  if (!str) return str;
+
+  const normalizedStr = str.toLowerCase();
+
+  // Convert all _x patterns to X
+  return normalizedStr.replace(/_([a-z0-9])/g, (_match, letter) =>
+    letter.toUpperCase(),
+  );
 };
 
 /**
@@ -59,19 +66,28 @@ export const keysToSnakeCase = <T>(obj: T): T => {
  * @returns A new object with all keys converted to camelCase
  */
 export const keysToCamelCase = <T>(obj: T): T => {
+  // Just in case...
+  if (obj === null || obj === undefined) {
+    return obj;
+  }
+
   // Handle arrays by mapping over each element
   if (Array.isArray(obj)) {
     return obj.map(keysToCamelCase) as unknown as T;
   }
 
   // Handle objects by converting each key and recursively transforming values
-  if (obj !== null && typeof obj === 'object') {
-    return Object.fromEntries(
-      Object.entries(obj).map(([key, value]) => [
-        valsToCamelCase(key),
-        keysToCamelCase(value),
-      ]),
-    ) as unknown as T;
+  if (typeof obj === 'object') {
+    const newObj: Record<string, any> = {};
+
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        const camelKey = valsToCamelCase(key);
+        newObj[camelKey] = keysToCamelCase((obj as any)[key]);
+      }
+    }
+
+    return newObj as T;
   }
 
   // Return primitives as is

@@ -36,6 +36,7 @@ defmodule ApiWeb.Router do
     post("/register", AuthController, :register)
     post("/login", AuthController, :login)
     delete("/logout", AuthController, :logout)
+    post("/refresh", AuthController, :refresh)
 
     # Protected auth routes
     pipe_through(:auth)

@@ -1,4 +1,9 @@
-type AuthStatus = 'idle' | 'loading' | 'authenticated' | 'error';
+type AuthStatus =
+  | 'idle'
+  | 'loading'
+  | 'authenticated'
+  | 'error'
+  | 'refresh_needed';
 
 export interface User {
   id: string;
@@ -25,12 +30,16 @@ export interface LoginCredentials {
 export interface TokenData {
   value: string;
   expiresAt: number;
+  refreshToken?: string;
+  refreshExpiresAt?: number;
 }
 
 export interface SuccessResponse {
   user: User;
   token: string;
   expiresAt: number;
+  refreshToken?: string;
+  refreshExpiresAt?: number;
 }
 
 export interface ErrorResponse {
@@ -44,6 +53,8 @@ export interface AuthState {
   user: User | null;
   token: string | null;
   expiresAt: number | null;
+  refreshToken?: string | null;
+  refreshExpiresAt?: number | null;
   error: string | null;
 }
 
