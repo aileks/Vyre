@@ -1,46 +1,76 @@
-// authStore.ts
-import { createResource, createSignal, onCleanup } from 'solid-js';
+import { createEffect, createMemo, createResource, onCleanup } from 'solid-js';
+import { createStore, reconcile } from 'solid-js/store';
 
-import type { LoginCredentials, RegistrationData, User } from '../types';
+import type {
+  AuthState,
+  LoginCredentials,
+  RegistrationData,
+  User,
+} from '../types';
 import apiClient from '../utils/apiClient';
 
-/**
- * Fetches the current user using an abortable request.
- * If the user isn’t authenticated or an error occurs,
- * returns null.
- */
 const fetchUser = async (): Promise<User | null> => {
   const controller = new AbortController();
+
   onCleanup(() => controller.abort());
+
   try {
     const response = await apiClient.get('/user/current', {
       signal: controller.signal,
     });
     return response.data.user as User;
   } catch (error) {
+    // Treat any error as not authenticated or an unavailable user.
     return null;
   }
 };
 
-/**
- * Creates an authentication store that provides:
- * - A reactive `currentUser` resource (with automatic cleanup)
- * - Signals for loading and error state
- * - Methods for logging in, registering, and logging out
- */
-export function createAuthStore() {
-  const [currentUser, { refetch, mutate }] = createResource(fetchUser);
-  const isAuthenticated = () => !!currentUser();
+// Automatically fetch/refetch the current user.
+const [currentUser, { refetch, mutate }] = createResource(fetchUser);
 
-  const [isLoading, setIsLoading] = createSignal(false);
-  const [currentError, setCurrentError] = createSignal<string | null>(null);
+export const createAuthStore = () => {
+  const [state, setState] = createStore<AuthState>({
+    status: 'idle',
+    user: null,
+    error: null,
+  });
 
-  /**
-   * Log in a user and refetch the current user.
-   */
+  const isLoading = createMemo(() => state.status === 'loading');
+  const isAuthenticated = createMemo(() => state.status === 'authenticated');
+  const currentError = createMemo(() => state.error);
+
+  // When the currentUser resource updates, update our auth state.
+  createEffect(() => {
+    const user = currentUser();
+
+    if (user === undefined) {
+      setState('status', 'loading');
+    } else if (user === null) {
+      setState(
+        reconcile({
+          status: 'idle',
+          user: null,
+          error: null,
+        }),
+      );
+    } else {
+      setState(
+        reconcile({
+          status: 'authenticated',
+          user,
+          error: null,
+        }),
+      );
+    }
+  });
+
+  const getErrorMessage = (error: any, defaultMsg: string) =>
+    error?.response?.data?.error?.message || error?.message || defaultMsg;
+
   const login = async (credentials: LoginCredentials) => {
-    setIsLoading(true);
-    setCurrentError(null);
+    setState('status', 'loading');
+    setState('error', null);
+
     try {
       await apiClient.post('/session', {
         user: {
@@ -49,66 +79,77 @@ export function createAuthStore() {
           remember_me: credentials.rememberMe,
         },
       });
+      // Refetch to update the currentUser resource.
       await refetch();
     } catch (error: any) {
-      setCurrentError(error?.message || 'Unknown login error');
+      const errorMessage = getErrorMessage(error, 'Network error (login)');
+
+      setState('status', 'error');
+      setState('error', errorMessage);
+
       throw error;
-    } finally {
-      setIsLoading(false);
     }
   };
 
-  /**
-   * Register a new user.
-   *
-   * After the successful call, refetch the current user.
-   */
   const register = async (registrationData: RegistrationData) => {
-    setIsLoading(true);
-    setCurrentError(null);
+    setState('status', 'loading');
+    setState('error', null);
+
     try {
       await apiClient.post('/users/new', {
         user: {
-          username: registrationData.username,
           email: registrationData.email,
           password: registrationData.password,
+          username: registrationData.username,
           display_name: registrationData.displayName,
         },
       });
-
       await refetch();
     } catch (error: any) {
-      setCurrentError(error?.message || 'Unknown registration error');
+      const errorMessage = getErrorMessage(
+        error,
+        'Network error (registration)',
+      );
+
+      setState('status', 'error');
+      setState('error', errorMessage);
+
       throw error;
-    } finally {
-      setIsLoading(false);
     }
   };
 
-  /**
-   * Log out the user and set the current user to null immediately.
-   */
   const logout = async () => {
-    setIsLoading(true);
+    setState({ status: 'loading' });
+
     try {
       await apiClient.delete('/session');
+
       mutate(null);
+      setState(
+        reconcile({
+          status: 'idle',
+          user: null,
+          error: null,
+        }),
+      );
     } catch (error: any) {
-      setCurrentError(error?.message || 'Unknown logout error');
+      const errorMessage = getErrorMessage(error, 'Network error (logout)');
+
+      setState('status', 'error');
+      setState('error', errorMessage);
+
       throw error;
-    } finally {
-      setIsLoading(false);
     }
   };
 
   return {
-    currentUser, // Resource holding the current user (or null)
-    isAuthenticated, // Checks if currentUser exists
-    isLoading, // Signal for loading state
-    currentError, // Signal for error messages
-    login, // Login handler
-    register, // Registration handler
-    logout, // Logout handler
-    refetch, // Expose refetch in case it's needed
+    state,
+    isLoading,
+    isAuthenticated,
+    currentError,
+    login,
+    register,
+    logout,
+    refetch,
   };
-}
+};

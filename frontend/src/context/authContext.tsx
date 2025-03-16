@@ -1,14 +1,13 @@
-// authContext.ts
 import { ParentProps, createContext, useContext } from 'solid-js';
 
 import { createAuthStore } from '../stores/authStore';
-import type { LoginCredentials, RegistrationData } from '../types';
+import type { AuthState, LoginCredentials, RegistrationData } from '../types';
 
 export interface AuthContextValue {
-  currentUser: ReturnType<typeof createAuthStore>['currentUser'];
+  state: AuthState;
+  currentError: () => string | null;
+  isLoading: () => boolean;
   isAuthenticated: () => boolean;
-  isLoading: ReturnType<typeof createAuthStore>['isLoading'];
-  currentError: ReturnType<typeof createAuthStore>['currentError'];
   login: (credentials: LoginCredentials) => Promise<void>;
   logout: () => Promise<void>;
   register: (data: RegistrationData) => Promise<void>;

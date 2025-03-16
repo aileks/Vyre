@@ -1,9 +1,4 @@
-type AuthStatus =
-  | 'idle'
-  | 'loading'
-  | 'authenticated'
-  | 'error'
-  | 'refresh_needed';
+type AuthStatus = 'idle' | 'loading' | 'authenticated' | 'error';
 
 export interface User {
   id: string;

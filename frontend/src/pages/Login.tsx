@@ -7,7 +7,7 @@ import { LoginCredentials } from '../types';
 
 export default function Login() {
   const navigate = useNavigate();
-  const { isAuthenticated, isLoading, login } = useAuth();
+  const { isAuthenticated, isLoading, login, currentError } = useAuth();
 
   const [email, setEmail] = createSignal<string>('');
   const [password, setPassword] = createSignal<string>('');
@@ -32,7 +32,7 @@ export default function Login() {
       await login(credentials);
       navigate('/', { replace: true });
     } catch (error) {
-      setError('Invalid credentials');
+      setError(currentError());
     }
   };
 
