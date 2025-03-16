@@ -13,7 +13,7 @@ const fetchUser = async (): Promise<User | null> => {
   const controller = new AbortController();
   onCleanup(() => controller.abort());
   try {
-    const response = await apiClient.get('/auth/me', {
+    const response = await apiClient.get('/user/current', {
       signal: controller.signal,
     });
     return response.data.user as User;
@@ -67,9 +67,15 @@ export function createAuthStore() {
     setIsLoading(true);
     setCurrentError(null);
     try {
-      await apiClient.post('/auth/register', registrationData);
-      // If your backend automatically logs in the user post registration,
-      // refetch the current user. Otherwise, you might want to route to a login page.
+      await apiClient.post('/users/new', {
+        user: {
+          username: registrationData.username,
+          email: registrationData.email,
+          password: registrationData.password,
+          display_name: registrationData.displayName,
+        },
+      });
+
       await refetch();
     } catch (error: any) {
       setCurrentError(error?.message || 'Unknown registration error');

@@ -20,16 +20,13 @@ config :api, ApiWeb.Auth.Guardian,
   issuer: "api",
   secret_key: System.get_env("GUARDIAN_SECRET_KEY"),
   allowed_algos: ["HS512"],
-  token_ttl: %{
-    access: {1, :hour},
-    refresh: {7, :days}
-  },
-  hooks: GuardianDb
+  verify_issuer: true,
+  hooks: [Guardian.DB]
 
 config :guardian, Guardian.DB,
   repo: Api.Repo,
-  # Only track refresh tokens
-  token_types: [:refresh]
+  token_types: ["refresh_token"],
+  sweep_interval: 60
 
 # Set up CORS
 config :cors_plug,

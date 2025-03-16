@@ -37,6 +37,7 @@ defmodule Api.Accounts do
 
   """
   def get_user!(id) do
+    IO.inspect(id, label: "\n\nGETTING USER BY ID")
     Repo.get(User, id)
   end
 

@@ -2,6 +2,7 @@ defmodule ApiWeb.Auth.Guardian do
   use Guardian, otp_app: :api
 
   alias Api.Accounts
+  alias Api.Accounts.User
 
   def after_encode_and_sign(resource, claims, token, _options) do
     with {:ok, _} <- Guardian.DB.after_encode_and_sign(resource, claims["typ"], claims, token) do
@@ -27,21 +28,24 @@ defmodule ApiWeb.Auth.Guardian do
     end
   end
 
-  def subject_for_token(%{id: id}, _claims) do
-    sub = to_string(id)
-    {:ok, sub}
+  def subject_for_token(%User{id: id}, claims) do
+    IO.inspect([id, claims], label: "\n\nsubject_for_token: ID and CLAIMS")
+
+    {:ok, "User:#{id}"}
   end
 
-  def subject_for_token(_, _) do
-    {:error, :missing_id}
-  end
+  def subject_for_token(_, _), do: {:error, :unhandled_resource_type}
 
-  def resource_from_claims(%{"sub" => id}) do
+  def resource_from_claims(%{"sub" => "User:" <> id}) do
+    IO.inspect(id, label: "\n\nresource_from_claims: ID")
+
     case Accounts.get_user!(id) do
-      nil -> {:error, :not_found}
+      nil -> {:error, :user_not_found}
       user -> {:ok, user}
     end
   end
+
+  def resource_from_claims(_), do: {:error, :unhandled_resource_type}
 
   @doc """
   Create an access token for a user.
@@ -137,6 +141,18 @@ defmodule ApiWeb.Auth.Guardian do
   Returns {:ok, claims} or {:error, reason}
   """
   def validate_token(token, token_type \\ "access") do
-    decode_and_verify(token, %{"typ" => token_type})
+    case decode_and_verify(token, %{"typ" => token_type}) do
+      {:ok, claims} -> {:valid, claims}
+      {:error, _reason} -> {:invalid, :token_expired_or_invalid}
+    end
+  end
+
+  @doc """
+  Revokes all tokens of a given subject
+  """
+  def revoke_all(resource, claims) do
+    with {:ok, _sub} <- subject_for_token(resource, claims) do
+      Guardian.DB.revoke_all(resource)
+    end
   end
 end

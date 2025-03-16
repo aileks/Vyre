@@ -4,48 +4,28 @@ defmodule ApiWeb.Router do
 
   pipeline :api do
     plug(:accepts, ["json"])
-  end
-
-  pipeline :maybe_auth do
-    plug(Api.Auth.Pipeline)
+    plug(:fetch_cookies)
   end
 
   pipeline :auth do
-    plug(Api.Auth.AuthenticatedPipeline)
-  end
-
-  pipeline :refresh do
-    plug(Api.Auth.RefreshablePipeline)
+    plug(Api.Auth.Pipeline)
   end
 
   pipeline :browser do
     plug(:accepts, ["html"])
   end
 
-  # Public Routes
   scope "/api", ApiWeb do
+    # Public Routes
     pipe_through(:api)
-    post("/auth/register", AuthController, :register)
+    post("/users/new", AuthController, :register)
     post("/session", AuthController, :login)
-  end
+    get("/user/current", AuthController, :me)
 
-  # Semi-authenticated Routes
-  scope "/api", ApiWeb do
-    pipe_through([:api, :maybe_auth])
-    get("/auth/me", AuthController, :me)
+    # Protected Routes
+    pipe_through(:auth)
     delete("/session", AuthController, :logout)
-  end
-
-  # Refresh Route
-  scope "/api", ApiWeb do
-    pipe_through([:api, :refresh])
     post("/session/refresh", AuthController, :refresh)
-  end
-
-  # Protected Routes
-  scope "/api", ApiWeb do
-    pipe_through([:api, :auth])
-
     resources("/users", UserController, except: [:new, :edit])
     # resources("/servers", ServerController)
     # resources("/servers/:server_id/channels", ChannelController, except: [:new, :edit])
@@ -56,7 +36,7 @@ defmodule ApiWeb.Router do
     # get("/friends/pending_requests", FriendController, :list_pending_requests)
   end
 
-  # Catch-All for Routes
+  # Catch-All for Frontend Routes
   scope "/", ApiWeb do
     pipe_through(:browser)
     get("/*path", PageController, :index)

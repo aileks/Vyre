@@ -7,7 +7,6 @@ defmodule Api.Auth.VerifyRefreshCookiePlug do
   def init(opts), do: opts
 
   def call(conn, _opts) do
-    # First, fetch cookies to ensure they're accessible
     conn = fetch_cookies(conn)
 
     # Now safely access the cookies

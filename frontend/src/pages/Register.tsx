@@ -21,21 +21,21 @@ export default function Register() {
 
   const handleSubmit = async (e: Event) => {
     e.preventDefault();
-    setError('');
+    setError(null);
 
     if (password() !== passwordConfirmation()) {
       setError('Passwords do not match');
       return;
     }
 
-    const credentials: RegistrationData = {
+    const data: RegistrationData = {
       username: username(),
       displayName: username(), // using username as displayName by default
       email: email(),
       password: password(),
     };
 
-    await register(credentials);
+    await register(data);
 
     if (isAuthenticated()) {
       navigate('/', { replace: true });

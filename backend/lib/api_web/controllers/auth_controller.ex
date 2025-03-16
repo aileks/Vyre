@@ -92,7 +92,6 @@ defmodule ApiWeb.AuthController do
   end
 
   def logout(conn, _params) do
-    # Delete auth cookies
     conn
     |> delete_resp_cookie("_auth_token", @cookie_opts)
     |> delete_resp_cookie("_auth_refresh_token", @refresh_cookie_opts)
@@ -101,6 +100,8 @@ defmodule ApiWeb.AuthController do
   end
 
   def refresh(conn, _params) do
+    IO.inspect(conn, label: "\n\nREFRESH CONNECTION")
+
     conn = fetch_cookies(conn)
     refresh_token = conn.private[:api_auth_refresh_token] || conn.cookies["_auth_refresh_token"]
 
@@ -152,30 +153,46 @@ defmodule ApiWeb.AuthController do
     end
   end
 
+  @doc """
+  Returns the current user if they exist
+  """
   def me(conn, _params) do
-    conn = fetch_cookies(conn)
+    # NOTE: This hacky af
+    token =
+      case conn.cookies["_auth_token"] do
+        nil -> Guardian.Plug.current_token(conn)
+        token -> token
+      end
 
-    case Guardian.Plug.current_resource(conn) do
+    case token do
       nil ->
-        case Guardian.decode_and_verify(conn) do
-          {:ok, user} ->
-            conn
-            |> put_status(:ok)
-            |> put_view(json: ApiWeb.AuthJSON)
-            |> render(:user, %{user: user})
-
-          {:error, _reason} ->
-            conn
-            |> put_status(:unauthorized)
-            |> put_view(json: ApiWeb.ErrorJSON)
-            |> render("401.json", %{error: "Not authenticated"})
-        end
-
-      user ->
         conn
         |> put_status(:ok)
-        |> put_view(json: ApiWeb.AuthJSON)
-        |> render(:user, %{user: user})
+        |> json(%{user: nil})
+
+      token ->
+        case Guardian.decode_and_verify(token) do
+          {:ok, claims} ->
+            case Guardian.resource_from_claims(claims) do
+              {:ok, user} ->
+                conn
+                |> put_status(:ok)
+                |> put_view(ApiWeb.AuthJSON)
+                |> render(:user, %{user: user})
+
+              # If resource lookup fails, return a null user.
+              _error ->
+                conn
+                |> put_status(:ok)
+                |> json(%{user: nil})
+            end
+
+          # If token verification fails, return a null user.
+          {:error, _reason} ->
+            conn
+            |> put_status(:ok)
+            |> json(%{user: nil})
+        end
     end
   end
 end

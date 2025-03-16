@@ -33,7 +33,7 @@ defmodule ApiWeb.AuthControllerTest do
     test "returns errors when registration data is invalid", %{conn: conn} do
       # Missing required fields
       conn =
-        post(conn, ~p"/api/auth/register",
+        post(conn, ~p"/api/users/new",
           user: %{
             email: "",
             username: "",
@@ -53,7 +53,7 @@ defmodule ApiWeb.AuthControllerTest do
 
       # Try to create another user with the same email
       conn =
-        post(conn, ~p"/api/auth/register",
+        post(conn, ~p"/api/users/new",
           user: %{
             email: user.email,
             username: unique_user_username(),
