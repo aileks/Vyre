@@ -21,11 +21,12 @@ config :api, ApiWeb.Auth.Guardian,
   secret_key: System.get_env("GUARDIAN_SECRET_KEY"),
   allowed_algos: ["HS512"],
   verify_issuer: true,
-  hooks: [Guardian.DB]
+  hooks: Guardian.DB
 
 config :guardian, Guardian.DB,
   repo: Api.Repo,
-  token_types: ["refresh_token"],
+  prefix: System.get_env("DB_SCHEMA"),
+  token_types: ["access", "refresh"],
   sweep_interval: 60
 
 # Set up CORS
