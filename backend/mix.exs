@@ -58,7 +58,9 @@ defmodule Api.MixProject do
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.5"},
       {:excoveralls, "~> 0.18", only: [:test, :dev]},
-      {:dotenv, "~> 3.0"}
+      {:dotenv, "~> 3.0", only: [:test, :dev]},
+      {:faker, "~> 0.18", only: :dev},
+      {:ex_machina, "~> 2.8", only: [:test, :dev]}
     ]
   end
 
