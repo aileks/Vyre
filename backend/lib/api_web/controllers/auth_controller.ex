@@ -100,8 +100,6 @@ defmodule ApiWeb.AuthController do
   end
 
   def refresh(conn, _params) do
-    IO.inspect(conn, label: "\n\nREFRESH CONNECTION")
-
     conn = fetch_cookies(conn)
     refresh_token = conn.private[:api_auth_refresh_token] || conn.cookies["_auth_refresh_token"]
 

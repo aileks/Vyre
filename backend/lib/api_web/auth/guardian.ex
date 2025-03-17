@@ -29,16 +29,12 @@ defmodule ApiWeb.Auth.Guardian do
   end
 
   def subject_for_token(%User{id: id}, claims) do
-    IO.inspect([id, claims], label: "\n\nsubject_for_token: ID and CLAIMS")
-
     {:ok, "User:#{id}"}
   end
 
   def subject_for_token(_, _), do: {:error, :unhandled_resource_type}
 
   def resource_from_claims(%{"sub" => "User:" <> id}) do
-    IO.inspect(id, label: "\n\nresource_from_claims: ID")
-
     case Accounts.get_user!(id) do
       nil -> {:error, :user_not_found}
       user -> {:ok, user}
