@@ -49,7 +49,7 @@ export default function Home() {
 
           <div class='mb-8 flex justify-center'>
             <div class='text-cybertext-400 flex items-center font-mono text-lg md:text-xl'>
-              <span>Estimated Launch Date: 2025/06/15</span>
+              <span>Estimated Launch Date: 2025/08/12</span>
               <span class='bg-primary-400 animate-blink ml-1 inline-block h-5 w-2.5'></span>
             </div>
           </div>
@@ -111,7 +111,7 @@ export default function Home() {
 
             <A
               href='https://github.com/aileks/Vyre'
-              class='bg-midnight-700 text-electric-400 hover:bg-midnight-600 focus:ring-electric-700 rounded-xs border border-gray-700 px-6 py-3 text-center font-mono transition-all duration-200 focus:ring-2 focus:outline-none'
+              class='bg-midnight-700 text-electric-400 hover:bg-midnight-500 focus:ring-electric-700 hover:text-electric-500 rounded-xs border border-gray-700 px-6 py-3 text-center font-mono transition-all duration-200 focus:ring-2 focus:outline-none'
             >
               Learn More
             </A>
