@@ -25,3 +25,5 @@ config :api, Api.Repo,
   pool_size: 5,
   queue_target: 5000,
   queue_interval: 5000
+
+config :guardian, Guardian.DB, prefix: db_schema
