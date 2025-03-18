@@ -27,7 +27,7 @@ defmodule ApiWeb.Router do
     delete("/session", AuthController, :logout)
     post("/session/refresh", AuthController, :refresh)
     resources("/users", UserController, except: [:new, :edit])
-    # resources("/servers", ServerController)
+    resources("/servers", ServerController)
     # resources("/servers/:server_id/channels", ChannelController, except: [:new, :edit])
     # post("/friends/send_request", FriendController, :send_request)
     # post("/friends/accept_request", FriendController, :accept_request)

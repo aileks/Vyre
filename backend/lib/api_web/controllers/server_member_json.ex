@@ -16,10 +16,25 @@ defmodule ApiWeb.ServerMemberJSON do
   end
 
   defp data(%ServerMember{} = server_member) do
+    roles = ServerMember.get_roles(server_member)
+
     %{
       id: server_member.id,
-      roles: server_member.roles,
-      joined_at: server_member.joined_at
+      user_id: server_member.user_id,
+      server_id: server_member.server_id,
+      nickname: server_member.nickname,
+      joined_at: server_member.joined_at,
+      roles: render_roles(roles)
     }
+  end
+
+  defp render_roles(roles) do
+    Enum.map(roles, fn role ->
+      %{
+        id: role.id,
+        name: role.name,
+        color: role.color
+      }
+    end)
   end
 end

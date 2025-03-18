@@ -1,4 +1,3 @@
-# lib/api/roles/user_role.ex
 defmodule Api.Roles.UserRole do
   use Ecto.Schema
   import Ecto.Changeset

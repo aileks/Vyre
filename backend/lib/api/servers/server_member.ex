@@ -1,6 +1,10 @@
 defmodule Api.Servers.ServerMember do
   use Ecto.Schema
   import Ecto.Changeset
+  import Ecto.Query
+
+  alias Api.Roles.Role
+  alias Api.Roles.UserRole
 
   @schema_prefix System.get_env("DB_SCHEMA")
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -12,7 +16,6 @@ defmodule Api.Servers.ServerMember do
 
     belongs_to(:user, Api.Accounts.User, foreign_key: :user_id)
     belongs_to(:server, Api.Servers.Server, foreign_key: :server_id)
-    many_to_many(:roles, Api.Roles.Role, join_through: "server_member_roles")
   end
 
   def changeset(server_member, attrs) do
@@ -34,9 +37,13 @@ defmodule Api.Servers.ServerMember do
     |> validate_length(:nickname, max: 32)
   end
 
-  def roles_changeset(server_member, roles) do
-    server_member
-    |> cast(%{}, [])
-    |> put_assoc(:roles, roles)
+  def get_roles(%__MODULE__{} = server_member) do
+    from(ur in UserRole,
+      join: r in Role,
+      on: ur.role_id == r.id,
+      where: ur.user_id == ^server_member.user_id and r.server_id == ^server_member.server_id,
+      select: r
+    )
+    |> Api.Repo.all()
   end
 end
