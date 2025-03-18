@@ -6,9 +6,9 @@ defmodule ApiWeb.AuthController do
   action_fallback(ApiWeb.FallbackController)
 
   def login(conn, %{
-        "user" => %{"email" => email, "password" => password, "remember_me" => _remember_me}
+        "user" => %{"email" => email, "password" => password, "remember_me" => remember_me}
       }) do
-    case AuthGuardian.authenticate(email, password) do
+    case AuthGuardian.authenticate(email, password, remember_me) do
       {:ok, user, token} ->
         conn
         |> AuthGuardian.Plug.sign_in(user)
@@ -29,36 +29,39 @@ defmodule ApiWeb.AuthController do
   end
 
   def refresh_session(conn, _params) do
-    old_token = Guradian.Plug.current_token(conn)
+    case Guardian.Plug.current_token(conn) do
+      nil ->
+        conn
+        |> put_status(:unauthorized)
+        |> json(%{error: "No token found"})
 
-    case Guaridan.decode_and_verify(old_token) do
-      {:ok, claims} ->
-        case Guardian.resource_from_claims(claims) do
-          {:ok, user} ->
-            {:ok, _old, {new_token, _new_claims}} = Guardian.refresh(old_token)
+      old_token ->
+        case AuthGuardian.refresh(old_token, ttl: {2, :hour}) do
+          {:ok, _old_claims, {new_token, _new_claims}} ->
+            user = Guardian.Plug.current_resource(conn)
 
             conn
-            |> AuthGuardian.Plug.sign_in(user)
+            |> AuthGuardian.Plug.sign_in(user, %{}, AuthGuardian.token_opts(:access))
             |> put_status(:ok)
             |> put_view(ApiWeb.UserJSON)
             |> render(:show_with_token, %{user: user, token: new_token})
 
-          {:error, _reason} ->
+          {:error, reason} ->
             conn
             |> put_status(:unauthorized)
-            |> json(%{error: "Invalid token"})
+            |> json(%{error: "Could not refresh token", details: reason})
         end
-
-      {:error, _reason} ->
-        conn
-        |> put_status(:not_found)
-        |> json(%{error: "Resource not found"})
     end
   end
 
-  def logout(conn, _params) do
+  def logout(conn, %{"refresh_token" => refresh_token}) do
+    access_token = Guardian.Plug.current_token(conn)
+    if access_token, do: AuthGuardian.revoke(access_token)
+
+    if refresh_token, do: AuthGuardian.revoke(refresh_token)
+
     conn
-    |> Guardian.Plug.sign_out()
+    |> AuthGuardian.Plug.sign_out()
     |> clear_session()
     |> put_status(:ok)
     |> json(%{message: "Logged out successfully"})

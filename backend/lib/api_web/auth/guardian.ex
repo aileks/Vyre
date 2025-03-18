@@ -19,23 +19,33 @@ defmodule ApiWeb.Auth.Guardian do
 
   def resource_from_claims(_), do: {:error, :unhandled_resource_type}
 
-  def authenticate(email, password) do
+  def authenticate(email, password, remember_me) do
     case Accounts.get_user_by_email!(email) do
       nil ->
         Bcrypt.no_user_verify()
         {:error, "Invalid credentials"}
 
       user ->
+        token_type = if remember_me, do: :refresh, else: :access
+
         case Accounts.validate_password(password, user.password_hash) do
-          true -> create_token(user)
+          true -> create_token(user, token_type)
           false -> {:error, "Invalid credentials"}
         end
     end
   end
 
-  def create_token(user) do
-    {:ok, token, _claims} = encode_and_sign(user)
+  def create_token(user, type) do
+    {:ok, token, _claims} = encode_and_sign(user, %{}, token_opts(type))
     {:ok, user, token}
+  end
+
+  def token_opts(type) do
+    case type do
+      :access -> [token_type: "access", ttl: {8, :hour}]
+      :refresh -> [token_type: "refresh", ttl: {30, :day}]
+      :reset -> [token_type: "reset", ttl: {15, :minute}]
+    end
   end
 
   def revoke_all(resource, claims) do
