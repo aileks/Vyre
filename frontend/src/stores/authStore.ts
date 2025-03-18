@@ -19,7 +19,7 @@ const fetchUser = async (): Promise<User | null> => {
       signal: controller.signal,
     });
     return response.data.user as User;
-  } catch (error) {
+  } catch (err) {
     // Treat any error as not authenticated or an unavailable user.
     return null;
   }
@@ -109,7 +109,7 @@ export const createAuthStore = () => {
     } catch (err) {
       const errorMessage = getErrorMessage(
         err,
-        'Login failed. Please try again.',
+        'Logging in failed. Please try again.',
       );
 
       setState('status', 'error');
@@ -165,7 +165,10 @@ export const createAuthStore = () => {
 
       return true;
     } catch (error: any) {
-      const errorMessage = getErrorMessage(error, 'Network error (logout)');
+      const errorMessage = getErrorMessage(
+        error,
+        'Logging out failed. Please try again.',
+      );
 
       setState('status', 'error');
       setState('error', errorMessage);
@@ -173,6 +176,76 @@ export const createAuthStore = () => {
       return false;
     }
   };
+
+  createEffect(() => {
+    const handleSessionExpired = (e: CustomEvent<{ message: string }>) => {
+      // Clear auth state
+      setState(
+        reconcile({
+          status: 'idle',
+          user: null,
+          error: e.detail?.message || 'Session expired',
+        }),
+      );
+
+      window.location.href = '/login';
+    };
+
+    window.addEventListener(
+      'auth:session-expired',
+      handleSessionExpired as EventListener,
+    );
+
+    onCleanup(() => {
+      window.removeEventListener(
+        'auth:session-expired',
+        handleSessionExpired as EventListener,
+      );
+    });
+  });
+
+  createEffect(() => {
+    const user = currentUser();
+
+    if (user === undefined) {
+      setState('status', 'loading');
+    } else if (user === null) {
+      setState(
+        reconcile({
+          status: 'idle',
+          user: null,
+          error: null,
+        }),
+      );
+    } else {
+      setState(
+        reconcile({
+          status: 'authenticated',
+          user,
+          error: null,
+        }),
+      );
+    }
+  });
+
+  createEffect(() => {
+    if (isAuthenticated()) {
+      const refreshInterval = setInterval(
+        async () => {
+          try {
+            await apiClient.post('/session/refresh');
+          } catch (err) {
+            // Error handling will be done by interceptor
+          }
+        },
+        60 * 60 * 1000,
+      ); // 1 hour
+
+      onCleanup(() => {
+        clearInterval(refreshInterval);
+      });
+    }
+  });
 
   return {
     state,

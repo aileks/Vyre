@@ -64,7 +64,7 @@ defmodule ApiWeb.AuthController do
     end
   end
 
-  def logout(conn) do
+  def logout(conn, _params) do
     conn
     |> AuthGuardian.Plug.sign_out()
     |> clear_session()

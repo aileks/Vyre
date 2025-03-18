@@ -15,7 +15,11 @@ const Spinner = () => (
 );
 
 export default function Home() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+  };
 
   return (
     <div class='container mx-auto mt-32 max-w-6xl px-4 py-16'>
@@ -102,10 +106,17 @@ export default function Home() {
                   </A>
                 }
               >
-                <div class='bg-electric-600/20 text-cybertext-400 border-electric-700 mt-6 mb-0 rounded-xs border px-6 py-3 text-center font-mono'>
+                <div class='bg-electric-600/20 text-cybertext-400 border-electric-700 rounded-xs border px-6 py-3 text-center font-mono'>
                   <span class='text-success-500 text-lg'>✓</span> Thanks for
                   pre-registering!
                 </div>
+
+                <button
+                  class='bg-warning-600 text-cybertext-100 hover:bg-warning-500 focus:ring-warning-300 border-warning-400 rounded-xs border px-6 py-3 text-center font-mono transition-all duration-200 hover:cursor-pointer focus:ring-2 focus:outline-none'
+                  onClick={handleLogout}
+                >
+                  Log Out
+                </button>
               </Show>
             </Show>
 
