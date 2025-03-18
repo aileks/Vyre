@@ -1,22 +1,22 @@
-import { createEffect, createSignal } from 'solid-js';
+// import { createEffect, createSignal } from 'solid-js';
 
-import apiClient from '../utils/apiClient';
+// import apiClient from '../utils/apiClient';
 
-interface Server {
-  id: string;
-  name: string;
-  description: string;
-  iconUrl: string;
-}
+// interface Server {
+//   id: string;
+//   name: string;
+//   description: string;
+//   iconUrl: string;
+// }
 
 export default function Servers() {
-  const [servers, setServers] = createSignal<Server[]>([]);
+  // const [servers, setServers] = createSignal<Server[]>([]);
 
-  createEffect(() => {
-    apiClient.get('/servers').then(res => {
-      setServers(res.data);
-    });
-  });
+  // createEffect(() => {
+  //   apiClient.get('/servers').then(res => {
+  //     setServers(res.data);
+  //   });
+  // });
 
   return (
     <div>

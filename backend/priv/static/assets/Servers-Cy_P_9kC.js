@@ -1,1 +1,0 @@
-import{b as r,d as s,t as a,o as l}from"./index-EBv8GHVi.js";var o=a('<div><h1 class="mt-12 ml-12 text-2xl font-bold">Hello from Servers');function m(){const[n,e]=r([]);return s(()=>{l.get("/servers").then(t=>{e(t.data)})}),o()}export{m as default};

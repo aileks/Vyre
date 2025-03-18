@@ -26,7 +26,7 @@ defmodule ApiWeb.Router do
   scope "/api", ApiWeb do
     pipe_through([:api, :auth])
     delete("/session", AuthController, :logout)
-    post("/session/refresh", AuthController, :refresh)
+    post("/session/refresh", AuthController, :refresh_session)
     get("/users/me", AuthController, :me)
     resources("/users", UserController, except: [:new, :edit])
     resources("/servers", ServerController)
