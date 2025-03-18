@@ -8,7 +8,7 @@ defmodule ApiWeb.Router do
   end
 
   pipeline :auth do
-    plug(Api.Auth.Pipeline)
+    plug(ApiWeb.Auth.Pipeline)
   end
 
   pipeline :browser do

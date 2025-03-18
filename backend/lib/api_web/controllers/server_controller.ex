@@ -4,7 +4,7 @@ defmodule ApiWeb.ServerController do
   alias Api.Servers
   alias Api.Servers.Server
 
-  action_fallback ApiWeb.FallbackController
+  action_fallback(ApiWeb.FallbackController)
 
   def index(conn, _params) do
     servers = Servers.list_servers()

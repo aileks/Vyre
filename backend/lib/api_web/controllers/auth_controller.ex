@@ -1,6 +1,5 @@
 defmodule ApiWeb.AuthController do
   use ApiWeb, :controller
-
   alias Api.Accounts
   alias ApiWeb.Auth.Guardian
 
@@ -8,7 +7,7 @@ defmodule ApiWeb.AuthController do
 
   @cookie_opts [
     http_only: true,
-    secure: Application.compile_env(:api, :env) != :dev,
+    secure: System.get_env("MIX_ENV") != :dev,
     # 7 days
     max_age: 604_800,
     same_site: "Lax",
@@ -17,7 +16,7 @@ defmodule ApiWeb.AuthController do
 
   @refresh_cookie_opts [
     http_only: true,
-    secure: Application.compile_env(:api, :env) != :dev,
+    secure: System.get_env("MIX_ENV") != :dev,
     # 30 days
     max_age: 2_592_000,
     same_site: "Lax",
@@ -43,6 +42,8 @@ defmodule ApiWeb.AuthController do
         conn
         |> put_resp_cookie("_auth_token", token, @cookie_opts)
         |> put_resp_cookie("_auth_refresh_token", refresh_token, @refresh_cookie_opts)
+        # Simplified this - Guardian will handle type
+        |> Guardian.Plug.sign_in(user)
         |> put_status(:created)
         |> put_view(ApiWeb.AuthJSON)
         |> render(:user_with_token_info, %{
@@ -61,14 +62,13 @@ defmodule ApiWeb.AuthController do
 
   def login(conn, %{"user" => %{"email" => email, "password" => password}}) do
     with {:ok, user} <- Accounts.authenticate_user(email, password) do
-      # Generate tokens
-      {:ok, token, %{"exp" => exp} = _claims} =
+      {:ok, token, %{"exp" => exp} = claims} =
         Guardian.encode_and_sign(user, %{}, token_type: "access")
 
-      {:ok, refresh_token, %{"exp" => refresh_exp} = _refresh_claims} =
+      {:ok, refresh_token, %{"exp" => refresh_exp}} =
         Guardian.encode_and_sign(user, %{}, token_type: "refresh")
 
-      # Convert UNIX timestamp to DateTime
+      conn = Guardian.Plug.sign_in(conn, user, claims)
       expiry = DateTime.from_unix!(exp)
       refresh_expires_at = DateTime.from_unix!(refresh_exp)
 
@@ -93,60 +93,62 @@ defmodule ApiWeb.AuthController do
 
   def logout(conn, _params) do
     conn
-    |> delete_resp_cookie("_auth_token", @cookie_opts)
-    |> delete_resp_cookie("_auth_refresh_token", @refresh_cookie_opts)
+    |> Guardian.Plug.sign_out()
+    |> delete_resp_cookie("_auth_token")
+    |> delete_resp_cookie("_auth_refresh_token")
+    |> clear_session()
+    |> configure_session(drop: true)
     |> put_status(:ok)
     |> json(%{message: "Successfully logged out"})
   end
 
+  # Simplified refresh function
   def refresh(conn, _params) do
-    conn = fetch_cookies(conn)
-    refresh_token = conn.private[:api_auth_refresh_token] || conn.cookies["_auth_refresh_token"]
+    refresh_token = conn.cookies["_auth_refresh_token"]
 
     if is_nil(refresh_token) do
       conn
       |> put_status(:unauthorized)
-      |> put_view(json: ApiWeb.ErrorJSON)
-      |> render("401.json", %{error: "Missing refresh token"})
+      |> json(%{error: "Missing refresh token"})
     else
-      with {:ok, claims} <- Guardian.decode_and_verify(refresh_token, %{"typ" => "refresh"}),
-           {:ok, _old_stuff, {token, %{"exp" => exp} = _claims}} <-
-             Guardian.exchange(refresh_token, "refresh", "access"),
-           {:ok, {_old_token, _old_claims},
-            {new_refresh_token, %{"exp" => refresh_exp} = _refresh_claims}} <-
-             Guardian.refresh(refresh_token),
-           {:ok, user} <- Guardian.resource_from_claims(%{"sub" => claims["sub"]}) do
-        expiry = DateTime.from_unix!(exp)
-        refresh_expires_at = DateTime.from_unix!(refresh_exp)
+      case Guardian.decode_and_verify(refresh_token, %{"typ" => "refresh"}) do
+        {:ok, claims} ->
+          # Get the user from claims
+          case Guardian.resource_from_claims(claims) do
+            {:ok, user} ->
+              # Create new tokens
+              {:ok, token, %{"exp" => exp}} =
+                Guardian.encode_and_sign(user, %{}, token_type: "access")
 
-        conn
-        |> Guardian.Plug.sign_in(user, %{}, token_type: "access")
-        |> put_resp_cookie("_auth_token", token, @cookie_opts)
-        |> put_resp_cookie("_auth_refresh_token", new_refresh_token, @refresh_cookie_opts)
-        |> put_status(:ok)
-        |> json(%{
-          user: %{
-            id: user.id,
-            email: user.email,
-            username: user.username,
-            password_hash: user.password_hash,
-            display_name: user.display_name,
-            avatar_url: user.avatar_url,
-            status: user.status
-          },
-          access_token: token,
-          refresh_token: new_refresh_token,
-          expires_at: expiry,
-          refresh_expires_at: refresh_expires_at
-        })
-      else
-        _error ->
+              {:ok, new_refresh, %{"exp" => refresh_exp}} =
+                Guardian.encode_and_sign(user, %{}, token_type: "refresh")
+
+              expiry = DateTime.from_unix!(exp)
+              refresh_expiry = DateTime.from_unix!(refresh_exp)
+
+              # Sign in user with new token
+              conn
+              |> Guardian.Plug.sign_in(user)
+              |> put_resp_cookie("_auth_token", token, @cookie_opts)
+              |> put_resp_cookie("_auth_refresh_token", new_refresh, @refresh_cookie_opts)
+              |> put_status(:ok)
+              |> put_view(ApiWeb.AuthJSON)
+              |> render(:user_with_token_info, %{
+                user: user,
+                expires_at: expiry,
+                refresh_expires_at: refresh_expiry
+              })
+
+            {:error, _} ->
+              conn
+              |> put_status(:unauthorized)
+              |> json(%{error: "Invalid refresh token"})
+          end
+
+        {:error, _} ->
           conn
-          |> delete_resp_cookie("_auth_token", @cookie_opts)
-          |> delete_resp_cookie("_auth_refresh_token", @refresh_cookie_opts)
           |> put_status(:unauthorized)
-          |> put_view(json: ApiWeb.ErrorJSON)
-          |> render("401.json", %{error: "Session expired"})
+          |> json(%{error: "Invalid refresh token"})
       end
     end
   end

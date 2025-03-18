@@ -12,7 +12,7 @@ defmodule ApiWeb.Auth.Guardian do
 
   def resource_from_claims(%{"sub" => "User:" <> id}) do
     case Accounts.get_user!(id) do
-      nil -> {:error, :user_not_found}
+      nil -> {:error, :not_found}
       user -> {:ok, user}
     end
   end

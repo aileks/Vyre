@@ -25,6 +25,7 @@ config :api, ApiWeb.Auth.Guardian,
 
 config :guardian, Guardian.DB,
   repo: Api.Repo,
+  schema_name: "guardian_tokens",
   prefix: System.get_env("DB_SCHEMA"),
   token_types: ["access", "refresh"],
   sweep_interval: 60

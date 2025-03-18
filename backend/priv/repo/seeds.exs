@@ -4,8 +4,6 @@ alias Api.Servers.Server
 
 Application.ensure_all_started(:faker)
 
-IO.puts("\nSEEDS STARTING\n")
-
 users = Factory.insert_list(20, :user)
 
 owners = Enum.take_random(users, 5)
