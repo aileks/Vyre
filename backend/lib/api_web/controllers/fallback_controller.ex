@@ -44,7 +44,6 @@ defmodule ApiWeb.FallbackController do
 
   # Handle validation errors
   def call(conn, {:error, %Ecto.Changeset{} = changeset}) do
-    # Check if this is a unique constraint error specifically
     if has_unique_constraint_error?(changeset) do
       conn
       # Return 400 instead of 422

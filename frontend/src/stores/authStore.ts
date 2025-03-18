@@ -62,28 +62,28 @@ export const createAuthStore = () => {
   };
 
   // Automatically refresh sessions.
-  const setupRefreshInterval = () => {
-    const interval = setInterval(
-      async () => {
-        if (isAuthenticated()) {
-          try {
-            await apiClient.post('/session/refresh');
-          } catch (error) {
-            console.error('Session validation failed');
-          }
-        }
-      },
-      60 * 60 * 1000,
-    ); // 1 hour
+  // const setupRefreshInterval = () => {
+  //   const interval = setInterval(
+  //     async () => {
+  //       if (isAuthenticated()) {
+  //         try {
+  //           await apiClient.post('/session/refresh');
+  //         } catch (error) {
+  //           console.error('Session validation failed');
+  //         }
+  //       }
+  //     },
+  //     60 * 60 * 1000,
+  //   ); // 1 hour
 
-    onCleanup(() => clearInterval(interval));
-  };
+  //   onCleanup(() => clearInterval(interval));
+  // };
 
-  createEffect(() => {
-    if (isAuthenticated()) {
-      setupRefreshInterval();
-    }
-  });
+  // createEffect(() => {
+  //   if (isAuthenticated()) {
+  //     setupRefreshInterval();
+  //   }
+  // });
 
   // When the currentUser resource updates, update our auth state.
   createEffect(() => {

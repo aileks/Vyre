@@ -2,8 +2,28 @@ defmodule ApiWeb.AuthController do
   use ApiWeb, :controller
 
   alias ApiWeb.Auth.Guardian, as: AuthGuardian
+  alias Api.Accounts
 
   action_fallback(ApiWeb.FallbackController)
+
+  def register(conn, %{"user" => user_params}) do
+    case Accounts.register_user(user_params) do
+      {:ok, user} ->
+        {:ok, user, token} = AuthGuardian.create_token(user, :access)
+
+        conn
+        |> AuthGuardian.Plug.sign_in(user)
+        |> put_status(:created)
+        |> put_view(ApiWeb.UserJSON)
+        |> render(:show_with_token, %{user: user, token: token})
+
+      {:error, changeset} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> put_view(ApiWeb.ChangesetJSON)
+        |> render("error.json", changeset)
+    end
+  end
 
   def login(conn, %{"user" => %{"email" => email, "password" => password} = params}) do
     remember_me = Map.get(params, "remember_me", false)
