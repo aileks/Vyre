@@ -4,7 +4,7 @@ defmodule ApiWeb.Router do
 
   pipeline :api do
     plug(:accepts, ["json"])
-    plug(:fetch_cookies)
+    plug(:fetch_session)
   end
 
   pipeline :auth do
@@ -15,17 +15,19 @@ defmodule ApiWeb.Router do
     plug(:accepts, ["html"])
   end
 
+  # Public Routes
   scope "/api", ApiWeb do
-    # Public Routes
     pipe_through(:api)
     post("/users/new", AuthController, :register)
     post("/session", AuthController, :login)
-    get("/user/current", AuthController, :me)
+  end
 
-    # Protected Routes
-    pipe_through(:auth)
+  # Protected Routes
+  scope "/api", ApiWeb do
+    pipe_through([:api, :auth])
     delete("/session", AuthController, :logout)
     post("/session/refresh", AuthController, :refresh)
+    get("/users/me", AuthController, :me)
     resources("/users", UserController, except: [:new, :edit])
     resources("/servers", ServerController)
     # resources("/servers/:server_id/channels", ChannelController, except: [:new, :edit])

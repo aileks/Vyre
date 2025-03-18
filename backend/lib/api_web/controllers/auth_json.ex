@@ -1,42 +1,13 @@
 defmodule ApiWeb.AuthJSON do
-  def user(%{user: user}) do
+  def me(%{user: user}) do
     %{
       user: %{
         id: user.id,
-        status: user.status,
         email: user.email,
         username: user.username,
-        displayName: user.display_name,
-        avatarUrl: user.avatar_url
+        display_name: user.display_name,
+        avatar_url: user.avatar_url
       }
     }
   end
-
-  def user_with_token_info(
-        %{
-          user: user,
-          expires_at: expiry,
-          refresh_expires_at: refresh_expires_at
-        } = _params
-      ) do
-    %{
-      user: %{
-        id: user.id,
-        status: user.status,
-        email: user.email,
-        username: user.username,
-        displayName: user.display_name,
-        avatarUrl: user.avatar_url
-      },
-      expiresAt: expiry,
-      refreshExpiresAt: refresh_expires_at
-    }
-  end
-
-  # def tokens(%{access_token: access_token, refresh_token: refresh_token}) do
-  #   %{
-  #     access_token: access_token,
-  #     refresh_token: refresh_token
-  #   }
-  # end
 end

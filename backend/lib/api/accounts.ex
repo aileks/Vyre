@@ -7,7 +7,6 @@ defmodule Api.Accounts do
   alias Api.Repo
 
   alias Api.Accounts.User
-  alias ApiWeb.Auth.Guardian
 
   @doc """
   Returns the list of users.
@@ -151,45 +150,10 @@ defmodule Api.Accounts do
   end
 
   @doc """
-  Authenticates a user.
+  Verifies a user's password if they exist.
   Includes a failsafe for invalid credentials to prevent timing attacks.
   """
-  def authenticate_user(email, password) do
-    case get_user_by_email!(email) do
-      nil ->
-        Bcrypt.no_user_verify()
-        {:error, :invalid_credentials}
-
-      user ->
-        case Bcrypt.verify_pass(password, user.password_hash) do
-          true -> {:ok, user}
-          false -> {:error, :invalid_credentials}
-        end
-    end
-  end
-
-  @doc """
-  Creates an authentication token for a user.
-
-  Returns {:ok, token, claims} if successful,
-  otherwise returns {:error, reason}.
-  """
-  def create_token(user) do
-    ApiWeb.Auth.Guardian.encode_and_sign(user)
-  end
-
-  @doc """
-  Gets a user based on the provided token.
-
-  Returns {:ok, user} if the token is valid and belongs to a user,
-  otherwise returns {:error, reason}.
-  """
-  def get_current_user(token) do
-    with {:ok, claims} <- Guardian.decode_and_verify(token),
-         {:ok, user} <- Guardian.resource_from_claims(claims) do
-      {:ok, user}
-    else
-      _error -> {:error, :invalid_token}
-    end
+  def validate_password(password, password_hash) do
+    Bcrypt.verify_pass(password, password_hash)
   end
 end

@@ -15,7 +15,7 @@ const fetchUser = async (): Promise<User | null> => {
   onCleanup(() => controller.abort());
 
   try {
-    const response = await apiClient.get('/user/current', {
+    const response = await apiClient.get('/users/me', {
       signal: controller.signal,
     });
     return response.data.user as User;
