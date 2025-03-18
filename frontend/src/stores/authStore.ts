@@ -39,6 +39,52 @@ export const createAuthStore = () => {
   const isAuthenticated = createMemo(() => state.status === 'authenticated');
   const currentError = createMemo(() => state.error);
 
+  // Handle session expiration
+  const setupAuthEventListeners = () => {
+    const handleSessionExpired = () => {
+      // Clear auth state and redirect to login
+      setState(
+        reconcile({
+          status: 'idle',
+          user: null,
+          error: 'Your session has expired. Please log in again.',
+        }),
+      );
+
+      // window.location.href = '/login';
+    };
+
+    window.addEventListener('auth:session-expired', handleSessionExpired);
+
+    onCleanup(() => {
+      window.removeEventListener('auth:session-expired', handleSessionExpired);
+    });
+  };
+
+  // Automatically refresh sessions.
+  const setupRefreshInterval = () => {
+    const interval = setInterval(
+      async () => {
+        if (isAuthenticated()) {
+          try {
+            await apiClient.post('/session/refresh');
+          } catch (error) {
+            console.error('Session validation failed');
+          }
+        }
+      },
+      60 * 60 * 1000,
+    ); // 1 hour
+
+    onCleanup(() => clearInterval(interval));
+  };
+
+  createEffect(() => {
+    if (isAuthenticated()) {
+      setupRefreshInterval();
+    }
+  });
+
   // When the currentUser resource updates, update our auth state.
   createEffect(() => {
     const user = currentUser();
@@ -141,6 +187,8 @@ export const createAuthStore = () => {
       throw error;
     }
   };
+
+  setupAuthEventListeners();
 
   return {
     state,

@@ -1,7 +1,7 @@
 import { A } from '@solidjs/router';
 import { Show } from 'solid-js';
 
-import { useAuth } from '../context/authContext';
+import { useAuth } from '../context/AuthContext';
 
 const Spinner = () => (
   <div

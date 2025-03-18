@@ -2,7 +2,7 @@ import { A } from '@solidjs/router';
 import { useNavigate } from '@solidjs/router';
 import { Show, createEffect, createSignal } from 'solid-js';
 
-import { useAuth } from '../context/authContext';
+import { useAuth } from '../context/AuthContext';
 import { LoginCredentials } from '../types';
 
 export default function Login() {

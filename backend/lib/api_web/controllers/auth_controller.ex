@@ -5,9 +5,9 @@ defmodule ApiWeb.AuthController do
 
   action_fallback(ApiWeb.FallbackController)
 
-  def login(conn, %{
-        "user" => %{"email" => email, "password" => password, "remember_me" => remember_me}
-      }) do
+  def login(conn, %{"user" => %{"email" => email, "password" => password} = params}) do
+    remember_me = Map.get(params, "remember_me", false)
+
     case AuthGuardian.authenticate(email, password, remember_me) do
       {:ok, user, token} ->
         conn
@@ -23,34 +23,27 @@ defmodule ApiWeb.AuthController do
     end
   end
 
-  # Just in case...
-  def login(conn, %{"user" => %{"email" => email, "password" => password}}) do
-    login(conn, %{"email" => email, "password" => password, "remember_me" => false})
-  end
-
   def refresh_session(conn, _params) do
-    case Guardian.Plug.current_token(conn) do
-      nil ->
-        conn
-        |> put_status(:unauthorized)
-        |> json(%{error: "No token found"})
+    token = Guardian.Plug.current_token(conn)
 
-      old_token ->
-        case AuthGuardian.refresh(old_token, ttl: {2, :hour}) do
-          {:ok, _old_claims, {new_token, _new_claims}} ->
-            user = Guardian.Plug.current_resource(conn)
+    if is_nil(token) do
+      conn
+      |> put_status(:unauthorized)
+      |> json(%{error: "Invalid token"})
+    else
+      case AuthGuardian.authenticate(token) do
+        {:ok, user, new_token} ->
+          conn
+          |> AuthGuardian.Plug.sign_in(user, %{}, AuthGuardian.token_opts(:access))
+          |> put_status(:ok)
+          |> put_view(ApiWeb.UserJSON)
+          |> render(:show_with_token, %{user: user, token: new_token})
 
-            conn
-            |> AuthGuardian.Plug.sign_in(user, %{}, AuthGuardian.token_opts(:access))
-            |> put_status(:ok)
-            |> put_view(ApiWeb.UserJSON)
-            |> render(:show_with_token, %{user: user, token: new_token})
-
-          {:error, reason} ->
-            conn
-            |> put_status(:unauthorized)
-            |> json(%{error: "Could not refresh token", details: reason})
-        end
+        {:error, _reason} ->
+          conn
+          |> put_status(:internal_server_error)
+          |> json(%{error: "Server error"})
+      end
     end
   end
 

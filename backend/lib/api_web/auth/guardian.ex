@@ -35,6 +35,14 @@ defmodule ApiWeb.Auth.Guardian do
     end
   end
 
+  def authenticate(token) do
+    with {:ok, claims} <- decode_and_verify(token),
+         {:ok, user} <- resource_from_claims(claims),
+         {:ok, _old, {new_token, _claims}} <- refresh(token) do
+      {:ok, user, new_token}
+    end
+  end
+
   def create_token(user, type) do
     {:ok, token, _claims} = encode_and_sign(user, %{}, token_opts(type))
     {:ok, user, token}
