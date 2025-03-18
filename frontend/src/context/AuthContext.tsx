@@ -8,9 +8,9 @@ export interface AuthContextValue {
   currentError: () => string | null;
   isLoading: () => boolean;
   isAuthenticated: () => boolean;
-  login: (credentials: LoginCredentials) => Promise<void>;
-  logout: () => Promise<void>;
-  register: (data: RegistrationData) => Promise<void>;
+  login: (credentials: LoginCredentials) => Promise<boolean>;
+  logout: () => Promise<boolean>;
+  register: (data: RegistrationData) => Promise<boolean>;
   refetch: () => void;
 }
 

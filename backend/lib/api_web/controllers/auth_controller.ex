@@ -64,12 +64,7 @@ defmodule ApiWeb.AuthController do
     end
   end
 
-  def logout(conn, %{"refresh_token" => refresh_token}) do
-    access_token = Guardian.Plug.current_token(conn)
-    if access_token, do: AuthGuardian.revoke(access_token)
-
-    if refresh_token, do: AuthGuardian.revoke(refresh_token)
-
+  def logout(conn) do
     conn
     |> AuthGuardian.Plug.sign_out()
     |> clear_session()

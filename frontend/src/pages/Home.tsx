@@ -102,19 +102,21 @@ export default function Home() {
                   </A>
                 }
               >
-                <div class='bg-electric-600/20 text-cybertext-400 border-electric-700 rounded-xs border px-6 py-3 text-center font-mono'>
+                <div class='bg-electric-600/20 text-cybertext-400 border-electric-700 mt-6 mb-0 rounded-xs border px-6 py-3 text-center font-mono'>
                   <span class='text-success-500 text-lg'>✓</span> Thanks for
                   pre-registering!
                 </div>
               </Show>
             </Show>
 
-            <A
-              href='https://github.com/aileks/Vyre'
-              class='bg-midnight-700 text-electric-400 hover:bg-midnight-500 focus:ring-electric-700 hover:text-electric-500 rounded-xs border border-gray-700 px-6 py-3 text-center font-mono transition-all duration-200 focus:ring-2 focus:outline-none'
-            >
-              Learn More
-            </A>
+            <Show when={!isAuthenticated()}>
+              <A
+                href='https://github.com/aileks/Vyre'
+                class='bg-midnight-400 text-electric-400 hover:bg-midnight-700 focus:ring-electric-700 hover:text-electric-500 rounded-xs border border-gray-700 px-6 py-3 text-center font-mono transition-all duration-200 focus:ring-2 focus:outline-none'
+              >
+                Learn More
+              </A>
+            </Show>
           </div>
         </div>
       </div>
