@@ -18,10 +18,7 @@ defmodule ApiWeb.AuthController do
         |> render(:show_with_token, %{user: user, token: token})
 
       {:error, changeset} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> put_view(ApiWeb.ChangesetJSON)
-        |> render("error.json", changeset)
+        {:error, changeset}
     end
   end
 

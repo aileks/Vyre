@@ -28,10 +28,11 @@ export default function Login() {
       rememberMe: remember(),
     };
 
-    try {
-      await login(credentials);
+    await login(credentials);
+
+    if (isAuthenticated()) {
       navigate('/', { replace: true });
-    } catch (error) {
+    } else {
       setError(currentError());
     }
   };

@@ -110,8 +110,30 @@ export const createAuthStore = () => {
     }
   });
 
-  const getErrorMessage = (error: any, defaultMsg: string) =>
-    error?.response?.data?.error?.message || error?.message || defaultMsg;
+  const getErrorMessage = (error: any, defaultMsg: string) => {
+    if (error?.response?.data?.error) {
+      const { error: apiError } = error.response.data;
+
+      if (apiError.details && typeof apiError.details === 'object') {
+        // Format the validation errors nicely
+        return Object.entries(apiError.details)
+          .map(([field, messages]) => {
+            const fieldName =
+              field.charAt(0).toUpperCase() + field.slice(1).replace('_', ' ');
+            if (Array.isArray(messages)) {
+              return `${fieldName}: ${messages.join(', ')}`;
+            }
+            return `${fieldName}: ${messages}`;
+          })
+          .join('\n');
+      }
+
+      return apiError || defaultMsg;
+    }
+
+    // Fallback
+    return error?.message || defaultMsg;
+  };
 
   const login = async (credentials: LoginCredentials) => {
     setState('status', 'loading');
@@ -125,15 +147,21 @@ export const createAuthStore = () => {
           remember_me: credentials.rememberMe,
         },
       });
+
       // Refetch to update the currentUser resource.
       await refetch();
-    } catch (error: any) {
-      const errorMessage = getErrorMessage(error, 'Network error (login)');
+
+      return true;
+    } catch (err) {
+      const errorMessage = getErrorMessage(
+        err,
+        'Login failed. Please try again.',
+      );
 
       setState('status', 'error');
       setState('error', errorMessage);
 
-      throw error;
+      return false;
     }
   };
 
@@ -150,17 +178,19 @@ export const createAuthStore = () => {
           display_name: registrationData.displayName,
         },
       });
+
       await refetch();
-    } catch (error: any) {
+      return true;
+    } catch (err) {
       const errorMessage = getErrorMessage(
-        error,
-        'Network error (registration)',
+        err,
+        'Registration failed. Please try again.',
       );
 
       setState('status', 'error');
       setState('error', errorMessage);
 
-      throw error;
+      return false;
     }
   };
 
@@ -178,6 +208,8 @@ export const createAuthStore = () => {
           error: null,
         }),
       );
+
+      return true;
     } catch (error: any) {
       const errorMessage = getErrorMessage(error, 'Network error (logout)');
 

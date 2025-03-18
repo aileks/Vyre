@@ -44,22 +44,28 @@ export default function Register() {
     }
   };
 
+  const formatErrorMessage = (errorMessage: string) => {
+    return errorMessage.split('\n').map((line, index) => (
+      <>
+        {index > 0 && <br />}
+        {line}
+      </>
+    ));
+  };
+
   return (
     <div class='flex min-h-screen items-center justify-center px-4 py-8 sm:px-6 lg:px-8'>
       <div class='bg-midnight-700 shadow-midnight-900/50 w-full max-w-md rounded-xs border border-gray-700 p-5 shadow-lg sm:p-7'>
         <div class='mb-4 text-2xl font-bold tracking-wide text-pink-400 sm:text-4xl'>
           Register
         </div>
-        <div style='position: fixed; bottom: 10px; right: 10px; background: #333; color: white; padding: 5px;'>
-          Error state: {error() ? `"${error()}"` : 'none'}
-        </div>
 
         <Show when={error()}>
           <div class='border-error-700 bg-midnight-800 text-error-400 mb-5 rounded-xs border p-3 text-sm'>
-            <div class='flex items-center'>
+            <div class='flex items-start'>
               <svg
                 xmlns='http://www.w3.org/2000/svg'
-                class='text-error-500 mr-2 h-4 w-4 flex-shrink-0'
+                class='text-error-500 mt-0.5 mr-2 h-4 w-4 flex-shrink-0'
                 fill='none'
                 viewBox='0 0 24 24'
                 stroke='currentColor'
@@ -71,7 +77,9 @@ export default function Register() {
                   d='M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
                 />
               </svg>
-              <span class='text-wrap'>{error()}</span>
+              <span class='text-wrap whitespace-pre-line'>
+                {formatErrorMessage(error() || '')}
+              </span>
             </div>
           </div>
         </Show>
