@@ -15,7 +15,7 @@ const fetchUser = async (): Promise<User | null> => {
   onCleanup(() => controller.abort());
 
   try {
-    const response = await apiClient.get('/users/me', {
+    const response = await apiClient.get('/session/current', {
       signal: controller.signal,
     });
     return response.data.user as User;
@@ -177,32 +177,32 @@ export const createAuthStore = () => {
     }
   };
 
-  createEffect(() => {
-    const handleSessionExpired = (e: CustomEvent<{ message: string }>) => {
-      // Clear auth state
-      setState(
-        reconcile({
-          status: 'idle',
-          user: null,
-          error: e.detail?.message || 'Session expired',
-        }),
-      );
+  // createEffect(() => {
+  //   const handleSessionExpired = (e: CustomEvent<{ message: string }>) => {
+  //     // Clear auth state
+  //     setState(
+  //       reconcile({
+  //         status: 'idle',
+  //         user: null,
+  //         error: e.detail?.message || 'Session expired',
+  //       }),
+  //     );
 
-      window.location.href = '/login';
-    };
+  //     window.location.href = '/login';
+  //   };
 
-    window.addEventListener(
-      'auth:session-expired',
-      handleSessionExpired as EventListener,
-    );
+  //   window.addEventListener(
+  //     'auth:session-expired',
+  //     handleSessionExpired as EventListener,
+  //   );
 
-    onCleanup(() => {
-      window.removeEventListener(
-        'auth:session-expired',
-        handleSessionExpired as EventListener,
-      );
-    });
-  });
+  //   onCleanup(() => {
+  //     window.removeEventListener(
+  //       'auth:session-expired',
+  //       handleSessionExpired as EventListener,
+  //     );
+  //   });
+  // });
 
   createEffect(() => {
     const user = currentUser();
@@ -228,24 +228,24 @@ export const createAuthStore = () => {
     }
   });
 
-  createEffect(() => {
-    if (isAuthenticated()) {
-      const refreshInterval = setInterval(
-        async () => {
-          try {
-            await apiClient.post('/session/refresh');
-          } catch (err) {
-            // Error handling will be done by interceptor
-          }
-        },
-        60 * 60 * 1000,
-      ); // 1 hour
+  // createEffect(() => {
+  //   if (isAuthenticated()) {
+  //     const refreshInterval = setInterval(
+  //       async () => {
+  //         try {
+  //           await apiClient.post('/session/refresh');
+  //         } catch (err) {
+  //           // Error handling will be done by interceptor
+  //         }
+  //       },
+  //       60 * 60 * 1000,
+  //     ); // 1 hour
 
-      onCleanup(() => {
-        clearInterval(refreshInterval);
-      });
-    }
-  });
+  //     onCleanup(() => {
+  //       clearInterval(refreshInterval);
+  //     });
+  //   }
+  // });
 
   return {
     state,
