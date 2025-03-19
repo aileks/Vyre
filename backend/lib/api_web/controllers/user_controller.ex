@@ -21,8 +21,14 @@ defmodule ApiWeb.UserController do
   end
 
   def show(conn, %{"id" => id}) do
-    with {:ok, user} <- Accounts.get_user!(id) do
-      render(conn, :show, user: user)
+    user = Accounts.get_user!(id)
+
+    case user do
+      nil ->
+        {:error, :not_found}
+
+      user ->
+        render(conn, :show, user: user)
     end
   end
 

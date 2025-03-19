@@ -8,6 +8,7 @@ defmodule Api.Repo.Migrations.CreateServers do
       add(:description, :string)
       add(:icon_url, :string)
       add(:owner_id, references(:users, on_delete: :restrict, type: :binary_id), null: false)
+
       timestamps(type: :utc_datetime)
     end
 

@@ -20,7 +20,10 @@ defmodule ApiWeb.ServerJSON do
       id: server.id,
       name: server.name,
       description: server.description,
-      icon_url: server.icon_url
+      icon_url: server.icon_url,
+      owner_id: server.owner_id,
+      created_at: server.inserted_at,
+      updated_at: server.updated_at
     }
   end
 end

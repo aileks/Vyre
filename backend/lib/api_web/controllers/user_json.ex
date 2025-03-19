@@ -26,7 +26,8 @@ defmodule ApiWeb.UserJSON do
       display_name: user.display_name,
       email: user.email,
       avatar_url: user.avatar_url,
-      status: user.status
+      status: user.status,
+      servers: user.servers
       # friendships: user.friendships,
       # friend_requests: user.friend_requests
     }

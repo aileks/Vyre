@@ -36,7 +36,19 @@ defmodule Api.Accounts do
 
   """
   def get_user!(id) do
-    Repo.get(User, id)
+    User
+    |> Repo.get!(id)
+    |> Repo.preload([
+      :servers,
+      :owned_servers,
+      :messages,
+      :server_memberships,
+      :sent_private_messages,
+      :received_private_messages,
+      :roles,
+      :friendships,
+      :friend_requests
+    ])
   end
 
   @doc """
