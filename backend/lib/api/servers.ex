@@ -7,6 +7,8 @@ defmodule Api.Servers do
   alias Api.Repo
   alias Api.Servers.Server
   alias Api.Servers.ServerMember
+  alias Api.Roles.Role
+  alias Api.Roles.UserRole
 
   @doc """
   Returns the list of servers.
@@ -60,15 +62,67 @@ defmodule Api.Servers do
         |> Server.changeset(Map.put(attrs, "owner_id", owner.id))
 
       with {:ok, server} <- Repo.insert(server_changeset) do
+        # Create default roles
+        owner_role =
+          %Role{
+            name: "Owner",
+            server_id: server.id,
+            color: "#FF0000",
+            permissions: 8,
+            position: 100,
+            hoist: true,
+            mentionable: true
+          }
+          |> Repo.insert!()
+
+        %Role{
+          name: "Admin",
+          server_id: server.id,
+          color: "#FF0000",
+          permissions: 8,
+          position: 100,
+          hoist: true,
+          mentionable: true
+        }
+        |> Repo.insert!()
+
+        %Role{
+          name: "Moderator",
+          server_id: server.id,
+          color: "#00FF00",
+          permissions: 4,
+          position: 50,
+          hoist: true,
+          mentionable: true
+        }
+        |> Repo.insert!()
+
+        %Role{
+          name: "Member",
+          server_id: server.id,
+          color: "#FFFFFF",
+          permissions: 1,
+          position: 1,
+          hoist: false,
+          mentionable: false
+        }
+        |> Repo.insert!()
+
         membership_attrs = %{
           user_id: owner.id,
           server_id: server.id,
-          role: "admin",
           nickname: owner.display_name
         }
 
         %ServerMember{}
         |> ServerMember.changeset(membership_attrs)
+        |> Repo.insert!()
+
+        %UserRole{
+          user_id: owner.id,
+          role_id: owner_role.id,
+          server_id: server.id
+        }
         |> Repo.insert!()
 
         server
@@ -154,6 +208,13 @@ defmodule Api.Servers do
   """
   def get_server_member!(id), do: Repo.get!(ServerMember, id)
 
+  def get_server_member(server_id, user_id) do
+    case Repo.get_by(ServerMember, server_id: server_id, user_id: user_id) do
+      nil -> nil
+      member -> load_member_with_roles(member)
+    end
+  end
+
   @doc """
   Creates a server_member.
 
@@ -217,5 +278,51 @@ defmodule Api.Servers do
   """
   def change_server_member(%ServerMember{} = server_member, attrs \\ %{}) do
     ServerMember.changeset(server_member, attrs)
+  end
+
+  def load_member_with_roles(%ServerMember{} = member) do
+    roles = Api.Roles.get_user_roles(member.user_id, member.server_id)
+    %{member | roles: roles}
+  end
+
+  def load_members_with_roles(members) when is_list(members) do
+    Enum.map(members, &load_member_with_roles/1)
+  end
+
+  def list_server_members(server_id) do
+    members = Repo.all(from(m in ServerMember, where: m.server_id == ^server_id))
+    load_members_with_roles(members)
+  end
+
+  def add_role_to_member(server_id, user_id, role_id) do
+    # Verify the user is a member of this server
+    with %ServerMember{} = _member <- get_server_member_without_roles(server_id, user_id),
+         %Role{} = role <- Roles.get_role!(role_id),
+         true <- role.server_id == server_id do
+      Api.Roles.assign_role(%{user_id: user_id, role_id: role_id, server_id: server_id})
+    else
+      nil -> {:error, :not_found}
+      false -> {:error, :invalid_role}
+      error -> error
+    end
+  end
+
+  # TODO
+  # def remove_role_from_member(server_id, user_id, role_id) do
+  #   with %ServerMember{} = _member <- get_server_member_without_roles(server_id, user_id),
+  #        %Role{} = role <- Api.Roles.get_role!(role_id),
+  #        true <- role.server_id == server_id,
+  #        {count, _} when count > 0 <- Api.Roles.remove_role(user_id, role_id) do
+  #     {:ok, nil}
+  #   else
+  #     nil -> {:error, :not_found}
+  #     false -> {:error, :invalid_role}
+  #     {0, _} -> {:error, :role_not_assigned}
+  #     error -> error
+  #   end
+  # end
+
+  defp get_server_member_without_roles(server_id, user_id) do
+    Repo.get_by(ServerMember, server_id: server_id, user_id: user_id)
   end
 end

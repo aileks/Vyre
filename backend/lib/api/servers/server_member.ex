@@ -6,7 +6,7 @@ defmodule Api.Servers.ServerMember do
   alias Api.Roles.Role
   alias Api.Roles.UserRole
 
-  @derive {Jason.Encoder, only: [:id, :user_id, :server_id, :nickname, :joined_at]}
+  @derive {Jason.Encoder, only: [:id, :user_id, :server_id, :nickname, :joined_at, :roles]}
 
   @schema_prefix System.get_env("DB_SCHEMA")
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -14,6 +14,7 @@ defmodule Api.Servers.ServerMember do
   schema "server_members" do
     field(:joined_at, :utc_datetime, default: DateTime.utc_now() |> DateTime.truncate(:second))
     field(:nickname, :string)
+    field(:roles, {:array, :map}, virtual: true, default: [])
     timestamps(type: :utc_datetime)
 
     belongs_to(:user, Api.Accounts.User, foreign_key: :user_id)

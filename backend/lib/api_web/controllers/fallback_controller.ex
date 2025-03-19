@@ -58,6 +58,13 @@ defmodule ApiWeb.FallbackController do
     end
   end
 
+  def call(conn, {:ok, {:error, %Ecto.Changeset{} = changeset}}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> put_view(ApiWeb.ErrorJSON)
+    |> render("422.json", changeset: changeset)
+  end
+
   # Helper to detect unique constraint errors
   defp has_unique_constraint_error?(changeset) do
     Enum.any?(changeset.errors, fn

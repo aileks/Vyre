@@ -5,12 +5,14 @@ defmodule Api.Roles.UserRole do
   alias Api.Repo
   alias Api.Roles.Role
 
+  # @derive {Jason.Encoder, only: [:id, :user_id, :role_id, :server_id]}
+
   @schema_prefix System.get_env("DB_SCHEMA")
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "user_roles" do
     belongs_to(:user, Api.Accounts.User, foreign_key: :user_id)
-    belongs_to(:role, Api.Roles.Role)
+    belongs_to(:role, Api.Roles.Role, foreign_key: :role_id)
     belongs_to(:server, Api.Servers.Server, foreign_key: :server_id)
 
     timestamps(type: :utc_datetime)

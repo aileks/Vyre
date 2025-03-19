@@ -2,6 +2,8 @@ defmodule Api.Roles.Role do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @derive {Jason.Encoder, only: [:name, :color, :permissions, :position, :hoist, :mentionable]}
+
   @schema_prefix System.get_env("DB_SCHEMA")
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id

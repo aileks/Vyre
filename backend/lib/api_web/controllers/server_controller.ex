@@ -43,10 +43,25 @@ defmodule ApiWeb.ServerController do
   end
 
   def delete(conn, %{"id" => id}) do
-    server = Servers.get_server!(id)
+    case Servers.get_server(id) do
+      nil ->
+        conn
+        |> put_status(:not_found)
+        |> put_view(ApiWeb.ErrorJSON)
+        |> render("404.json", %{message: "Server not found"})
 
-    with {:ok, %Server{}} <- Servers.delete_server(server) do
-      send_resp(conn, :no_content, "")
+      server ->
+        # Server exists, try to delete it
+        case Servers.delete_server(server) do
+          {:ok, _} ->
+            json(conn, %{message: "Server deleted successfully"})
+
+          {:error, reason} ->
+            conn
+            |> put_status(:unprocessable_entity)
+            |> put_view(ApiWeb.ErrorJSON)
+            |> render("error.json", %{message: "Failed to delete server: #{inspect(reason)}"})
+        end
     end
   end
 end

@@ -12,10 +12,10 @@ defmodule ApiWeb.RoleJSON do
   Renders a single role.
   """
   def show(%{role: role}) do
-    %{data: data(role)}
+    %{role: data(role)}
   end
 
-  defp data(%Role{} = role) do
+  def data(%Role{} = role) do
     %{
       id: role.id,
       name: role.name,
@@ -23,7 +23,8 @@ defmodule ApiWeb.RoleJSON do
       permissions: role.permissions,
       position: role.position,
       hoist: role.hoist,
-      mentionable: role.mentionable
+      mentionable: role.mentionable,
+      server_id: role.server_id
     }
   end
 end

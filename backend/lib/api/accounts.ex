@@ -36,19 +36,52 @@ defmodule Api.Accounts do
 
   """
   def get_user!(id) do
-    User
-    |> Repo.get!(id)
-    |> Repo.preload([
-      :owned_servers,
-      :messages,
-      :servers,
-      :server_memberships,
-      :sent_private_messages,
-      :received_private_messages,
-      :roles,
-      :friendships,
-      :friend_requests
-    ])
+    user =
+      User
+      |> Repo.get!(id)
+      |> Repo.preload([
+        :owned_servers,
+        :messages,
+        :servers,
+        :server_memberships,
+        :sent_private_messages,
+        :received_private_messages,
+        :roles,
+        :friendships,
+        :friend_requests
+      ])
+
+    %{user | server_memberships: load_memberships_with_roles(user.server_memberships)}
+  end
+
+  defp load_memberships_with_roles(memberships) when is_list(memberships) do
+    Enum.map(memberships, fn membership ->
+      roles = get_roles_for_membership(membership.user_id, membership.server_id)
+      %{membership | roles: roles}
+    end)
+  end
+
+  defp load_memberships_with_roles(nil), do: []
+
+  defp get_roles_for_membership(user_id, server_id) do
+    role_ids =
+      Repo.all(
+        from(ur in Api.Roles.UserRole,
+          where: ur.user_id == ^user_id and ur.server_id == ^server_id,
+          select: ur.role_id
+        )
+      )
+
+    if Enum.empty?(role_ids) do
+      []
+    else
+      Repo.all(
+        from(r in Api.Roles.Role,
+          where: r.id in ^role_ids,
+          order_by: [desc: r.position]
+        )
+      )
+    end
   end
 
   @doc """

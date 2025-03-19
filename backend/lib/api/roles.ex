@@ -2,11 +2,11 @@ defmodule Api.Roles do
   @moduledoc """
   The Roles context.
   """
-
   import Ecto.Query, warn: false
-  alias Api.Repo
 
+  alias Api.Repo
   alias Api.Roles.Role
+  alias Api.Roles.UserRole
 
   @doc """
   Returns the list of roles.
@@ -52,6 +52,12 @@ defmodule Api.Roles do
   def create_role(attrs \\ %{}) do
     %Role{}
     |> Role.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def assign_role(attrs) do
+    %UserRole{}
+    |> UserRole.changeset(attrs)
     |> Repo.insert()
   end
 
@@ -132,6 +138,25 @@ defmodule Api.Roles do
 
   """
   def get_user_role!(id), do: Repo.get!(UserRole, id)
+
+  @doc """
+  Gets all roles assigned to a user in a server.
+  """
+  def get_user_roles(user_id, server_id) do
+    role_ids_query =
+      from(ur in UserRole,
+        where: ur.user_id == ^user_id and ur.server_id == ^server_id,
+        select: ur.role_id
+      )
+
+    role_ids = Repo.all(role_ids_query)
+
+    if Enum.empty?(role_ids) do
+      []
+    else
+      Repo.all(from(r in Role, where: r.id in ^role_ids, order_by: [desc: r.position]))
+    end
+  end
 
   @doc """
   Creates a user_role.

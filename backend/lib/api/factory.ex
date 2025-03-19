@@ -100,7 +100,7 @@ if Code.ensure_loaded?(ExMachina.Ecto) do
     end
 
     # -------------------------------------------------------------------
-    # USER ROLES (association between users and roles)
+    # USER ROLES
     # -------------------------------------------------------------------
     def user_role_factory do
       # TODO
