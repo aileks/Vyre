@@ -3,41 +3,60 @@ defmodule ApiWeb.AuthController do
 
   alias ApiWeb.Auth.Guardian, as: AuthGuardian
   alias Api.Accounts
+  alias Api.RateLimit
 
   action_fallback(ApiWeb.FallbackController)
 
   def register(conn, %{"user" => user_params}) do
-    case Accounts.register_user(user_params) do
-      {:ok, user} ->
-        {:ok, user, token} = AuthGuardian.create_token(user, :access)
+    ip_string = conn.remote_ip |> :inet.ntoa() |> to_string()
+    key = "register:#{ip_string}"
+    scale = :timer.minutes(5)
+    limit = 3
 
-        conn
-        |> AuthGuardian.Plug.sign_in(user)
-        |> put_status(:created)
-        |> put_view(ApiWeb.UserJSON)
-        |> render(:show_with_token, %{user: user, token: token})
+    handle_rate_limit(conn, key, scale, limit, fn ->
+      case Accounts.register_user(user_params) do
+        {:ok, user} ->
+          {:ok, user, token} = AuthGuardian.create_token(user, :access)
 
-      {:error, changeset} ->
-        {:error, changeset}
-    end
+          conn
+          |> AuthGuardian.Plug.sign_in(user)
+          |> put_status(:created)
+          |> put_view(ApiWeb.UserJSON)
+          |> render(:show_with_token, %{user: user, token: token})
+
+        {:error, changeset} ->
+          {:error, changeset}
+      end
+    end)
   end
 
   def login(conn, %{"user" => %{"email" => email, "password" => password} = params}) do
-    remember_me = Map.get(params, "remember_me", false)
+    ip_string = conn.remote_ip |> :inet.ntoa() |> to_string()
+    key = "login:#{ip_string}"
+    scale = :timer.minutes(3)
+    limit = 5
 
-    case AuthGuardian.authenticate(email, password, remember_me) do
-      {:ok, user, token} ->
-        conn
-        |> AuthGuardian.Plug.sign_in(user)
-        |> put_status(:ok)
-        |> put_view(ApiWeb.UserJSON)
-        |> render(:show_with_token, %{user: user, token: token})
+    handle_rate_limit(conn, key, scale, limit, fn ->
+      remember_me = Map.get(params, "remember_me", false)
 
-      {:error, _reason} ->
-        conn
-        |> put_status(:unauthorized)
-        |> json(%{error: "Invalid credentials"})
-    end
+      case AuthGuardian.authenticate(email, password, remember_me) do
+        {:ok, user, token} ->
+          conn
+          |> AuthGuardian.Plug.sign_in(user)
+          |> put_status(:ok)
+          |> put_view(ApiWeb.UserJSON)
+          |> render(:show_with_token, %{user: user, token: token})
+
+        {:error, _reason} ->
+          # Track failed login attempts separately
+          failed_key = "failed_login:#{email}:#{ip_string}"
+          RateLimit.hit(failed_key, :timer.hours(24), 20)
+
+          conn
+          |> put_status(:unauthorized)
+          |> json(%{error: "Invalid credentials"})
+      end
+    end)
   end
 
   def refresh_session(conn, _params) do
@@ -84,6 +103,25 @@ defmodule ApiWeb.AuthController do
         |> put_status(:ok)
         |> put_view(ApiWeb.AuthJSON)
         |> render(:me, %{user: user})
+    end
+  end
+
+  defp handle_rate_limit(conn, key, scale, limit, action_fn) do
+    case RateLimit.hit(key, scale, limit) do
+      {:allow, _count} ->
+        action_fn.()
+
+      {:deny, retry_after} ->
+        retry_after_seconds = div(retry_after, 1000)
+
+        conn
+        |> put_resp_header("retry-after", Integer.to_string(retry_after_seconds))
+        |> put_status(:too_many_requests)
+        |> json(%{
+          error: "Limit exceeded. Please try again later.",
+          retry_after_seconds: retry_after_seconds
+        })
+        |> halt()
     end
   end
 end

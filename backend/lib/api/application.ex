@@ -23,7 +23,8 @@ defmodule Api.Application do
       # {Api.Worker, arg},
       # Start to serve requests, typically the last entry
       ApiWeb.Endpoint,
-      {Guardian.DB.Token.SweeperServer, []}
+      {Guardian.DB.Token.SweeperServer, []},
+      {Api.RateLimit, [clean_period: :timer.minutes(10)]}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

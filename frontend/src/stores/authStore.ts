@@ -1,5 +1,11 @@
-import { createEffect, createMemo, createResource, onCleanup } from 'solid-js';
-import { createStore, reconcile } from 'solid-js/store';
+import {
+  batch,
+  createEffect,
+  createMemo,
+  createResource,
+  onCleanup,
+} from 'solid-js';
+import { createStore } from 'solid-js/store';
 
 import type {
   AuthState,
@@ -11,28 +17,23 @@ import apiClient from '../utils/apiClient';
 
 const fetchUser = async (): Promise<User | null> => {
   const controller = new AbortController();
-  if (fetchUser.isFetching) return null;
-  fetchUser.isFetching = true;
-
   onCleanup(() => controller.abort());
 
   try {
-    const response = await apiClient.get('/session/current', {
+    const res = await apiClient.get('/session/current', {
       signal: controller.signal,
     });
-    fetchUser.isFetching = false;
 
-    return response.data.user as User;
+    return res.data.user as User;
   } catch (err) {
-    fetchUser.isFetching = false;
-    // Treat any error as not authenticated or an unavailable user.
     return null;
   }
 };
-fetchUser.isFetching = false;
 
 // Automatically fetch/refetch the current user.
-const [currentUser, { refetch, mutate }] = createResource(fetchUser);
+const [currentUser, { mutate: mutateUser, refetch: refetchUser }] =
+  createResource(fetchUser);
+// const [refreshFetch] = createResource(refreshUser);
 
 export const createAuthStore = () => {
   const [state, setState] = createStore<AuthState>({
@@ -52,21 +53,17 @@ export const createAuthStore = () => {
     if (user === undefined) {
       setState('status', 'loading');
     } else if (user === null) {
-      setState(
-        reconcile({
-          status: 'idle',
-          user: null,
-          error: null,
-        }),
-      );
+      batch(() => {
+        setState('status', 'idle');
+        setState('user', null);
+        setState('error', null);
+      });
     } else {
-      setState(
-        reconcile({
-          status: 'authenticated',
-          user,
-          error: null,
-        }),
-      );
+      batch(() => {
+        setState('status', 'authenticated');
+        setState('user', user);
+        setState('error', null);
+      });
     }
   });
 
@@ -108,8 +105,7 @@ export const createAuthStore = () => {
         },
       });
 
-      // Refetch to update the currentUser resource.
-      await refetch();
+      await refetchUser();
 
       return true;
     } catch (err) {
@@ -139,7 +135,7 @@ export const createAuthStore = () => {
         },
       });
 
-      await refetch();
+      await refetchUser();
       return true;
     } catch (err) {
       const errorMessage = getErrorMessage(
@@ -155,19 +151,18 @@ export const createAuthStore = () => {
   };
 
   const logout = async () => {
-    setState({ status: 'loading' });
+    setState('status', 'loading');
 
     try {
       await apiClient.delete('/session');
 
-      mutate(null);
-      setState(
-        reconcile({
-          status: 'idle',
-          user: null,
-          error: null,
-        }),
-      );
+      mutateUser(null);
+
+      batch(() => {
+        setState('status', 'idle');
+        setState('error', null);
+        setState('user', null);
+      });
 
       return true;
     } catch (error: any) {
@@ -183,59 +178,28 @@ export const createAuthStore = () => {
     }
   };
 
-  createEffect(() => {
-    const handleSessionExpired = (e: CustomEvent<{ message: string }>) => {
-      // Clear auth state
-      setState(
-        reconcile({
-          status: 'idle',
-          user: null,
-          error: e.detail?.message || 'Session expired',
-        }),
-      );
+  const handleSessionExpired = (event: CustomEvent) => {
+    console.warn('Session expired:', event.detail.message);
 
-      window.location.href = '/login';
-    };
+    setState({
+      status: 'idle',
+      user: null,
+      error: 'Your session has expired.',
+    });
+  };
 
-    window.addEventListener(
-      'auth:session-expired',
+  window.addEventListener(
+    'sessionExpired',
+    handleSessionExpired as EventListener,
+  );
+
+  // Clean up the listener when the component/store is destroyed
+  onCleanup(() => {
+    window.removeEventListener(
+      'sessionExpired',
       handleSessionExpired as EventListener,
     );
-
-    onCleanup(() => {
-      window.removeEventListener(
-        'auth:session-expired',
-        handleSessionExpired as EventListener,
-      );
-    });
   });
-
-  createEffect(() => {
-    if (isAuthenticated()) {
-      let refreshing = false;
-
-      const refreshInterval = setInterval(
-        async () => {
-          if (!refreshing) {
-            refreshing = true;
-            try {
-              await apiClient.post('/session/refresh');
-            } catch (err) {
-              // Error handling will be done by interceptor
-            } finally {
-              refreshing = false;
-            }
-          }
-        },
-        60 * 60 * 1000, // 1 hour
-      );
-
-      onCleanup(() => {
-        clearInterval(refreshInterval);
-      });
-    }
-  });
-
   return {
     state,
     isLoading,
@@ -244,6 +208,5 @@ export const createAuthStore = () => {
     login,
     register,
     logout,
-    refetch,
   };
 };

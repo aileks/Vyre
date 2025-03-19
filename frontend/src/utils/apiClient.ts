@@ -2,19 +2,13 @@ import axios from 'axios';
 
 // import { keysToCamelCase, keysToSnakeCase } from './caseTransformer';
 
+interface QueueItem {
+  resolve: (value?: any) => void;
+  reject: (reason?: string) => void;
+}
+
 let isRefreshing = false;
-let refreshSubscribers: Array<() => void> = [];
-
-// Subscriber queue
-const addSubscriber = (cb: () => void) => {
-  refreshSubscribers.push(cb);
-};
-
-// Hook to execute all subscriber callbacks and clear the queue
-const onRefreshed = () => {
-  refreshSubscribers.forEach(cb => cb());
-  refreshSubscribers = [];
-};
+let failedReqsQueue: Array<QueueItem> = [];
 
 const apiClient = axios.create({
   baseURL: '/api',
@@ -39,60 +33,69 @@ const apiClient = axios.create({
 //   return response;
 // });
 
+const processQueue = (error: any = null) => {
+  failedReqsQueue.forEach(prom => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve();
+    }
+  });
+
+  failedReqsQueue = [];
+};
+
 apiClient.interceptors.response.use(
-  // Return successful responses
+  // Automatically return successful responses
   res => res,
 
   async error => {
     const originalRequest = error.config;
 
-    if (
-      error.response.status === 401 &&
-      !originalRequest._retry &&
-      !originalRequest.url?.includes('/session/refresh') &&
-      !originalRequest.url?.includes('/session/current')
-    ) {
-      if (!isRefreshing) {
-        isRefreshing = true;
-        originalRequest._retry = true;
+    // Reject if the error is not 401 or we already tried to refresh
+    if (error.response?.status !== 401 || originalRequest._retry)
+      Promise.reject(error);
 
-        try {
-          // Attempt to refresh the token
-          await apiClient.post('/session/refresh');
-          isRefreshing = false;
+    originalRequest._retry = true;
 
-          onRefreshed();
-
-          // Retry the original request
+    // If we're already refreshing, queue this request
+    if (isRefreshing) {
+      return new Promise((resolve, reject) => {
+        failedReqsQueue.push({ resolve, reject });
+      })
+        .then(() => {
           return apiClient(originalRequest);
-        } catch (err) {
-          isRefreshing = false;
-          refreshSubscribers = [];
-
-          // Dispatch an event to notify the app of a session expiration
-          window.dispatchEvent(
-            new CustomEvent('auth:session-expired', {
-              detail: {
-                message: 'Your session has expired. Please log in again.',
-              },
-            }),
-          );
-
+        })
+        .catch(err => {
           return Promise.reject(err);
-        }
-      } else {
-        // If another request is already refreshing the token,
-        // wait for it to complete and then retry this request
-        return new Promise(resolve => {
-          addSubscriber(() => {
-            resolve(apiClient(originalRequest));
-          });
         });
-      }
     }
 
-    return Promise.reject(error);
+    isRefreshing = true;
+
+    try {
+      // Try to refresh the token
+      await apiClient.post('/session/refresh');
+
+      // Process any queued requests
+      processQueue();
+
+      // Retry the original request
+      return apiClient(originalRequest);
+    } catch (refreshErr) {
+      // If refresh fails, process queue with error and handle logout
+      processQueue(refreshErr);
+
+      // NOTE: Implement when app is ready
+      const event = new CustomEvent('sessionExpired', {
+        detail: { message: 'Session expired.' },
+      });
+      window.dispatchEvent(event);
+
+      return Promise.reject(refreshErr);
+    } finally {
+      isRefreshing = false;
+    }
   },
 );
-
 export default apiClient;

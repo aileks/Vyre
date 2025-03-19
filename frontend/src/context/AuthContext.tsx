@@ -11,7 +11,6 @@ export interface AuthContextValue {
   login: (credentials: LoginCredentials) => Promise<boolean>;
   logout: () => Promise<boolean>;
   register: (data: RegistrationData) => Promise<boolean>;
-  refetch: () => void;
 }
 
 const AuthContext = createContext<AuthContextValue>();

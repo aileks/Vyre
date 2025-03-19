@@ -60,7 +60,8 @@ defmodule Api.MixProject do
       {:excoveralls, "~> 0.18", only: [:test, :dev]},
       {:dotenv, "~> 3.0", only: [:test, :dev]},
       {:faker, "~> 0.18", only: :dev},
-      {:ex_machina, "~> 2.8", only: [:test, :dev]}
+      {:ex_machina, "~> 2.8", only: [:test, :dev]},
+      {:hammer, "~> 7.0"}
     ]
   end
 

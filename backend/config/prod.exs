@@ -26,4 +26,11 @@ config :api, Api.Repo,
   queue_target: 5000,
   queue_interval: 5000
 
+config :cors_plug,
+  origin: ["https://vyre-2uyou.ondigitalocean.app/"],
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  headers: ["Authorization", "Content-Type", "Accept", "Origin", "User-Agent"],
+  credentials: true,
+  max_age: 86400
+
 config :guardian, Guardian.DB, prefix: db_schema
