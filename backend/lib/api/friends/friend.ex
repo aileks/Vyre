@@ -2,6 +2,8 @@ defmodule Api.Friends.Friend do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @derive {Jason.Encoder, only: [:id, :status, :user_id, :friend_id, :inserted_at]}
+
   @schema_prefix System.get_env("DB_SCHEMA")
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id

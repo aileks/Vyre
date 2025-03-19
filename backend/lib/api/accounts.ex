@@ -18,75 +18,45 @@ defmodule Api.Accounts do
 
   """
   def list_users do
-    Repo.all(User)
+    users = Repo.all(User)
+
+    users_with_basic =
+      Repo.preload(users, [
+        :owned_servers,
+        :messages,
+        :servers,
+        :sent_private_messages,
+        :received_private_messages,
+        :friendships,
+        :friend_requests
+      ])
+
+    Enum.map(users_with_basic, &preload_memberships_with_roles/1)
   end
 
   @doc """
   Gets a single user.
 
-  Raises `Ecto.NoResultsError` if the User does not exist.
+  Returns `nil` if the User does not exist.
 
   ## Examples
 
-      iex> get_user!(123)
+      iex> get_user(123)
       %User{}
 
-      iex> get_user!(456)
-      ** (Ecto.NoResultsError)
+      iex> get_user(456)
+      nil
 
   """
   def get_user(id) do
-    user =
-      User
-      |> Repo.get(id)
-      |> Repo.preload([
-        :owned_servers,
-        :messages,
-        :servers,
-        :server_memberships,
-        :sent_private_messages,
-        :received_private_messages,
-        :roles,
-        :friendships,
-        :friend_requests
-      ])
-
-    case user do
+    case Repo.get(User, id) do
       nil ->
         nil
 
       user ->
-        %{user | server_memberships: load_memberships_with_roles(user.server_memberships)}
-    end
-  end
-
-  defp load_memberships_with_roles(memberships) when is_list(memberships) do
-    Enum.map(memberships, fn membership ->
-      roles = get_roles_for_membership(membership.user_id, membership.server_id)
-      %{membership | roles: roles}
-    end)
-  end
-
-  defp load_memberships_with_roles(nil), do: []
-
-  defp get_roles_for_membership(user_id, server_id) do
-    role_ids =
-      Repo.all(
-        from(ur in Api.Roles.UserRole,
-          where: ur.user_id == ^user_id and ur.server_id == ^server_id,
-          select: ur.role_id
-        )
-      )
-
-    if Enum.empty?(role_ids) do
-      []
-    else
-      Repo.all(
-        from(r in Api.Roles.Role,
-          where: r.id in ^role_ids,
-          order_by: [desc: r.position]
-        )
-      )
+        user
+        |> preload_basic_user_associations()
+        |> preload_memberships_with_roles()
     end
   end
 
@@ -179,26 +149,14 @@ defmodule Api.Accounts do
 
   """
   def get_user_by_email(email) when is_binary(email) do
-    user =
-      Repo.get_by(User, email: email)
-      |> Repo.preload([
-        :owned_servers,
-        :messages,
-        :servers,
-        :server_memberships,
-        :sent_private_messages,
-        :received_private_messages,
-        :roles,
-        :friendships,
-        :friend_requests
-      ])
-
-    case user do
+    case Repo.get_by(User, email: email) do
       nil ->
         nil
 
       user ->
-        %{user | server_memberships: load_memberships_with_roles(user.server_memberships)}
+        user
+        |> preload_basic_user_associations()
+        |> preload_memberships_with_roles()
     end
   end
 
@@ -209,15 +167,23 @@ defmodule Api.Accounts do
 
   ## Examples
 
-      iex> get_user_by_username!("username123")
+      iex> get_user_by_username("username123")
       %User{}
 
-      iex> get_user_by_username!("unknown")
+      iex> get_user_by_username("unknown")
       nil
 
   """
-  def get_user_by_username!(username) when is_binary(username) do
-    Repo.get_by(User, username: username)
+  def get_user_by_username(username) when is_binary(username) do
+    case Repo.get_by(User, username: username) do
+      nil ->
+        nil
+
+      user ->
+        user
+        |> preload_basic_user_associations()
+        |> preload_memberships_with_roles()
+    end
   end
 
   @doc """
@@ -226,5 +192,73 @@ defmodule Api.Accounts do
   """
   def validate_password(password, password_hash) do
     Bcrypt.verify_pass(password, password_hash)
+  end
+
+  defp preload_basic_user_associations(user_or_users) do
+    Repo.preload(user_or_users, [
+      :owned_servers,
+      :messages,
+      :servers,
+      :sent_private_messages,
+      :received_private_messages,
+      :friendships,
+      :friend_requests
+    ])
+  end
+
+  # FIXME: Why did I make this so complex?
+  defp preload_memberships_with_roles(user) do
+    user_with_memberships = Repo.preload(user, :server_memberships)
+
+    # Early return if no memberships
+    if Enum.empty?(user_with_memberships.server_memberships) do
+      user_with_memberships
+    else
+      # Extract all server IDs for bulk role loading
+      server_ids = Enum.map(user_with_memberships.server_memberships, & &1.server_id)
+
+      role_assignments =
+        Repo.all(
+          from(ur in Api.Roles.UserRole,
+            where: ur.user_id == ^user.id and ur.server_id in ^server_ids,
+            select: {ur.server_id, ur.role_id}
+          )
+        )
+
+      # Group role IDs by server ID
+      role_ids_by_server = Enum.group_by(role_assignments, &elem(&1, 0), &elem(&1, 1))
+
+      # Avoid N+1
+      all_role_ids = Enum.flat_map(role_assignments, fn {_, role_id} -> [role_id] end)
+
+      roles_by_id =
+        if Enum.empty?(all_role_ids) do
+          %{}
+        else
+          Repo.all(
+            from(r in Api.Roles.Role,
+              where: r.id in ^all_role_ids,
+              order_by: [desc: r.position]
+            )
+          )
+          |> Enum.group_by(& &1.id)
+        end
+
+      # Attach roles to each membership
+      updated_memberships =
+        Enum.map(user_with_memberships.server_memberships, fn membership ->
+          roles =
+            role_ids_by_server
+            |> Map.get(membership.server_id, [])
+            |> Enum.flat_map(fn role_id ->
+              Map.get(roles_by_id, role_id, [])
+            end)
+            |> Enum.sort_by(& &1.position, :desc)
+
+          %{membership | roles: roles}
+        end)
+
+      %{user_with_memberships | server_memberships: updated_memberships}
+    end
   end
 end

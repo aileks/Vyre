@@ -10,79 +10,33 @@ const apiClient = axios.create({
 });
 
 /* FIXME: Implement proper automatic refresh later */
-// interface QueueItem {
-//   resolve: (value?: any) => void;
-//   reject: (reason?: string) => void;
-// }
+apiClient.interceptors.response.use(
+  // Return success responses
+  async res => res,
 
-// let isRefreshing = false;
-// let failedReqsQueue: Array<QueueItem> = [];
+  async error => {
+    const originalReq = error.config;
 
-// const processQueue = (error: any = null) => {
-//   failedReqsQueue.forEach(prom => {
-//     if (error) {
-//       prom.reject(error);
-//     } else {
-//       prom.resolve();
-//     }
-//   });
+    if (
+      error.response?.status !== 401 ||
+      originalReq._retry ||
+      originalReq.url === '/session/refresh' ||
+      originalReq.url === '/session/me'
+    ) {
+      return Promise.reject(error);
+    }
 
-//   failedReqsQueue = [];
-// };
+    try {
+      originalReq._retry = true;
 
-// apiClient.interceptors.response.use(
-//   // Automatically return successful responses
-//   res => res,
+      await apiClient.post('/session/refresh');
 
-//   async error => {
-//     const originalRequest = error.config;
+      return await axios(originalReq);
+    } catch (refreshErr) {
+      console.error('Failed to refresh session:', refreshErr);
 
-//     // Reject if the error is not 401 or we already tried to refresh
-//     if (error.response?.status !== 401 || originalRequest._retry) {
-//       return Promise.reject(error);
-//     }
-
-//     originalRequest._retry = true;
-
-//     // If we're already refreshing, queue this request
-//     if (isRefreshing) {
-//       return new Promise((resolve, reject) => {
-//         failedReqsQueue.push({ resolve, reject });
-//       })
-//         .then(() => {
-//           return apiClient(originalRequest);
-//         })
-//         .catch(err => {
-//           return Promise.reject(err);
-//         });
-//     }
-
-//     isRefreshing = true;
-
-//     try {
-//       // Try to refresh the token
-//       await apiClient.post('/session/refresh');
-
-//       // Process any queued requests
-//       processQueue();
-
-//       // Retry the original request
-//       return apiClient(originalRequest);
-//     } catch (refreshErr) {
-//       // If refresh fails, process queue with error and handle logout
-//       processQueue(refreshErr);
-
-//       // NOTE: Implement when app is ready
-//       const event = new CustomEvent('sessionExpired', {
-//         detail: { message: 'Session expired.' },
-//       });
-//       window.dispatchEvent(event);
-
-//       return Promise.reject(refreshErr);
-//     } finally {
-//       isRefreshing = false;
-//     }
-//   },
-// );
-
+      return Promise.reject(error);
+    }
+  },
+);
 export default apiClient;

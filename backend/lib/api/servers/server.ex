@@ -8,9 +8,8 @@ defmodule Api.Servers.Server do
              :name,
              :description,
              :icon_url,
-             :inserted_at,
-             :updated_at,
-             :owner_id
+             :owner_id,
+             :inserted_at
            ]}
 
   @schema_prefix System.get_env("DB_SCHEMA")
