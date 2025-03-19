@@ -11,6 +11,8 @@ import apiClient from '../utils/apiClient';
 
 const fetchUser = async (): Promise<User | null> => {
   const controller = new AbortController();
+  if (fetchUser.isFetching) return null;
+  fetchUser.isFetching = true;
 
   onCleanup(() => controller.abort());
 
@@ -18,12 +20,16 @@ const fetchUser = async (): Promise<User | null> => {
     const response = await apiClient.get('/session/current', {
       signal: controller.signal,
     });
+    fetchUser.isFetching = false;
+
     return response.data.user as User;
   } catch (err) {
+    fetchUser.isFetching = false;
     // Treat any error as not authenticated or an unavailable user.
     return null;
   }
 };
+fetchUser.isFetching = false;
 
 // Automatically fetch/refetch the current user.
 const [currentUser, { refetch, mutate }] = createResource(fetchUser);
@@ -177,75 +183,58 @@ export const createAuthStore = () => {
     }
   };
 
-  // createEffect(() => {
-  //   const handleSessionExpired = (e: CustomEvent<{ message: string }>) => {
-  //     // Clear auth state
-  //     setState(
-  //       reconcile({
-  //         status: 'idle',
-  //         user: null,
-  //         error: e.detail?.message || 'Session expired',
-  //       }),
-  //     );
-
-  //     window.location.href = '/login';
-  //   };
-
-  //   window.addEventListener(
-  //     'auth:session-expired',
-  //     handleSessionExpired as EventListener,
-  //   );
-
-  //   onCleanup(() => {
-  //     window.removeEventListener(
-  //       'auth:session-expired',
-  //       handleSessionExpired as EventListener,
-  //     );
-  //   });
-  // });
-
   createEffect(() => {
-    const user = currentUser();
-
-    if (user === undefined) {
-      setState('status', 'loading');
-    } else if (user === null) {
+    const handleSessionExpired = (e: CustomEvent<{ message: string }>) => {
+      // Clear auth state
       setState(
         reconcile({
           status: 'idle',
           user: null,
-          error: null,
+          error: e.detail?.message || 'Session expired',
         }),
       );
-    } else {
-      setState(
-        reconcile({
-          status: 'authenticated',
-          user,
-          error: null,
-        }),
+
+      window.location.href = '/login';
+    };
+
+    window.addEventListener(
+      'auth:session-expired',
+      handleSessionExpired as EventListener,
+    );
+
+    onCleanup(() => {
+      window.removeEventListener(
+        'auth:session-expired',
+        handleSessionExpired as EventListener,
       );
-    }
+    });
   });
 
-  // createEffect(() => {
-  //   if (isAuthenticated()) {
-  //     const refreshInterval = setInterval(
-  //       async () => {
-  //         try {
-  //           await apiClient.post('/session/refresh');
-  //         } catch (err) {
-  //           // Error handling will be done by interceptor
-  //         }
-  //       },
-  //       60 * 60 * 1000,
-  //     ); // 1 hour
+  createEffect(() => {
+    if (isAuthenticated()) {
+      let refreshing = false;
 
-  //     onCleanup(() => {
-  //       clearInterval(refreshInterval);
-  //     });
-  //   }
-  // });
+      const refreshInterval = setInterval(
+        async () => {
+          if (!refreshing) {
+            refreshing = true;
+            try {
+              await apiClient.post('/session/refresh');
+            } catch (err) {
+              // Error handling will be done by interceptor
+            } finally {
+              refreshing = false;
+            }
+          }
+        },
+        60 * 60 * 1000, // 1 hour
+      );
+
+      onCleanup(() => {
+        clearInterval(refreshInterval);
+      });
+    }
+  });
 
   return {
     state,

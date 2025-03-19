@@ -112,7 +112,7 @@ export default function Home() {
                 </div>
 
                 <button
-                  class='bg-warning-600 text-cybertext-100 hover:bg-warning-500 focus:ring-warning-300 border-warning-400 rounded-xs border px-6 py-3 text-center font-mono transition-all duration-200 hover:cursor-pointer focus:ring-2 focus:outline-none'
+                  class='text-cybertext-100 border-error-400 bg-midnight-600 hover:bg-midnight-400 focus:ring-error-400 rounded-xs border px-6 py-3 text-center font-mono transition-all duration-200 hover:cursor-pointer focus:ring-2 focus:outline-none'
                   onClick={handleLogout}
                 >
                   Log Out
