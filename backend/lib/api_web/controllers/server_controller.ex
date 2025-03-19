@@ -38,8 +38,9 @@ defmodule ApiWeb.ServerController do
     server = Servers.get_server!(id)
     user = conn.private[:guardian_default_resource]
 
+    # TODO: Gate this behind permissions instead of owner in the future
     case user.id == server.owner_id do
-      true ->
+      false ->
         with {:ok, %Server{} = server} <- Servers.update_server(server, server_params) do
           render(conn, :show, server: server)
         end
