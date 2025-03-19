@@ -19,8 +19,8 @@ defmodule ApiWeb.ErrorJSON do
     %{error: %{message: "Unauthorized"}}
   end
 
-  def render("403.json", _assigns) do
-    %{error: %{message: "Forbidden"}}
+  def render("403.json", %{error: message}) do
+    %{error: %{message: message}}
   end
 
   def render("422.json", %{changeset: changeset}) do

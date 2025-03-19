@@ -34,11 +34,21 @@ defmodule ApiWeb.ServerController do
     end
   end
 
-  def update(conn, %{"id" => id, "server" => server_params}) do
+  def update(conn, %{"id" => id} = server_params) do
     server = Servers.get_server!(id)
+    user = conn.private[:guardian_default_resource]
 
-    with {:ok, %Server{} = server} <- Servers.update_server(server, server_params) do
-      render(conn, :show, server: server)
+    case user.id == server.owner_id do
+      true ->
+        with {:ok, %Server{} = server} <- Servers.update_server(server, server_params) do
+          render(conn, :show, server: server)
+        end
+
+      false ->
+        conn
+        |> put_status(:forbidden)
+        |> put_view(ApiWeb.ErrorJSON)
+        |> render("403.json", %{error: "You do not have access to this resource."})
     end
   end
 
