@@ -40,7 +40,7 @@ defmodule ApiWeb.ServerController do
 
     # TODO: Gate this behind permissions instead of owner in the future
     case user.id == server.owner_id do
-      false ->
+      true ->
         with {:ok, %Server{} = server} <- Servers.update_server(server, server_params) do
           render(conn, :show, server: server)
         end
