@@ -7,10 +7,10 @@ export type AppRouteDefinition = RouteDefinition & {
 
 // Lazy load components for better performance
 const Home = lazy(() => import('./pages/Home'));
-const Login = lazy(() => import('./pages/Login'));
+// const Login = lazy(() => import('./pages/Login'));
 const Register = lazy(() => import('./pages/Register'));
 const NotFound = lazy(() => import('./pages/NotFound'));
-const Servers = lazy(() => import('./pages/Servers'));
+// const Servers = lazy(() => import('./pages/Servers'));
 
 const Layout: Component<ParentProps> = props => {
   return <>{props.children}</>;
@@ -22,18 +22,18 @@ export const routes: AppRouteDefinition[] = [
     path: '/',
     component: Home,
   },
-  {
-    path: '/login',
-    component: Login,
-  },
+  // {
+  //   path: '/login',
+  //   component: Login,
+  // },
   {
     path: '/register',
     component: Register,
   },
-  {
-    path: '/servers',
-    component: Servers,
-  },
+  // {
+  //   path: '/servers',
+  //   component: Servers,
+  // },
 
   // Catch-all route for 404
   {
