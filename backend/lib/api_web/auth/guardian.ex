@@ -50,7 +50,7 @@ defmodule ApiWeb.Auth.Guardian do
 
   def token_opts(type) do
     case type do
-      :access -> [token_type: "access", ttl: {8, :hour}]
+      :access -> [token_type: "access", ttl: {7, :day}]
       :refresh -> [token_type: "refresh", ttl: {30, :day}]
       :reset -> [token_type: "reset", ttl: {15, :minute}]
     end

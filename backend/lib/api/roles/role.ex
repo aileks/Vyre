@@ -13,7 +13,7 @@ defmodule Api.Roles.Role do
     field(:permissions, :integer)
     field(:color, :string)
     field(:hoist, :boolean, default: false)
-    field(:mentionable, :boolean, default: false)
+    field(:mentionable, :boolean, default: true)
     timestamps(type: :utc_datetime)
 
     belongs_to(:server, Api.Servers.Server, foreign_key: :server_id)
