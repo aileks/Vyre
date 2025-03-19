@@ -6,6 +6,8 @@ defmodule Api.Servers.ServerMember do
   alias Api.Roles.Role
   alias Api.Roles.UserRole
 
+  @derive {Jason.Encoder, only: [:id, :user_id, :server_id, :nickname, :joined_at]}
+
   @schema_prefix System.get_env("DB_SCHEMA")
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id

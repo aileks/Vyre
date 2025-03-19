@@ -2,11 +2,11 @@ defmodule Api.Servers do
   @moduledoc """
   The Servers context.
   """
-
   import Ecto.Query, warn: false
-  alias Api.Repo
 
+  alias Api.Repo
   alias Api.Servers.Server
+  alias Api.Servers.ServerMember
 
   @doc """
   Returns the list of servers.
@@ -37,6 +37,10 @@ defmodule Api.Servers do
   """
   def get_server!(id), do: Repo.get!(Server, id)
 
+  def get_server(id) do
+    Repo.get(Server, id)
+  end
+
   @doc """
   Creates a server.
 
@@ -49,10 +53,27 @@ defmodule Api.Servers do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_server(attrs \\ %{}) do
-    %Server{}
-    |> Server.changeset(attrs)
-    |> Repo.insert()
+  def create_server(attrs, owner) do
+    Repo.transaction(fn ->
+      server_changeset =
+        %Server{}
+        |> Server.changeset(Map.put(attrs, "owner_id", owner.id))
+
+      with {:ok, server} <- Repo.insert(server_changeset) do
+        membership_attrs = %{
+          user_id: owner.id,
+          server_id: server.id,
+          role: "admin",
+          nickname: owner.display_name
+        }
+
+        %ServerMember{}
+        |> ServerMember.changeset(membership_attrs)
+        |> Repo.insert!()
+
+        server
+      end
+    end)
   end
 
   @doc """

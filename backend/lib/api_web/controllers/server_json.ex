@@ -12,7 +12,7 @@ defmodule ApiWeb.ServerJSON do
   Renders a single server.
   """
   def show(%{server: server}) do
-    %{data: data(server)}
+    %{server: data(server)}
   end
 
   defp data(%Server{} = server) do
@@ -22,8 +22,7 @@ defmodule ApiWeb.ServerJSON do
       description: server.description,
       icon_url: server.icon_url,
       owner_id: server.owner_id,
-      created_at: server.inserted_at,
-      updated_at: server.updated_at
+      created_at: server.inserted_at
     }
   end
 end

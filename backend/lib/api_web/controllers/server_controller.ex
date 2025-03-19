@@ -12,7 +12,9 @@ defmodule ApiWeb.ServerController do
   end
 
   def create(conn, %{"server" => server_params}) do
-    with {:ok, %Server{} = server} <- Servers.create_server(server_params) do
+    owner = conn.private[:guardian_default_resource]
+
+    with {:ok, %Server{} = server} <- Servers.create_server(server_params, owner) do
       conn
       |> put_status(:created)
       |> render(:show, server: server)
@@ -20,8 +22,16 @@ defmodule ApiWeb.ServerController do
   end
 
   def show(conn, %{"id" => id}) do
-    server = Servers.get_server!(id)
-    render(conn, :show, server: server)
+    case Servers.get_server(id) do
+      nil ->
+        conn
+        |> put_status(:not_found)
+        |> put_view(ApiWeb.ErrorJSON)
+        |> render("404.json")
+
+      server ->
+        render(conn, :show, server: server)
+    end
   end
 
   def update(conn, %{"id" => id, "server" => server_params}) do

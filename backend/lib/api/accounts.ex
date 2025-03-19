@@ -39,9 +39,9 @@ defmodule Api.Accounts do
     User
     |> Repo.get!(id)
     |> Repo.preload([
-      :servers,
       :owned_servers,
       :messages,
+      :servers,
       :server_memberships,
       :sent_private_messages,
       :received_private_messages,
