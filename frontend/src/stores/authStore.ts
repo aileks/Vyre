@@ -33,7 +33,6 @@ const fetchUser = async (): Promise<User | null> => {
 // Automatically fetch/refetch the current user.
 const [currentUser, { mutate: mutateUser, refetch: refetchUser }] =
   createResource(fetchUser);
-// const [refreshFetch] = createResource(refreshUser);
 
 export const createAuthStore = () => {
   const [state, setState] = createStore<AuthState>({
@@ -48,11 +47,19 @@ export const createAuthStore = () => {
 
   // When the currentUser resource updates, update our auth state.
   createEffect(() => {
-    const user = currentUser();
+    if (currentUser.error) {
+      setState({
+        status: 'error',
+        error: getErrorMessage(
+          currentUser.error,
+          'Failed to fetch user information',
+        ),
+      });
+      return;
+    }
 
-    if (user === undefined) {
-      setState('status', 'loading');
-    } else if (user === null) {
+    const user = currentUser();
+    if (!user) {
       batch(() => {
         setState('status', 'idle');
         setState('user', null);
@@ -77,9 +84,11 @@ export const createAuthStore = () => {
           .map(([field, messages]) => {
             const fieldName =
               field.charAt(0).toUpperCase() + field.slice(1).replace('_', ' ');
+
             if (Array.isArray(messages)) {
               return `${fieldName}: ${messages.join(', ')}`;
             }
+
             return `${fieldName}: ${messages}`;
           })
           .join('\n');
@@ -178,28 +187,6 @@ export const createAuthStore = () => {
     }
   };
 
-  const handleSessionExpired = (event: CustomEvent) => {
-    console.warn('Session expired:', event.detail.message);
-
-    setState({
-      status: 'idle',
-      user: null,
-      error: 'Your session has expired.',
-    });
-  };
-
-  window.addEventListener(
-    'sessionExpired',
-    handleSessionExpired as EventListener,
-  );
-
-  // Clean up the listener when the component/store is destroyed
-  onCleanup(() => {
-    window.removeEventListener(
-      'sessionExpired',
-      handleSessionExpired as EventListener,
-    );
-  });
   return {
     state,
     isLoading,
