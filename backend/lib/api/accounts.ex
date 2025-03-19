@@ -35,10 +35,10 @@ defmodule Api.Accounts do
       ** (Ecto.NoResultsError)
 
   """
-  def get_user!(id) do
+  def get_user(id) do
     user =
       User
-      |> Repo.get!(id)
+      |> Repo.get(id)
       |> Repo.preload([
         :owned_servers,
         :messages,
@@ -51,7 +51,13 @@ defmodule Api.Accounts do
         :friend_requests
       ])
 
-    %{user | server_memberships: load_memberships_with_roles(user.server_memberships)}
+    case user do
+      nil ->
+        nil
+
+      user ->
+        %{user | server_memberships: load_memberships_with_roles(user.server_memberships)}
+    end
   end
 
   defp load_memberships_with_roles(memberships) when is_list(memberships) do
@@ -165,15 +171,35 @@ defmodule Api.Accounts do
 
   ## Examples
 
-      iex> get_user_by_email!("user@example.com")
+      iex> get_user_by_email("user@example.com")
       %User{}
 
-      iex> get_user_by_email!("unknown@example.com")
+      iex> get_user_by_email("unknown@example.com")
       nil
 
   """
-  def get_user_by_email!(email) when is_binary(email) do
-    Repo.get_by(User, email: email)
+  def get_user_by_email(email) when is_binary(email) do
+    user =
+      Repo.get_by(User, email: email)
+      |> Repo.preload([
+        :owned_servers,
+        :messages,
+        :servers,
+        :server_memberships,
+        :sent_private_messages,
+        :received_private_messages,
+        :roles,
+        :friendships,
+        :friend_requests
+      ])
+
+    case user do
+      nil ->
+        nil
+
+      user ->
+        %{user | server_memberships: load_memberships_with_roles(user.server_memberships)}
+    end
   end
 
   @doc """

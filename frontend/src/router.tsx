@@ -7,7 +7,7 @@ export type AppRouteDefinition = RouteDefinition & {
 
 // Lazy load components for better performance
 const Home = lazy(() => import('./pages/Home'));
-// const Login = lazy(() => import('./pages/Login'));
+const Login = lazy(() => import('./pages/Login'));
 const Register = lazy(() => import('./pages/Register'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 // const Servers = lazy(() => import('./pages/Servers'));
@@ -22,10 +22,10 @@ export const routes: AppRouteDefinition[] = [
     path: '/',
     component: Home,
   },
-  // {
-  //   path: '/login',
-  //   component: Login,
-  // },
+  {
+    path: '/login',
+    component: Login,
+  },
   {
     path: '/register',
     component: Register,

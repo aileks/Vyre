@@ -11,7 +11,7 @@ defmodule ApiWeb.Auth.Guardian do
   def subject_for_token(_, _), do: {:error, :unhandled_resource_type}
 
   def resource_from_claims(%{"sub" => id}) do
-    case Accounts.get_user!(id) do
+    case Accounts.get_user(id) do
       nil -> {:error, :not_found}
       user -> {:ok, user}
     end
@@ -20,7 +20,7 @@ defmodule ApiWeb.Auth.Guardian do
   def resource_from_claims(_), do: {:error, :unhandled_resource_type}
 
   def authenticate(email, password, remember_me) do
-    case Accounts.get_user_by_email!(email) do
+    case Accounts.get_user_by_email(email) do
       nil ->
         Bcrypt.no_user_verify()
         {:error, "Invalid credentials"}

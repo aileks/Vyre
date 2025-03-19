@@ -7,6 +7,7 @@ defmodule Api.Servers do
   alias Api.Repo
   alias Api.Servers.Server
   alias Api.Servers.ServerMember
+  alias Api.Roles
   alias Api.Roles.Role
   alias Api.Roles.UserRole
 
