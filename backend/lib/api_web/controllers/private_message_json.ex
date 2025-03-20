@@ -5,14 +5,14 @@ defmodule ApiWeb.PrivateMessageJSON do
   Renders a list of private_messages.
   """
   def index(%{private_messages: private_messages}) do
-    %{data: for(private_message <- private_messages, do: data(private_message))}
+    %{private_messages: for(private_message <- private_messages, do: data(private_message))}
   end
 
   @doc """
   Renders a single private_message.
   """
   def show(%{private_message: private_message}) do
-    %{data: data(private_message)}
+    %{private_message: data(private_message)}
   end
 
   defp data(%PrivateMessage{} = private_message) do

@@ -5,7 +5,7 @@ defmodule ApiWeb.RoleJSON do
   Renders a list of roles.
   """
   def index(%{roles: roles}) do
-    %{data: for(role <- roles, do: data(role))}
+    %{roles: for(role <- roles, do: data(role))}
   end
 
   @doc """

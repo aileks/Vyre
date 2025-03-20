@@ -5,7 +5,7 @@ defmodule ApiWeb.ServerJSON do
   Renders a list of servers.
   """
   def index(%{servers: servers}) do
-    %{data: for(server <- servers, do: data(server))}
+    %{servers: for(server <- servers, do: data(server))}
   end
 
   @doc """

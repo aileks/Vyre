@@ -5,14 +5,14 @@ defmodule ApiWeb.ServerMemberJSON do
   Renders a list of server_members.
   """
   def index(%{server_members: server_members}) do
-    %{data: for(server_member <- server_members, do: data(server_member))}
+    %{server_members: for(server_member <- server_members, do: data(server_member))}
   end
 
   @doc """
   Renders a single server_member.
   """
   def show(%{server_member: server_member}) do
-    %{data: data(server_member)}
+    %{server_member: data(server_member)}
   end
 
   defp data(%ServerMember{} = server_member) do

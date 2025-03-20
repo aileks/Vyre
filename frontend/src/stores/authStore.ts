@@ -3,6 +3,7 @@ import {
   createEffect,
   createMemo,
   createResource,
+  createRoot,
   onCleanup,
 } from 'solid-js';
 import { createStore } from 'solid-js/store';
@@ -17,7 +18,9 @@ import apiClient from '../utils/apiClient';
 
 const fetchUser = async (): Promise<User | null> => {
   const controller = new AbortController();
-  onCleanup(() => controller.abort());
+  createRoot(() => {
+    onCleanup(() => controller.abort());
+  });
 
   try {
     const res = await apiClient.get('/session/current', {

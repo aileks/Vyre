@@ -5,7 +5,7 @@ defmodule ApiWeb.FriendJSON do
   Renders a list of friends.
   """
   def index(%{friends: friends}) do
-    %{data: for(friend <- friends, do: data(friend))}
+    %{friends: for(friend <- friends, do: data(friend))}
   end
 
   @doc """

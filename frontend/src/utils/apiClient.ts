@@ -1,5 +1,7 @@
 import axios from 'axios';
 
+import { keysToCamelCase, keysToSnakeCase } from './caseTransformer';
+
 const apiClient = axios.create({
   baseURL: '/api',
   withCredentials: true,
@@ -7,6 +9,20 @@ const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+});
+
+apiClient.interceptors.request.use(config => {
+  if (config.data) {
+    config.data = keysToSnakeCase(config.data);
+  }
+  return config;
+});
+
+apiClient.interceptors.response.use(response => {
+  if (response.data) {
+    response.data = keysToCamelCase(response.data);
+  }
+  return response;
 });
 
 /* FIXME: Implement proper automatic refresh later */
@@ -33,8 +49,6 @@ apiClient.interceptors.response.use(
 
       return await axios(originalReq);
     } catch (refreshErr) {
-      console.error('Failed to refresh session:', refreshErr);
-
       return Promise.reject(error);
     }
   },
