@@ -10,7 +10,8 @@ const Home = lazy(() => import('./pages/Home'));
 const Login = lazy(() => import('./pages/Login'));
 const Register = lazy(() => import('./pages/Register'));
 const NotFound = lazy(() => import('./pages/NotFound'));
-const Servers = lazy(() => import('./pages/Servers'));
+const Servers = lazy(() => import('./pages/Servers/Servers'));
+const Server = lazy(() => import('./pages/Servers/Server'));
 
 const Layout: Component<ParentProps> = props => {
   return <>{props.children}</>;
@@ -32,7 +33,16 @@ export const routes: AppRouteDefinition[] = [
   },
   {
     path: '/servers',
-    component: Servers,
+    children: [
+      {
+        path: '/',
+        component: Servers,
+      },
+      {
+        path: '/:id',
+        component: Server,
+      },
+    ],
   },
 
   // Catch-all route for 404
