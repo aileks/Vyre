@@ -15,11 +15,11 @@ const Spinner = () => (
 );
 
 export default function Home() {
-  const { isAuthenticated, isLoading, logout } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
 
-  const handleLogout = () => {
-    logout();
-  };
+  // const handleLogout = () => {
+  //   logout();
+  // };
 
   return (
     <div class='container mx-auto mt-32 max-w-6xl px-4 py-16'>
@@ -69,7 +69,7 @@ export default function Home() {
 
               <div class='flex'>
                 <span class='w-24 shrink-0 text-gray-500'>[PROGRESS]</span>
-                <span class='text-teal-300'>13% complete</span>
+                <span class='text-verdant-300'>13% complete</span>
               </div>
 
               <div class='flex'>
@@ -111,12 +111,12 @@ export default function Home() {
                   pre-registering!
                 </div>
 
-                <button
+                {/* <button
                   class='text-cybertext-100 border-error-400 bg-midnight-600 hover:bg-midnight-400 focus:ring-error-400 rounded-xs border px-6 py-3 text-center font-mono transition-all duration-200 hover:cursor-pointer focus:ring-2 focus:outline-none'
                   onClick={handleLogout}
                 >
                   Log Out
-                </button>
+                </button> */}
               </Show>
             </Show>
 

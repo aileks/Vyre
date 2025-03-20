@@ -1,3 +1,5 @@
+import { Icon } from '@iconify-icon/solid';
+import { Checkbox } from '@kobalte/core/checkbox';
 import { A } from '@solidjs/router';
 import { useNavigate } from '@solidjs/router';
 import { Show, createEffect, createSignal } from 'solid-js';
@@ -28,6 +30,7 @@ export default function Login() {
       rememberMe: remember(),
     };
 
+    console.log('LOGGING IN WITH THESE CREDENTIALS:', credentials);
     await login(credentials);
 
     if (isAuthenticated()) {
@@ -40,7 +43,7 @@ export default function Login() {
   return (
     <div class='flex min-h-screen items-center justify-center px-4 py-8 sm:px-6 lg:px-8'>
       <div class='bg-midnight-700 shadow-midnight-900/50 w-full max-w-md rounded-xs border border-gray-700 p-5 shadow-lg sm:p-7'>
-        <div class='text-primary-400 mb-4 text-2xl font-bold tracking-wide sm:text-4xl'>
+        <div class='text-verdant-400 mb-4 text-2xl font-bold tracking-wide sm:text-4xl'>
           Login
         </div>
 
@@ -83,7 +86,7 @@ export default function Login() {
               onInput={(e: InputEvent) =>
                 setEmail((e.target as HTMLInputElement).value)
               }
-              class='bg-midnight-900 focus:border-primary-500 focus:ring-primary-500/30 w-full rounded-xs border border-gray-700 px-3 py-2 transition-colors duration-200 focus:ring-1 focus:outline-none sm:py-2.5'
+              class='bg-midnight-900 focus:border-verdant-500 focus:ring-verdant-500/30 w-full rounded-xs border border-gray-700 px-3 py-2 transition-colors duration-200 focus:ring-1 focus:outline-none sm:py-2.5'
               placeholder='user@domain.com'
             />
           </div>
@@ -96,7 +99,7 @@ export default function Login() {
 
               {/* <A
                 href='/forgot-password'
-                class='text-xs text-teal-400 transition-colors duration-200 hover:text-teal-300 sm:text-sm'
+                class='text-xs text-verdant-400 transition-colors duration-200 hover:text-verdant-300 sm:text-sm'
               >
                 Forgot?
               </A> */}
@@ -112,16 +115,34 @@ export default function Login() {
               onInput={(e: InputEvent) =>
                 setPassword((e.target as HTMLInputElement).value)
               }
-              class='bg-midnight-900 focus:border-primary-500 focus:ring-primary-500/30 w-full rounded-xs border border-gray-700 px-3 py-2 transition-colors duration-200 focus:ring-1 focus:outline-none sm:py-2.5'
+              class='bg-midnight-900 focus:border-verdant-500 focus:ring-verdant-500/30 w-full rounded-xs border border-gray-700 px-3 py-2 transition-colors duration-200 focus:ring-1 focus:outline-none sm:py-2.5'
               placeholder='••••••••'
             />
           </div>
 
-          <div class='flex items-center'>
+          <Checkbox
+            checked={remember()}
+            onChange={() => {
+              setRemember(!remember());
+            }}
+            class='flex cursor-pointer items-center gap-2'
+          >
+            <Checkbox.Input class='sr-only' />{' '}
+            <Checkbox.Control class='data-[checked]:border-primary-600 border-primary-300 bg-cybertext-50 data-[checked]:bg-primary-600 relative flex h-4 w-4 items-center justify-center rounded-xs border transition-colors'>
+              <Checkbox.Indicator class='text-cybertext-200 flex items-center'>
+                <Icon icon='iconoir:check' class='h-4 w-4' />
+              </Checkbox.Indicator>
+            </Checkbox.Control>
+            <Checkbox.Label class='text-cybertext-600 text-sm select-none'>
+              Remember Me
+            </Checkbox.Label>
+          </Checkbox>
+
+          {/* <div class='flex items-center'>
             <input
               id='remember-me'
               type='checkbox'
-              class='bg-midnight-800 text-primary-600 focus:ring-primary-500 h-4 w-4 rounded border-gray-600'
+              class='bg-midnight-800 h-4 w-4 rounded border-gray-600 text-verdant-600 focus:ring-verdant-500'
               checked={remember()}
               onChange={() => {
                 setRemember(!remember());
@@ -133,12 +154,12 @@ export default function Login() {
             >
               Remember Me
             </label>
-          </div>
+          </div> */}
 
           <button
             type='submit'
             disabled={isLoading()}
-            class='bg-primary-600 hover:bg-primary-500 focus:ring-primary-500/50 border-primary-400 w-full rounded-xs border px-4 py-2 transition-all duration-200 hover:cursor-pointer focus:ring-2 focus:outline-none disabled:opacity-70 sm:py-2.5'
+            class='border-verdant-400 bg-verdant-600 hover:bg-verdant-500 focus:ring-verdant-500/50 w-full rounded-xs border px-4 py-2 transition-all duration-200 hover:cursor-pointer focus:ring-2 focus:outline-none disabled:opacity-70 sm:py-2.5'
           >
             {isLoading() ?
               <span class='flex items-center justify-center'>
@@ -174,7 +195,7 @@ export default function Login() {
           </span>{' '}
           <A
             href='/register'
-            class='text-electric-500 hover:text-electric-400 text-sm transition-colors duration-200 sm:text-base'
+            class='text-sm text-pink-400 transition-colors duration-200 hover:text-pink-300 sm:text-base'
           >
             Register here
           </A>

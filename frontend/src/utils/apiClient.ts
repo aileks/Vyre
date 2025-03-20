@@ -25,7 +25,6 @@ apiClient.interceptors.response.use(response => {
   return response;
 });
 
-/* FIXME: Implement proper automatic refresh later */
 apiClient.interceptors.response.use(
   // Return success responses
   async res => res,
@@ -53,4 +52,5 @@ apiClient.interceptors.response.use(
     }
   },
 );
+
 export default apiClient;

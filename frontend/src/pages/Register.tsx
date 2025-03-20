@@ -212,7 +212,7 @@ export default function Register() {
           </span>{' '}
           <A
             href='/login'
-            class='text-sm text-teal-400 transition-colors duration-200 hover:text-teal-300 sm:text-base'
+            class='text-verdant-400 hover:text-verdant-300 text-sm transition-colors duration-200 sm:text-base'
           >
             Log in here
           </A>

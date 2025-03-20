@@ -19,16 +19,16 @@
   --color-primary-900: oklch(0.2 0.1 290);
 
   /* Secondary Accent */
-  --color-teal-50: oklch(0.98 0.01 170);
-  --color-teal-100: oklch(0.95 0.03 170);
-  --color-teal-200: oklch(0.9 0.06 170);
-  --color-teal-300: oklch(0.8 0.1 170);
-  --color-teal-400: oklch(0.7 0.15 170);
-  --color-teal-500: oklch(0.6 0.19 170);
-  --color-teal-600: oklch(0.5 0.17 170);
-  --color-teal-700: oklch(0.4 0.14 170);
-  --color-teal-800: oklch(0.3 0.11 170);
-  --color-teal-900: oklch(0.2 0.08 170);
+  --color-verdant-50: oklch(0.98 0.01 170);
+  --color-verdant-100: oklch(0.95 0.03 170);
+  --color-verdant-200: oklch(0.9 0.06 170);
+  --color-verdant-300: oklch(0.8 0.1 170);
+  --color-verdant-400: oklch(0.7 0.15 170);
+  --color-verdant-500: oklch(0.6 0.19 170);
+  --color-verdant-600: oklch(0.5 0.17 170);
+  --color-verdant-700: oklch(0.4 0.14 170);
+  --color-verdant-800: oklch(0.3 0.11 170);
+  --color-verdant-900: oklch(0.2 0.08 170);
 
   /* Tertiary Accent */
   --color-pink-50: oklch(0.98 0.02 350);

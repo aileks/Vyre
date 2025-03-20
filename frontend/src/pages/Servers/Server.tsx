@@ -7,6 +7,7 @@ import apiClient from '../../utils/apiClient';
 
 export default function Server() {
   const [server, setServer] = createSignal<ServerData | null>(null);
+  setServer(null);
   const params = useParams();
   const serverId = params.id;
 
@@ -26,9 +27,9 @@ export default function Server() {
   };
 
   return (
-    <div class='flex justify-center p-18'>
-      <Show when={server()} fallback={<SpinnerFallback />}>
-        <div class='justify-center rounded-xs border border-pink-700 bg-pink-900 p-4 duration-200'>
+    <Show when={server()} fallback={<SpinnerFallback />}>
+      <div class='flex justify-center p-18'>
+        <div class='bg-midnight-600 border-primary-800 justify-center rounded-xs border p-4 duration-200'>
           <div class='flex items-center gap-4'>
             <img
               class='border-primary-300 h-32 w-32 rounded-full border-2'
@@ -45,7 +46,7 @@ export default function Server() {
             Created: {parseDate(server()?.createdAt)}
           </p>
         </div>
-      </Show>
-    </div>
+      </div>
+    </Show>
   );
 }

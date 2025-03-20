@@ -23,7 +23,8 @@ export default function Servers() {
         <For each={servers()}>
           {server => (
             <A href={`/servers/${server.id}`}>
-              <div class='border-cybertext-700 bg-electric-900 hover:bg-electric-800 rounded-xs border p-4 duration-200 hover:cursor-pointer'>
+              {/* bg-midnight-600 border-primary-800 justify-center rounded-xs border p-4 duration-200 */}
+              <div class='border-primary-800 bg-midnight-600 hover:bg-midnight-800 hover:border-primary-700 rounded-xs border p-4 duration-200 hover:cursor-pointer'>
                 <img
                   class='border-primary-300 h-32 w-32 rounded-full border-2'
                   src={server.iconUrl}
