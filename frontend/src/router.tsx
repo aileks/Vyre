@@ -1,5 +1,8 @@
 import { RouteDefinition, Router } from '@solidjs/router';
-import { Component, ParentProps, lazy } from 'solid-js';
+import { lazy } from 'solid-js';
+
+import { AppContextProvider } from './context/AppContext';
+import AppLayout from './layouts/AppLayout';
 
 export type AppRouteDefinition = RouteDefinition & {
   protected?: boolean;
@@ -10,13 +13,10 @@ const Home = lazy(() => import('./pages/Home'));
 const Login = lazy(() => import('./pages/Login'));
 const Register = lazy(() => import('./pages/Register'));
 const NotFound = lazy(() => import('./pages/NotFound'));
-// const Servers = lazy(() => import('./pages/Servers/Servers'));
-// const Server = lazy(() => import('./pages/Servers/Server'));
+const Friends = lazy(() => import('./pages/Friends'));
+const Channels = lazy(() => import('./pages/Channels'));
 
-const Layout: Component<ParentProps> = props => {
-  return <>{props.children}</>;
-};
-
+// Define routes with protection
 export const routes: AppRouteDefinition[] = [
   {
     path: '/',
@@ -30,20 +30,20 @@ export const routes: AppRouteDefinition[] = [
     path: '/login',
     component: Login,
   },
-  // {
-  //   path: '/servers',
-  //   children: [
-  //     {
-  //       path: '/',
-  //       component: Servers,
-  //     },
-  //     {
-  //       path: '/:id',
-  //       component: Server,
-  //     },
-  //   ],
-  // },
-
+  {
+    path: '/app',
+    component: AppLayout,
+    children: [
+      {
+        path: '/friends',
+        component: Friends,
+      },
+      {
+        path: '/channels/:channelId',
+        component: Channels,
+      },
+    ],
+  },
   // Catch-all route for 404
   {
     path: '/*',
@@ -52,5 +52,9 @@ export const routes: AppRouteDefinition[] = [
 ];
 
 export default function AppRouter() {
-  return <Router root={Layout}>{routes}</Router>;
+  return (
+    <AppContextProvider>
+      <Router>{routes}</Router>
+    </AppContextProvider>
+  );
 }
