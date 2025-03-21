@@ -7,14 +7,15 @@ defmodule ApiWeb.AuthController do
 
   action_fallback(ApiWeb.FallbackController)
 
-  def register(conn, %{"user" => user_params}) do
+  def register(conn, params) do
+    IO.inspect(params, label: "Register Params")
     ip_string = conn.remote_ip |> :inet.ntoa() |> to_string()
     key = "register:#{ip_string}"
-    scale = :timer.minutes(5)
+    scale = :timer.minutes(1)
     limit = 3
 
     handle_rate_limit(conn, key, scale, limit, fn ->
-      case Accounts.register_user(user_params) do
+      case Accounts.register_user(params) do
         {:ok, user} ->
           {:ok, user, token} = AuthGuardian.create_token(user, :access)
 

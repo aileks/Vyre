@@ -73,18 +73,18 @@ defmodule Api.Accounts do
 
   """
   def create_user(attrs \\ %{}) do
-    %User{}
-    |> User.changeset(attrs)
-    |> Repo.insert()
-    |> Repo.preload([
-      :owned_servers,
-      :messages,
-      :servers,
-      :sent_private_messages,
-      :received_private_messages,
-      :friendships,
-      :friend_requests
-    ])
+    case %User{}
+         |> User.changeset(attrs)
+         |> Repo.insert() do
+      {:ok, user} ->
+        {:ok,
+         user
+         |> preload_basic_user_associations()
+         |> preload_memberships_with_roles()}
+
+      error ->
+        error
+    end
   end
 
   @doc """
@@ -138,9 +138,18 @@ defmodule Api.Accounts do
   Registers a user.
   """
   def register_user(attrs \\ %{}) do
-    %User{}
-    |> User.registration_changeset(attrs)
-    |> Repo.insert()
+    case %User{}
+         |> User.registration_changeset(attrs)
+         |> Repo.insert() do
+      {:ok, user} ->
+        {:ok,
+         user
+         |> preload_basic_user_associations()
+         |> preload_memberships_with_roles()}
+
+      error ->
+        error
+    end
   end
 
   @doc """

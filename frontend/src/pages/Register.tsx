@@ -16,8 +16,6 @@ export default function Register() {
   const [error, setError] = createSignal<string | null>(null);
 
   createEffect(() => {
-    console.log('Register component mounted');
-    console.log(currentError());
     if (isAuthenticated()) navigate('/', { replace: true });
   });
 

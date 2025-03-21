@@ -2,6 +2,24 @@ defmodule Api.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @derive {Jason.Encoder,
+           only: [
+             :id,
+             :email,
+             :username,
+             :display_name,
+             :avatar_url,
+             :server_memberships,
+             :servers,
+             :status,
+             :messages,
+             :sent_private_messages,
+             :received_private_messages,
+             :friendships,
+             :friend_requests,
+             :roles
+           ]}
+
   @schema_prefix System.get_env("DB_SCHEMA")
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id

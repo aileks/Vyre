@@ -34,7 +34,6 @@ const fetchUser = async (): Promise<User | null> => {
 };
 
 const getErrorMessage = (error: any, defaultMsg: string) => {
-  console.log('LOGGING ERROR IN STORE:', error);
   if (error?.response?.data?.error) {
     const { error: apiError } = error.response.data;
 
@@ -58,7 +57,7 @@ const getErrorMessage = (error: any, defaultMsg: string) => {
   }
 
   // Fallback
-  return error?.message || defaultMsg;
+  return defaultMsg;
 };
 
 // Automatically fetch/refetch the current user.
@@ -140,12 +139,10 @@ export const createAuthStore = () => {
 
     try {
       await apiClient.post('/users/new', {
-        user: {
-          email: registrationData.email,
-          password: registrationData.password,
-          username: registrationData.username,
-          display_name: registrationData.displayName,
-        },
+        email: registrationData.email,
+        password: registrationData.password,
+        username: registrationData.username,
+        display_name: registrationData.displayName,
       });
 
       await refetchUser();
