@@ -78,7 +78,8 @@ defmodule ApiWeb.AuthController do
         {:error, _reason} ->
           conn
           |> put_status(:internal_server_error)
-          |> json(%{error: "Server error"})
+          |> put_view(json: ApiWeb.ErrorJSON)
+          |> render("500.json")
       end
     end
   end

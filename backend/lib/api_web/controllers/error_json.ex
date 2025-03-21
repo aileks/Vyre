@@ -3,6 +3,10 @@ defmodule ApiWeb.ErrorJSON do
   This module is invoked by your endpoint in case of errors on JSON requests.
   See config/config.exs.
   """
+  def render("500.json", _assigns) do
+    %{error: %{message: "Internal Server Error"}}
+  end
+
   def render("400.json", %{error: message}) do
     %{error: %{message: message}}
   end
@@ -30,10 +34,6 @@ defmodule ApiWeb.ErrorJSON do
         details: format_errors(changeset)
       }
     }
-  end
-
-  def render("500.json", _assigns) do
-    %{error: %{message: "Internal Server Error"}}
   end
 
   defp format_errors(changeset) do

@@ -76,6 +76,15 @@ defmodule Api.Accounts do
     %User{}
     |> User.changeset(attrs)
     |> Repo.insert()
+    |> Repo.preload([
+      :owned_servers,
+      :messages,
+      :servers,
+      :sent_private_messages,
+      :received_private_messages,
+      :friendships,
+      :friend_requests
+    ])
   end
 
   @doc """

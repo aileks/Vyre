@@ -33,6 +33,34 @@ const fetchUser = async (): Promise<User | null> => {
   }
 };
 
+const getErrorMessage = (error: any, defaultMsg: string) => {
+  console.log('LOGGING ERROR IN STORE:', error);
+  if (error?.response?.data?.error) {
+    const { error: apiError } = error.response.data;
+
+    if (apiError.details && typeof apiError.details === 'object') {
+      // Format the validation errors nicely
+      return Object.entries(apiError.details)
+        .map(([field, messages]) => {
+          const fieldName =
+            field.charAt(0).toUpperCase() + field.slice(1).replace('_', ' ');
+
+          if (Array.isArray(messages)) {
+            return `${fieldName}: ${messages.join(', ')}`;
+          }
+
+          return `${fieldName}: ${messages}`;
+        })
+        .join('\n');
+    }
+
+    return apiError.message || defaultMsg;
+  }
+
+  // Fallback
+  return error?.message || defaultMsg;
+};
+
 // Automatically fetch/refetch the current user.
 const [currentUser, { mutate: mutateUser, refetch: refetchUser }] =
   createResource(fetchUser);
@@ -76,33 +104,6 @@ export const createAuthStore = () => {
       });
     }
   });
-
-  const getErrorMessage = (error: any, defaultMsg: string) => {
-    if (error?.response?.data?.error) {
-      const { error: apiError } = error.response.data;
-
-      if (apiError.details && typeof apiError.details === 'object') {
-        // Format the validation errors nicely
-        return Object.entries(apiError.details)
-          .map(([field, messages]) => {
-            const fieldName =
-              field.charAt(0).toUpperCase() + field.slice(1).replace('_', ' ');
-
-            if (Array.isArray(messages)) {
-              return `${fieldName}: ${messages.join(', ')}`;
-            }
-
-            return `${fieldName}: ${messages}`;
-          })
-          .join('\n');
-      }
-
-      return apiError || defaultMsg;
-    }
-
-    // Fallback
-    return error?.message || defaultMsg;
-  };
 
   const login = async (credentials: LoginCredentials) => {
     setState('status', 'loading');
