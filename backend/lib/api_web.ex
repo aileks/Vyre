@@ -18,7 +18,7 @@ defmodule ApiWeb do
   """
 
   def static_paths,
-    do: ~w(assets fonts images favicon.ico robots.txt index.html js css manifest.json)
+    do: ~w(assets logo.png fonts images favicon.ico robots.txt index.html js css manifest.json)
 
   def router do
     quote do

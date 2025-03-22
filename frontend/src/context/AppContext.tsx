@@ -26,12 +26,8 @@ export interface AppSettings {
 }
 
 interface AppContextValue {
-  // Modal controls
   openSettings: () => void;
   openCommands: () => void;
-  openAddFriend: () => void;
-
-  // Settings
   settings: () => AppSettings;
   updateSettings: <K extends keyof AppSettings, T extends keyof AppSettings[K]>(
     category: K,
@@ -66,10 +62,8 @@ const defaultSettings: AppSettings = {
   },
 };
 
-// Create the context
 export const AppContext = createContext<AppContextValue>({} as AppContextValue);
 
-// Context provider component
 export function AppContextProvider(props: { children: JSX.Element }) {
   // Load settings from localStorage if available
   const loadSavedSettings = (): AppSettings => {
@@ -89,11 +83,8 @@ export function AppContextProvider(props: { children: JSX.Element }) {
     return defaultSettings;
   };
 
-  // Modal states
   const [_isSettingsOpen, setIsSettingsOpen] = createSignal(false);
   const [_isCommandsOpen, setIsCommandsOpen] = createSignal(false);
-
-  // Settings state
   const [settings, setSettings] =
     createSignal<AppSettings>(loadSavedSettings());
 
@@ -129,20 +120,12 @@ export function AppContextProvider(props: { children: JSX.Element }) {
     });
   };
 
-  // Modal controls
   const openSettings = () => setIsSettingsOpen(true);
   const openCommands = () => setIsCommandsOpen(true);
-  const openAddFriend = () => {
-    // Navigate to the friends add page
-    if (typeof window !== 'undefined') {
-      window.location.href = '/app/friends/add';
-    }
-  };
 
   const value: AppContextValue = {
     openSettings,
     openCommands,
-    openAddFriend,
     settings,
     updateSettings,
   };
@@ -152,7 +135,6 @@ export function AppContextProvider(props: { children: JSX.Element }) {
   );
 }
 
-// Hook to use the context
 export function useAppContext() {
   return useContext(AppContext);
 }

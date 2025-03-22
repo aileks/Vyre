@@ -1,7 +1,7 @@
 import { useParams } from '@solidjs/router';
 import { createEffect, createSignal } from 'solid-js';
 
-import Chat from '../components/Chat';
+import Chat from '../../components/Chat';
 
 // Types
 interface User {

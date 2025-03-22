@@ -20,7 +20,7 @@ export default function CommandsModal(props: CommandsModalProps) {
   const [selectedCategory, setSelectedCategory] = createSignal('all');
   const [isExiting, setIsExiting] = createSignal(false);
 
-  // Mock commands list - this would come from your actual commands system
+  // NOTE: MOCK COMMANDS LIST
   const commands: Command[] = [
     {
       name: 'join',

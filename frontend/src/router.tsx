@@ -1,7 +1,7 @@
 import { RouteDefinition, Router } from '@solidjs/router';
 import { lazy } from 'solid-js';
 
-import AppLayout from './layouts/AppLayout';
+// import AppLayout from './layouts/AppLayout';
 
 export type AppRouteDefinition = RouteDefinition & {
   protected?: boolean;
@@ -9,11 +9,11 @@ export type AppRouteDefinition = RouteDefinition & {
 
 // Lazy load components for better performance
 const Home = lazy(() => import('./pages/Home'));
-const Login = lazy(() => import('./pages/Login'));
+// const Login = lazy(() => import('./pages/Login'));
 const Register = lazy(() => import('./pages/Register'));
 const NotFound = lazy(() => import('./pages/NotFound'));
-const Friends = lazy(() => import('./pages/Friends'));
-const Channels = lazy(() => import('./pages/Channels'));
+// const Friends = lazy(() => import('./pages/Friends/Friends'));
+// const Channels = lazy(() => import('./pages/Channels/Channels'));
 
 // Define routes with protection
 export const routes: AppRouteDefinition[] = [
@@ -25,24 +25,24 @@ export const routes: AppRouteDefinition[] = [
     path: '/register',
     component: Register,
   },
-  {
-    path: '/login',
-    component: Login,
-  },
-  {
-    path: '/app',
-    component: AppLayout,
-    children: [
-      {
-        path: '/friends',
-        component: Friends,
-      },
-      {
-        path: '/channels/:channelId',
-        component: Channels,
-      },
-    ],
-  },
+  // {
+  //   path: '/login',
+  //   component: Login,
+  // },
+  // {
+  //   path: '/app',
+  //   component: AppLayout,
+  //   children: [
+  //     {
+  //       path: '/friends',
+  //       component: Friends,
+  //     },
+  //     {
+  //       path: '/channels/:channelId',
+  //       component: Channels,
+  //     },
+  //   ],
+  // },
   // Catch-all route for 404
   {
     path: '/*',

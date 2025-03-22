@@ -1,3 +1,4 @@
+import { Icon } from '@iconify-icon/solid';
 import { A } from '@solidjs/router';
 import { Show } from 'solid-js';
 
@@ -9,11 +10,15 @@ export default function Home() {
 
   return (
     <div class='flex min-h-screen flex-col'>
-      {/* Header with Navigation */}
       <header class='bg-midnight-800 border-b border-gray-700 py-4'>
         <div class='container mx-auto flex items-center justify-between px-4'>
           <div class='flex items-center'>
-            <div class='text-primary-400 font-mono text-xl font-bold'>Vyre</div>
+            <img
+              src='logo.png'
+              alt='Vyre Logo'
+              title='Vyre Logo'
+              class='border-midnight-400 h-12 w-12 rounded-full border-2'
+            />
           </div>
 
           <Show
@@ -34,24 +39,25 @@ export default function Home() {
               fallback={
                 <A
                   href='/app/friends'
-                  class='bg-primary-700 hover:bg-primary-600 text-cybertext-100 border-primary-400 rounded-xs border px-4 py-2 font-mono duration-200'
+                  class='bg-primary-700 hover:bg-primary-600 border-primary-400 rounded-xs border px-4 py-2 font-mono duration-200'
                 >
                   Launch App
                 </A>
               }
             >
               <div class='flex gap-3'>
-                <A
+                {/* <A
                   href='/login'
                   class='bg-verdant-500 hover:bg-verdant-600 text- border-verdant-400 rounded-xs border px-4 py-2 font-mono duration-200'
                 >
                   Login
-                </A>
+                </A> */}
+
                 <A
                   href='/register'
-                  class='bg-primary-500 hover:bg-primary-600 text-cybertext-100 border-primary-400 rounded-xs border px-4 py-2 font-mono duration-200'
+                  class='rounded-xs border border-pink-400 bg-pink-600 px-4 py-2 font-mono duration-200 hover:bg-pink-500'
                 >
-                  Register
+                  Pre-Register
                 </A>
               </div>
             </Show>
@@ -60,7 +66,7 @@ export default function Home() {
       </header>
 
       {/* Hero Section */}
-      <div class='container mx-auto mt-16 max-w-6xl px-4 py-12'>
+      <div class='container mx-auto max-w-6xl px-4 py-12'>
         <div class='bg-midnight-800 overflow-hidden rounded-xs border border-gray-700 shadow-lg'>
           <div class='bg-midnight-900 flex items-center border-b border-gray-700 px-4 py-2'>
             <div class='mr-4 flex space-x-2'>
@@ -78,29 +84,42 @@ export default function Home() {
               </h1>
 
               <p class='text-cybertext-400 mb-6 font-mono text-lg'>
-                A modern chat platform with IRC roots. Lightweight,
-                customizable, and privacy-focused.
+                A modern chat-based social platform. Lightweight, customizable,
+                and privacy-focused.
               </p>
 
-              <pre class='text- mb-8 font-mono text-sm'>
-                {`// Command-driven interface
-/join #SoMDiscussion
-/msg @user Hey there!
-/settings theme dark`}
-              </pre>
+              <div class='mb-8 flex flex-col gap-1 font-mono text-sm'>
+                <span class='italic'>
+                  Robust chat command system for common functions
+                </span>
+                <span class='text-gray-200'>/join #SoMDiscussion</span>
+                <span class='text-gray-200'>/msg @user Hey there!</span>
+                <span class='text-gray-200'>/mute #channel </span>
+              </div>
 
               <div class='mb-8 font-mono'>
                 <div class='mb-2 flex items-center gap-2'>
-                  <div class='bg-success-500 h-4 w-4 rounded-xs'></div>
-                  <span>Fault-tolerant backend</span>
+                  <Icon
+                    icon='lucide:circle-check'
+                    class='text-success-500 h-4 w-4'
+                  />
+                  <span>Open source</span>
                 </div>
+
                 <div class='mb-2 flex items-center gap-2'>
-                  <div class='bg-success-500 h-4 w-4 rounded-xs'></div>
-                  <span>Self-hostable infrastructure</span>
+                  <Icon
+                    icon='lucide:circle-check'
+                    class='text-success-500 h-4 w-4'
+                  />
+                  <span>Fault-tolerant</span>
                 </div>
+
                 <div class='flex items-center gap-2'>
-                  <div class='bg-success-500 h-4 w-4 rounded-xs'></div>
-                  <span>Server-side message history</span>
+                  <Icon
+                    icon='lucide:circle-check'
+                    class='text-success-500 h-4 w-4'
+                  />
+                  <span>Minimal</span>
                 </div>
               </div>
 
@@ -109,16 +128,16 @@ export default function Home() {
                   when={!isAuthenticated()}
                   fallback={
                     <A
-                      href='/register'
-                      class='bg-primary-700 hover:bg-primary-600 text-cybertext-100 border-primary-400 rounded-xs border px-6 py-3 text-center font-mono duration-200'
+                      href='/app/friends'
+                      class='rounded-xs border border-pink-400 bg-pink-600 px-6 py-3 text-center font-mono duration-200 hover:bg-pink-500'
                     >
-                      Pre-Register
+                      Launch App
                     </A>
                   }
                 >
                   <A
                     href='/register'
-                    class='bg-primary-500 hover:bg-primary-600 text-cybertext-100 border-primary-400 rounded-xs border px-6 py-3 text-center font-mono duration-200'
+                    class='bg-primary-600 hover:bg-primary-500 border-primary-400 rounded-xs border px-6 py-3 text-center font-mono duration-200'
                   >
                     Get Started
                   </A>
@@ -126,39 +145,41 @@ export default function Home() {
 
                 <A
                   href='https://github.com/aileks/Vyre'
-                  class='bg-midnight-700 hover:bg-midnight-500 text-electric-400 hover:text-electric-300 rounded-xs border border-gray-700 px-6 py-3 text-center font-mono duration-200'
+                  class='bg-midnight-700 hover:bg-midnight-400 text-electric-400 hover:text-electric-300 rounded-xs border border-gray-700 px-6 py-3 text-center font-mono duration-200'
                 >
-                  GitHub Repo
+                  Learn More
                 </A>
               </div>
             </div>
 
             <div class='bg-midnight-900 flex items-center justify-center rounded-xs border border-gray-700 md:w-1/2'>
-              <div class='w-full p-6'>
-                <div class='mb-4 flex items-center'>
+              <div class='flex w-full flex-col items-center p-6'>
+                <div class='mb-4 flex items-center gap-1 self-start'>
                   <div class='status-indicator status-indicator-online'></div>
-                  <span class='font-mono'>3 Servers · 24 Channels</span>
+                  <span class='font-sans font-semibold'>Project Collab </span>-
+                  <span class='font-mono'>#general</span>
                 </div>
 
                 {/* Mock Chat Interface Preview */}
-                <div class='chat-bubble-recipient mb-3'>
-                  <div class='text-cybertext-500 mb-1 text-xs'>@kai</div>
-                  Has anyone tried the new command syntax?
+                <div class='chat-message mb-3'>
+                  <div class='user-name mb-1 text-xs'>kai</div>
+                  Hey, everyone. I finished that presentation, want me to send
+                  it over?
                 </div>
 
-                <div class='chat-bubble-sender mb-3'>
-                  <div class='text-primary-300 mb-1 text-xs'>@you</div>
-                  Yeah, the /alias feature is amazing for custom commands
+                <div class='chat-message mb-3'>
+                  <div class='text-primary-400 mb-1 text-xs'>@you</div>
+                  Perfect! Thanks for finishing it so quickly.
                 </div>
 
-                <div class='chat-bubble-recipient mb-3'>
-                  <div class='text-cybertext-500 mb-1 text-xs'>@MrChristo</div>
-                  I've set up some automation scripts with the API too
+                <div class='chat-message mb-3'>
+                  <div class='user-name text-xs'>MrChristo</div>
+                  Yes, please!
                 </div>
 
-                <div class='chat-bubble-system'>
-                  User <span class='underline'>@local cryptid</span> has joined
-                  #general
+                <div class='chat-message-system mt-2 self-center'>
+                  User <span class='user-name underline'>local cryptid</span>{' '}
+                  has joined #general
                 </div>
               </div>
             </div>
@@ -187,12 +208,14 @@ export default function Home() {
           <div class='bg-midnight-800 rounded-xs border border-gray-700 p-6'>
             <div class='text-electric-400 mb-3 font-mono text-lg'>
               Command-Driven
+              <br />
+              <span class='text-sm italic'>Coming Soon</span>
             </div>
+
             <p class='text-cybertext-400'>
-              Familiar IRC-style commands with modern enhancements. Easily
-              access a command list with <kbd class='text-gray-300'>Ctrl+K</kbd>
-              or by beginning a message with a slash (
-              <kbd class='text-gray-300'>/</kbd>).
+              Easily access a command list with{' '}
+              <kbd class='text-gray-300'>Ctrl+K</kbd> or by beginning a message
+              with a slash (<kbd class='text-gray-300'>/</kbd>).
             </p>
           </div>
 
@@ -202,6 +225,7 @@ export default function Home() {
               <br />
               <span class='text-sm italic'>Coming Soon</span>
             </div>
+
             <p class='text-cybertext-400'>
               Run your own server or join existing networks. You control your
               data and privacy at all times.
@@ -212,6 +236,7 @@ export default function Home() {
             <div class='mb-3 font-mono text-lg text-pink-400'>
               Easy On The Eyes
             </div>
+
             <p class='text-cybertext-400'>
               Dark mode by default with customizable themes. Low-light friendly
               for late night coding sessions.
@@ -220,26 +245,17 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Footer */}
       <footer class='mt-auto border-t border-gray-700 py-8'>
         <div class='container mx-auto px-4'>
           <div class='flex flex-col items-center justify-between md:flex-row'>
-            <div class='text-primary-400 mb-4 font-mono text-xl md:mb-0'>
-              Vyre
+            <div class='text-primary-400 mb-4 text-lg md:mb-0'>
+              &copy; 2025 Vyre
             </div>
-            <div class='text-cybertext-400 flex gap-6 font-mono text-sm'>
-              <A href='#' class='hover:text-primary-400 duration-200'>
-                About
-              </A>
-              <A href='#' class='hover:text-primary-400 duration-200'>
-                Privacy
-              </A>
-              <A href='#' class='hover:text-primary-400 duration-200'>
-                Terms
-              </A>
+
+            <div class='text-cybertext-400 flex gap-6'>
               <A
                 href='https://github.com/aileks/Vyre'
-                class='hover:text-primary-400 duration-200'
+                class='hover:text-glow hover:text-primary-400 duration-200'
               >
                 GitHub
               </A>
