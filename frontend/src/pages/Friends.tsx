@@ -1,5 +1,5 @@
 import { Tabs } from '@kobalte/core/tabs';
-import { A, useLocation } from '@solidjs/router';
+import { useLocation } from '@solidjs/router';
 import { Component, createSignal } from 'solid-js';
 
 const Friends: Component = () => {

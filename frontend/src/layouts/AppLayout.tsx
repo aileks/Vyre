@@ -1,15 +1,16 @@
-import { useNavigate } from '@solidjs/router';
+// import { useNavigate } from '@solidjs/router';
 import { Component, ParentProps, createEffect, createSignal } from 'solid-js';
 
 import CommandsModal from '../components/CommandsModal';
 import SettingsModal from '../components/SettingsModal';
 import Sidebar from '../components/Sidebar';
 import { useAppContext } from '../context/AppContext';
-import { useAuth } from '../context/AuthContext';
+
+// import { useAuth } from '../context/AuthContext';
 
 const AppLayout: Component<ParentProps> = props => {
-  const { isAuthenticated } = useAuth();
-  const navigate = useNavigate();
+  // const { isAuthenticated } = useAuth();
+  // const navigate = useNavigate();
   // const location = useLocation();
   const context = useAppContext();
 
@@ -22,11 +23,12 @@ const AppLayout: Component<ParentProps> = props => {
     context.openCommands = () => setIsCommandsOpen(true);
   });
 
-  createEffect(() => {
-    if (!isAuthenticated()) {
-      navigate('/', { replace: true });
-    }
-  });
+  // createEffect(() => {
+  //   console.log('isAuthenticated', isAuthenticated());
+  //   if (!isAuthenticated()) {
+  //     navigate('/', { replace: true });
+  //   }
+  // });
 
   // createEffect(() => {
   //   if (location.pathname === '/app') {

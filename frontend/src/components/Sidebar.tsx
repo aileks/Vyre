@@ -41,7 +41,7 @@ const Sidebar: Component = () => {
   const [servers, _setServers] = createSignal<Server[]>([
     {
       id: 1,
-      name: 'Cyberpunk Coders',
+      name: 'Uni Group',
       channels: [
         { id: 101, name: 'general', unread: true, mentions: 0 },
         { id: 102, name: 'help', unread: false, mentions: 0 },
@@ -50,7 +50,7 @@ const Sidebar: Component = () => {
     },
     {
       id: 2,
-      name: 'SolidJS Community',
+      name: 'Dev Chat',
       channels: [
         { id: 201, name: 'chat', unread: false, mentions: 0 },
         { id: 202, name: 'typescript', unread: true, mentions: 0 },

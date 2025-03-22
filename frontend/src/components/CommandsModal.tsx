@@ -1,6 +1,6 @@
 import { Icon } from '@iconify-icon/solid';
 import { Dialog } from '@kobalte/core/dialog';
-import { For, Show, createSignal, onCleanup } from 'solid-js';
+import { For, Show, createSignal } from 'solid-js';
 
 interface CommandsModalProps {
   isOpen: boolean;
@@ -159,10 +159,6 @@ export default function CommandsModal(props: CommandsModalProps) {
     }, 200);
   };
 
-  onCleanup(() => {
-    handleClose();
-  });
-
   return (
     <Dialog
       open={props.isOpen}
@@ -204,7 +200,7 @@ export default function CommandsModal(props: CommandsModalProps) {
                 placeholder='Search commands...'
                 value={searchText()}
                 onInput={handleSearchChange}
-                class='text-input'
+                class='search-input'
               />
             </div>
 

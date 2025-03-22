@@ -113,7 +113,6 @@ const mockMessages: Message[] = [
   },
 ];
 
-// User avatar component
 const UserAvatar: Component<{
   user: User;
   onClick: (userId: number) => void;
@@ -125,23 +124,23 @@ const UserAvatar: Component<{
         onClick={() => props.onClick(props.user.id)}
       >
         <div
-          class={`${props.user.avatarColor || 'bg-electric-800'} text-cybertext-100 flex h-10 w-10 items-center justify-center rounded-xs text-sm`}
+          class={`${props.user.avatarColor || 'bg-electric-800'} text-cybertext-100 flex h-10 w-10 items-center justify-center rounded-full text-sm`}
         >
           {props.user.avatarInitial ||
             props.user.username.charAt(0).toUpperCase()}
         </div>
         <div
-          class={`border-midnight-600 absolute -right-0.5 -bottom-0.5 h-3 w-3 rounded-full border-2 status-indicator-${props.user.status}`}
+          class={`status-indicator absolute -right-0.5 -bottom-0.5 h-3 w-3 rounded-full status-indicator-${props.user.status}`}
         ></div>
       </Popover.Trigger>
 
       <Popover.Portal>
         <Popover.Content class='z-50'>
           <div class='bg-midnight-900 w-64 rounded-xs border border-gray-700 shadow-lg'>
-            <div class='border-b border-gray-700 p-4'>
+            <div class='chat-avatar border-b border-gray-700 p-4'>
               <div class='flex items-center'>
                 <div
-                  class={`${props.user.avatarColor || 'bg-electric-800'} text-cybertext-100 mr-3 flex h-14 w-14 items-center justify-center rounded-xs text-lg`}
+                  class={`${props.user.avatarColor || 'bg-electric-800'} mr-3 flex h-14 w-14 items-center justify-center rounded-xs text-lg`}
                 >
                   {props.user.avatarInitial ||
                     props.user.username.charAt(0).toUpperCase()}
@@ -422,11 +421,6 @@ const Chat = () => {
     return date.toLocaleDateString();
   };
 
-  const handleUserClick = (userId: number) => {
-    // This could be expanded to show user profile, open DM, etc.
-    console.log(`User clicked: ${userId}`);
-  };
-
   const scrollToBottom = () => {
     const ref = messagesEndRef();
     if (ref) {
@@ -441,85 +435,157 @@ const Chat = () => {
     scrollToBottom();
   });
 
+  const handleUserClick = (userId: number) => {
+    // This could be expanded to show user profile, open DM, etc.
+    console.log(`User clicked: ${userId}`);
+  };
+
+  const groupedMessages = createMemo(() => {
+    const groups = [];
+    let currentGroup = null;
+
+    for (const message of messages()) {
+      // Start a new group for system messages or different users
+      if (
+        message.isSystem ||
+        !currentGroup ||
+        currentGroup.userId !== message.userId
+      ) {
+        if (currentGroup) {
+          groups.push(currentGroup);
+        }
+        currentGroup = {
+          userId: message.userId,
+          isSystem: message.isSystem,
+          messages: [message],
+        };
+      } else {
+        // Add to existing group
+        currentGroup.messages.push(message);
+      }
+    }
+
+    // Add the last group
+    if (currentGroup) {
+      groups.push(currentGroup);
+    }
+
+    return groups;
+  });
+
   return (
-    <div class='bg-midnight-600 flex h-full flex-col'>
+    <div class='flex h-full w-full flex-col'>
       {/* Chat container */}
       <div class='flex flex-1 flex-col items-center overflow-y-auto p-4'>
-        <div class='w-full max-w-3xl'>
-          {/* Messages */}
-          <For each={messages()}>
-            {message => {
+        <div class='w-full max-w-3/5'>
+          {/* Message Groups */}
+          <For each={groupedMessages()}>
+            {group => {
               const user =
-                message.isSystem ? undefined : getUserById(message.userId);
+                group.isSystem ? undefined : getUserById(group.userId);
               const isCurrentUser = user?.id === currentUser().id;
 
               return (
-                <div class='mb-4'>
-                  {/* System message */}
-                  <Show when={message.isSystem}>
-                    <div class='chat-bubble-system mx-auto'>
-                      {message.content}
-                      <span class='text-cybertext-600 mt-1 block text-right text-xs'>
-                        {formatTimestamp(message.timestamp)}
-                      </span>
-                    </div>
-                  </Show>
-
-                  {/* User messages */}
-                  <Show when={!message.isSystem}>
-                    <div class='flex'>
-                      {/* Avatar */}
-                      <div class='mr-3 flex-shrink-0'>
-                        <Show when={user}>
-                          <UserAvatar user={user!} onClick={handleUserClick} />
-                        </Show>
-                      </div>
-
-                      {/* Message content with context menu */}
-                      <ContextMenu>
-                        <ContextMenu.Trigger class='max-w-[80%]'>
-                          <div
-                            class={
-                              isCurrentUser ? 'chat-bubble-sender' : (
-                                'chat-bubble-recipient'
-                              )
-                            }
-                          >
-                            <div
-                              class={
-                                isCurrentUser ?
-                                  'text-primary-300 mb-1 text-xs'
-                                : 'text-cybertext-500 mb-1 text-xs'
-                              }
-                            >
-                              {user?.username}
-                            </div>
+                <div class='chat-message-group'>
+                  {/* System message group */}
+                  <Show when={group.isSystem}>
+                    <For each={group.messages}>
+                      {message => (
+                        <div class='chat-message-system'>
+                          <div class='chat-bubble-system'>
                             {message.content}
                             <span class='text-cybertext-600 mt-1 block text-right text-xs'>
                               {formatTimestamp(message.timestamp)}
                             </span>
                           </div>
-                        </ContextMenu.Trigger>
+                        </div>
+                      )}
+                    </For>
+                  </Show>
 
-                        <ContextMenu.Portal>
-                          <ContextMenu.Content class='bg-midnight-900 z-50 w-48 overflow-hidden rounded-xs border border-gray-700 shadow-lg'>
-                            <ContextMenu.Item class='hover:bg-midnight-700 text- cursor-pointer px-4 py-2 text-sm'>
-                              Copy Message
-                            </ContextMenu.Item>
-                            <ContextMenu.Item class='hover:bg-midnight-700 text- cursor-pointer px-4 py-2 text-sm'>
-                              Reply
-                            </ContextMenu.Item>
-                            <ContextMenu.Item class='hover:bg-midnight-700 text- cursor-pointer px-4 py-2 text-sm'>
-                              Add Reaction
-                            </ContextMenu.Item>
-                            <ContextMenu.Separator class='my-1 border-t border-gray-800' />
-                            <ContextMenu.Item class='hover:bg-midnight-700 text-error-400 cursor-pointer px-4 py-2 text-sm'>
-                              Delete Message
-                            </ContextMenu.Item>
-                          </ContextMenu.Content>
-                        </ContextMenu.Portal>
-                      </ContextMenu>
+                  {/* User message group */}
+                  <Show when={!group.isSystem}>
+                    {/* Username header */}
+                    <div class='mb-1 flex items-baseline px-2'>
+                      <span
+                        class={`font-mono text-sm font-medium ${isCurrentUser ? 'text-primary-400' : 'text-verdant-400'}`}
+                      >
+                        {user?.username}
+                      </span>
+                      <span class='text-cybertext-600 ml-2 text-xs'>
+                        {formatTimestamp(group.messages[0].timestamp)}
+                      </span>
                     </div>
+
+                    {/* Messages */}
+                    <For each={group.messages}>
+                      {(message, index) => (
+                        <div class='mb-[2px] flex items-end'>
+                          {/* Avatar - only shown for first message in group */}
+                          <Show when={index() === 0}>
+                            <UserAvatar
+                              user={user!}
+                              onClick={handleUserClick}
+                            />
+                          </Show>
+                          <Show when={index() > 0}>
+                            <div class='h-10 w-10 flex-shrink-0'></div>
+                          </Show>
+
+                          {/* Message with context menu */}
+                          <ContextMenu>
+                            <ContextMenu.Trigger>
+                              <div
+                                class={`${
+                                  isCurrentUser ? 'chat-bubble-self' : (
+                                    'chat-bubble-other'
+                                  )
+                                }`}
+                              >
+                                {message.content}
+
+                                {/* Only show timestamp on last message in group */}
+                                <Show
+                                  when={index() === group.messages.length - 1}
+                                >
+                                  <span class='text-cybertext-600 mt-1 block text-right text-xs'>
+                                    {formatTimestamp(message.timestamp)}
+                                  </span>
+                                </Show>
+                              </div>
+                            </ContextMenu.Trigger>
+
+                            <ContextMenu.Portal>
+                              <ContextMenu.Content class='bg-midnight-900 z-50 w-48 overflow-hidden rounded-xs border border-gray-700 shadow-lg'>
+                                <ContextMenu.Item class='hover:bg-midnight-700 text-cybertext-300 cursor-pointer px-4 py-2 text-sm'>
+                                  Copy Message
+                                </ContextMenu.Item>
+                                <ContextMenu.Item class='hover:bg-midnight-700 text-cybertext-300 cursor-pointer px-4 py-2 text-sm'>
+                                  Reply
+                                </ContextMenu.Item>
+                                <ContextMenu.Item class='hover:bg-midnight-700 text-cybertext-300 cursor-pointer px-4 py-2 text-sm'>
+                                  Add Reaction
+                                </ContextMenu.Item>
+                                <ContextMenu.Separator class='my-1 border-t border-gray-800' />
+                                <ContextMenu.Item class='hover:bg-midnight-700 text-error-400 cursor-pointer px-4 py-2 text-sm'>
+                                  Delete Message
+                                </ContextMenu.Item>
+                              </ContextMenu.Content>
+                            </ContextMenu.Portal>
+                          </ContextMenu>
+
+                          {/* Message actions (show on hover) */}
+                          <div class='bg-midnight-800/90 absolute top-0 right-2 flex space-x-1 rounded-xs p-1 opacity-0 group-hover:opacity-100'>
+                            <button class='text-cybertext-500 hover:text-cybertext-300 rounded-xs p-1'>
+                              <Icon icon='lucide:smile' class='h-4 w-4' />
+                            </button>
+                            <button class='text-cybertext-500 hover:text-cybertext-300 rounded-xs p-1'>
+                              <Icon icon='lucide:reply' class='h-4 w-4' />
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </For>
                   </Show>
                 </div>
               );
@@ -531,9 +597,25 @@ const Chat = () => {
         </div>
       </div>
 
-      {/* Input area */}
-      <div class='flex justify-center border-t border-gray-700 p-4'>
-        <div class='relative w-full max-w-3xl'>
+      {/* Input area with typing indicator */}
+      <div class='flex flex-col justify-center border-t border-gray-700 p-4'>
+        {/* Optional typing indicator */}
+        <div class='text-cybertext-500 mb-2 ml-4 flex items-center gap-1 text-xs'>
+          <span>neo_coder is typing</span>
+          <div class='flex gap-1'>
+            <span class='bg-primary-500 h-1 w-1 animate-bounce rounded-full'></span>
+            <span
+              class='bg-primary-500 h-1 w-1 animate-bounce rounded-full'
+              style='animation-delay: 0.2s'
+            ></span>
+            <span
+              class='bg-primary-500 h-1 w-1 animate-bounce rounded-full'
+              style='animation-delay: 0.4s'
+            ></span>
+          </div>
+        </div>
+
+        <div class='relative mx-auto w-full max-w-3xl'>
           <textarea
             value={inputValue()}
             onInput={e => {
@@ -548,7 +630,7 @@ const Chat = () => {
             }}
             onKeyDown={handleInputKeyDown}
             placeholder='Type a message... (try typing / for commands)'
-            class='bg-midnight-800 text- h-14 w-full resize-none rounded-xs border border-gray-700 px-4 py-3 pr-10'
+            class='bg-midnight-800 text-cybertext-200 h-14 w-full resize-none rounded-xs border border-gray-700 px-4 py-3 pr-10'
           />
           <button
             onClick={handleSendMessage}
@@ -588,6 +670,27 @@ const Chat = () => {
       </div>
     </div>
   );
+};
+const formatMessageContent = (content: any) => {
+  // Format code blocks
+  let formatted = content.replace(
+    /```(.+?)```/gs,
+    '<pre class="chat-code-block">$1</pre>',
+  );
+
+  // Format inline code
+  formatted = formatted.replace(
+    /`(.+?)`/g,
+    '<code class="bg-midnight-900 text-electric-500 px-1 py-0.5 rounded-xs font-mono text-sm">$1</code>',
+  );
+
+  // Format mentions
+  formatted = formatted.replace(
+    /@(\w+)/g,
+    '<span class="chat-mention">@$1</span>',
+  );
+
+  return formatted;
 };
 
 export default Chat;

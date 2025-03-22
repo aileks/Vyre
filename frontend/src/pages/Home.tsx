@@ -34,7 +34,7 @@ export default function Home() {
               fallback={
                 <A
                   href='/app/friends'
-                  class='bg-primary-600 hover:bg-primary-500 text-cybertext-100 border-primary-400 rounded-xs border px-4 py-2 font-mono duration-200'
+                  class='bg-primary-700 hover:bg-primary-600 text-cybertext-100 border-primary-400 rounded-xs border px-4 py-2 font-mono duration-200'
                 >
                   Launch App
                 </A>
@@ -68,9 +68,6 @@ export default function Home() {
               <div class='h-3 w-3 rounded-full bg-yellow-500'></div>
               <div class='h-3 w-3 rounded-full bg-green-500'></div>
             </div>
-            <div class='text-cybertext-400 font-mono text-sm'>
-              Vyre - Connected
-            </div>
           </div>
 
           <div class='flex flex-col gap-8 p-8 md:flex-row'>
@@ -87,7 +84,7 @@ export default function Home() {
 
               <pre class='text- mb-8 font-mono text-sm'>
                 {`// Command-driven interface
-/join #cyberpunk
+/join #SoMDiscussion
 /msg @user Hey there!
 /settings theme dark`}
               </pre>
@@ -112,10 +109,10 @@ export default function Home() {
                   when={!isAuthenticated()}
                   fallback={
                     <A
-                      href='/app/friends'
-                      class='bg-primary-600 hover:bg-primary-500 text-cybertext-100 border-primary-400 rounded-xs border px-6 py-3 text-center font-mono duration-200'
+                      href='/register'
+                      class='bg-primary-700 hover:bg-primary-600 text-cybertext-100 border-primary-400 rounded-xs border px-6 py-3 text-center font-mono duration-200'
                     >
-                      Launch App
+                      Pre-Register
                     </A>
                   }
                 >
@@ -169,7 +166,9 @@ export default function Home() {
 
           <div class='bg-midnight-900 border-t border-gray-700 p-4'>
             <div class='text-cybertext-500 flex items-center font-mono text-xs'>
-              <div>Estimated Launch: 2025/08/12</div>
+              <div class='text-lg font-semibold'>
+                Estimated Launch: 2025/08/12
+              </div>
               <div class='flex items-center'>
                 <span class='bg-primary-400 animate-blink ml-1 inline-block h-4 w-2'></span>
               </div>
@@ -190,8 +189,10 @@ export default function Home() {
               Command-Driven
             </div>
             <p class='text-cybertext-400'>
-              Familiar IRC-style commands with modern enhancements. Power users
-              can navigate entirely without a mouse.
+              Familiar IRC-style commands with modern enhancements. Easily
+              access a command list with <kbd class='text-gray-300'>Ctrl+K</kbd>
+              or by beginning a message with a slash (
+              <kbd class='text-gray-300'>/</kbd>).
             </p>
           </div>
 

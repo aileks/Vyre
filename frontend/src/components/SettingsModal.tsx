@@ -2,7 +2,7 @@ import { Icon } from '@iconify-icon/solid';
 import { Dialog } from '@kobalte/core/dialog';
 import { Tabs } from '@kobalte/core/tabs';
 import { A } from '@solidjs/router';
-import { For, Show, createSignal, onCleanup } from 'solid-js';
+import { For, Show, createSignal } from 'solid-js';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -115,10 +115,6 @@ export default function SettingsModal(props: SettingsModalProps) {
       props.onOpenChange(false);
     }, 200);
   };
-
-  onCleanup(() => {
-    handleClose();
-  });
 
   return (
     <Dialog

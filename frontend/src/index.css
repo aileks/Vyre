@@ -149,9 +149,9 @@
 
   /* Status Indicators */
   --color-status-online: var(--color-success-500);
-  --color-status-offline: var(--color-gray-500);
+  --color-status-offline: oklch(0.55 0.01 285);
   --color-status-away: var(--color-warning-300);
-  --color-status-busy: var(--color-error-500);
+  --color-status-busy: oklch(0.57 0.2 60);
 
   /* Animation timing */
   --animation-duration-fast: 0.15s;
@@ -172,11 +172,6 @@ body {
   @apply font-sans;
   background: var(--ui-bg-dark);
   color: var(--ui-text);
-}
-
-:focus-visible {
-  outline: 1px solid var(--color-electric-700);
-  outline-offset: 1px;
 }
 
 /* Animations */
@@ -213,41 +208,144 @@ body {
   }
 }
 
-/* Chat Utilities */
-@utility chat-bubble-sender {
-  background-color: var(--color-chat-sender-bubble);
-  color: var(--color-chat-sender-text);
-  border-radius: 0.5rem 0.5rem 0 0.5rem;
-  padding: 0.5rem 0.75rem;
-  max-width: 80%;
-  margin-left: auto;
-  border-left: 2px solid var(--color-primary-400);
-  border-top: 1px solid var(--color-primary-300);
+/* Chat Message Container Utilities */
+@utility chat-message-group {
+  @apply mb-4 flex flex-col;
+
+  &:last-child {
+    @apply mb-0;
+  }
 }
 
-@utility chat-bubble-recipient {
-  background-color: var(--color-chat-recipient-bubble);
-  color: var(--color-chat-recipient-text);
-  border-radius: 0.5rem 0.5rem 0.5rem 0;
-  padding: 0.5rem 0.75rem;
-  max-width: 80%;
-  margin-right: auto;
-  border-right: 2px solid var(--color-midnight-400);
-  border-top: 1px solid var(--color-midnight-500);
+@utility chat-message-self {
+  @apply mb-[2px] flex flex-row-reverse items-end;
+}
+
+@utility chat-message-other {
+  @apply mb-[2px] flex items-end;
+}
+
+@utility chat-message-system {
+  @apply my-3 flex justify-center;
+}
+
+/* Chat Avatar */
+@utility chat-avatar {
+  @apply bg-midnight-900 mx-2 flex h-8 w-8 flex-shrink-0 items-center justify-center overflow-hidden rounded-full border border-gray-800 font-mono text-xs;
+}
+
+@utility chat-avatar-placeholder {
+  @apply text-primary-400;
+}
+
+/* Chat Header (username + timestamp) */
+@utility chat-header {
+  @apply mb-1 flex items-baseline px-2;
+}
+
+@utility chat-username {
+  @apply text-primary-400 font-mono text-sm font-medium;
+
+  &::before {
+    content: '@';
+    opacity: 0.7;
+    margin-right: 1px;
+  }
+}
+
+@utility chat-timestamp {
+  @apply text-cybertext-600 ml-2 text-xs;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Chat Bubbles */
+@utility chat-bubble-base {
+  @apply border-midnight-300 mx-2 w-full rounded-sm border p-2 break-words;
+}
+
+@utility chat-bubble-self {
+  @apply chat-bubble-base;
+  @apply bg-primary-800 text-cybertext-100;
+}
+
+@utility chat-bubble-other {
+  @apply chat-bubble-base;
+  @apply bg-midnight-300 text-cybertext-200;
 }
 
 @utility chat-bubble-system {
-  background-color: var(--color-chat-system-bubble);
-  color: var(--color-chat-system-text);
-  border-radius: 0.25rem;
-  padding: 0.25rem 0.5rem;
-  max-width: 90%;
-  margin: 0.5rem auto;
-  font-style: italic;
-  text-align: center;
-  font-size: 0.9em;
-  border-left: 1px solid var(--color-gray-600);
-  border-right: 1px solid var(--color-gray-600);
+  @apply chat-bubble-base;
+  @apply text-verdant-400 max-w-1/3 rounded-xs bg-gray-800 text-center text-sm italic;
+}
+
+/* Consecutive Messages (no repeated header) */
+@utility chat-bubble-self-continued {
+  @apply chat-bubble-self;
+  @apply mt-[2px];
+}
+
+@utility chat-bubble-other-continued {
+  @apply chat-bubble-other;
+  @apply mt-[2px];
+}
+
+/* Code Blocks in Chat */
+@utility chat-code-block {
+  @apply bg-midnight-900 text-cybertext-200 border-electric-700 my-1 overflow-x-auto rounded-xs border-l-2 p-2 font-mono text-sm;
+}
+
+/* Mentions in Chat */
+@utility chat-mention {
+  @apply bg-primary-900/30 text-primary-300 rounded-xs px-1 py-0.5 font-mono;
+
+  &:hover {
+    @apply bg-primary-800/40 text-primary-200;
+  }
+}
+
+/* Message Actions on Hover */
+@utility chat-message-actions {
+  @apply bg-midnight-800/90 absolute top-1 right-2 flex gap-1 rounded-xs p-1 opacity-0 transition-opacity;
+
+  .chat-message-self:hover &,
+  .chat-message-other:hover & {
+    @apply opacity-100;
+  }
+}
+
+/* Typing indicator */
+@utility chat-typing-indicator {
+  @apply text-cybertext-500 flex items-center gap-1 text-xs;
+}
+
+@utility chat-typing-dots {
+  @apply flex gap-1;
+
+  span {
+    @apply bg-primary-500 h-1 w-1 rounded-full;
+    animation: typing-dot 1.4s infinite;
+
+    &:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    &:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+  }
+}
+
+@keyframes typing-dot {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.6;
+  }
+  30% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
 }
 
 /* Status Utilities */
@@ -255,9 +353,9 @@ body {
   display: inline-block;
   width: 0.6rem;
   height: 0.6rem;
-  border-radius: 50%;
   position: relative;
   margin-right: 0.25rem;
+  border: 2px solid var(--color-midnight-900);
 }
 
 @utility status-indicator-online {
@@ -267,10 +365,12 @@ body {
 
 @utility status-indicator-offline {
   background-color: var(--color-status-offline);
+  box-shadow: 0 0 1px var(--color-status-offline);
 }
 
 @utility status-indicator-away {
   background-color: var(--color-status-away);
+  box-shadow: 0 0 3px var(--color-status-away);
 }
 
 @utility status-indicator-busy {
@@ -425,8 +525,8 @@ body {
 }
 
 @utility search-input {
-  @use cyber-input;
-  @use cyber-input-icon;
+  @apply text-input;
+  @apply text-input-icon;
 }
 
 /* Filter Utility */
@@ -673,7 +773,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-midnight-600);
+  background: var(--color-midnight-500);
   border-radius: 4px;
 }
 
