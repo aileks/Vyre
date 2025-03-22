@@ -8,7 +8,7 @@ export default function Home() {
   const { isAuthenticated, isLoading } = useAuth();
 
   return (
-    <div class='bg-midnight-500 flex min-h-screen flex-col'>
+    <div class='flex min-h-screen flex-col'>
       {/* Header with Navigation */}
       <header class='bg-midnight-800 border-b border-gray-700 py-4'>
         <div class='container mx-auto flex items-center justify-between px-4'>

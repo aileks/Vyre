@@ -61,7 +61,7 @@ const AppLayout: Component<ParentProps> = props => {
 
   return (
     <>
-      <div class='bg-midnight-600 flex h-screen'>
+      <div class='flex h-screen'>
         <Sidebar />
 
         <div class='flex h-full flex-1 flex-col overflow-hidden'>

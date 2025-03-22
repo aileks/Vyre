@@ -126,19 +126,6 @@
   --color-gray-800: oklch(0.25 0.005 285);
   --color-gray-900: oklch(0.15 0.005 285);
 
-  /* UI Colors */
-  --ui-bg-dark: var(--color-midnight-800);
-  --ui-container-bg: var(--color-midnight-700);
-  --ui-container-border: var(--color-gray-700);
-  --ui-text: var(--color-cybertext-200);
-  --ui-text-secondary: var(--color-cybertext-600);
-  --ui-accent: var(--color-primary-500);
-  --ui-input-bg: var(--color-midnight-900);
-  --ui-input-border: var(--color-primary-800);
-  --ui-error: var(--color-error-500);
-  --ui-success: var(--color-success-500);
-  --ui-warning: var(--color-warning-500);
-
   /* Chat Specific Colors */
   --color-chat-sender-bubble: var(--color-primary-600);
   --color-chat-sender-text: var(--color-cybertext-100);
@@ -168,10 +155,7 @@
 }
 
 body {
-  @apply antialiased;
-  @apply font-sans;
-  background: var(--ui-bg-dark);
-  color: var(--ui-text);
+  @apply bg-midnight-500 text-cybertext-200 font-sans antialiased;
 }
 
 /* Animations */
@@ -244,7 +228,7 @@ body {
 }
 
 @utility chat-username {
-  @apply text-primary-400 font-mono text-sm font-medium;
+  @apply font-mono text-sm font-medium text-pink-600;
 
   &::before {
     content: '@';
@@ -260,22 +244,20 @@ body {
 
 /* Chat Bubbles */
 @utility chat-bubble-base {
-  @apply border-midnight-300 mx-2 w-full rounded-sm border p-2 break-words;
+  @apply mx-2 w-full rounded-sm p-2 break-words;
 }
 
 @utility chat-bubble-self {
   @apply chat-bubble-base;
-  @apply bg-primary-800 text-cybertext-100;
 }
 
 @utility chat-bubble-other {
   @apply chat-bubble-base;
-  @apply bg-midnight-300 text-cybertext-200;
 }
 
 @utility chat-bubble-system {
   @apply chat-bubble-base;
-  @apply text-verdant-400 max-w-1/3 rounded-xs bg-gray-800 text-center text-sm italic;
+  @apply text-verdant-400 bg-midnight-300 max-w-1/3 rounded-xs text-center text-sm italic;
 }
 
 /* Consecutive Messages (no repeated header) */

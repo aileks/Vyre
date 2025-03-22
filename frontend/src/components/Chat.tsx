@@ -508,7 +508,7 @@ const Chat = () => {
                     {/* Username header */}
                     <div class='mb-1 flex items-baseline px-2'>
                       <span
-                        class={`font-mono text-sm font-medium ${isCurrentUser ? 'text-primary-400' : 'text-verdant-400'}`}
+                        class={`font-mono text-sm font-medium ${isCurrentUser ? 'text-primary-400' : 'text-electric-600'}`}
                       >
                         {user?.username}
                       </span>
