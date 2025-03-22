@@ -36,14 +36,7 @@ export default function Home() {
           >
             <Show
               when={!isAuthenticated()}
-              fallback={
-                <A
-                  href='/app/friends'
-                  class='bg-primary-700 hover:bg-primary-600 border-primary-400 rounded-xs border px-4 py-2 font-mono duration-200'
-                >
-                  Launch App
-                </A>
-              }
+              fallback={''}
             >
               <div class='flex gap-3'>
                 {/* <A
@@ -128,10 +121,9 @@ export default function Home() {
                   when={!isAuthenticated()}
                   fallback={
                     <A
-                      href='/app/friends'
-                      class='rounded-xs border border-pink-400 bg-pink-600 px-6 py-3 text-center font-mono duration-200 hover:bg-pink-500'
+                      class='rounded-xs border border-electric-500 bg-electric-300/70 px-6 py-3 text-center font-mono duration-200 hover:bg-pink-500'
                     >
-                      Launch App
+                      Thanks for pre-registering!
                     </A>
                   }
                 >
