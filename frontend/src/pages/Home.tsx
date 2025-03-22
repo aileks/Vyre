@@ -33,7 +33,7 @@ export default function Home() {
               when={!isAuthenticated()}
               fallback={
                 <A
-                  href='/app/chat'
+                  href='/app/friends'
                   class='bg-primary-600 hover:bg-primary-500 text-cybertext-100 border-primary-400 rounded-xs border px-4 py-2 font-mono duration-200'
                 >
                   Launch App
@@ -43,7 +43,7 @@ export default function Home() {
               <div class='flex gap-3'>
                 <A
                   href='/login'
-                  class='bg-verdant-500 hover:bg-verdant-600 text-cybertext-300 border-verdant-400 rounded-xs border px-4 py-2 font-mono duration-200'
+                  class='bg-verdant-500 hover:bg-verdant-600 text- border-verdant-400 rounded-xs border px-4 py-2 font-mono duration-200'
                 >
                   Login
                 </A>
@@ -77,10 +77,7 @@ export default function Home() {
             <div class='md:w-1/2'>
               <h1 class='mb-6 font-mono text-4xl font-bold md:text-5xl'>
                 <span class='text-primary-400'>Vyre</span>
-                <p class='text-cybertext-300 mt-4 mb-0 text-3xl'>
-                  {' '}
-                  Chat like a human
-                </p>
+                <p class='text- mt-4 mb-0 text-3xl'> Chat like a human</p>
               </h1>
 
               <p class='text-cybertext-400 mb-6 font-mono text-lg'>
@@ -88,14 +85,14 @@ export default function Home() {
                 customizable, and privacy-focused.
               </p>
 
-              <pre class='text-cybertext-300 mb-8 font-mono text-sm'>
+              <pre class='text- mb-8 font-mono text-sm'>
                 {`// Command-driven interface
 /join #cyberpunk
 /msg @user Hey there!
 /settings theme dark`}
               </pre>
 
-              <div class='text-cybertext-300 mb-8 font-mono'>
+              <div class='mb-8 font-mono'>
                 <div class='mb-2 flex items-center gap-2'>
                   <div class='bg-success-500 h-4 w-4 rounded-xs'></div>
                   <span>Fault-tolerant backend</span>
@@ -115,7 +112,7 @@ export default function Home() {
                   when={!isAuthenticated()}
                   fallback={
                     <A
-                      href='/app'
+                      href='/app/friends'
                       class='bg-primary-600 hover:bg-primary-500 text-cybertext-100 border-primary-400 rounded-xs border px-6 py-3 text-center font-mono duration-200'
                     >
                       Launch App
@@ -143,9 +140,7 @@ export default function Home() {
               <div class='w-full p-6'>
                 <div class='mb-4 flex items-center'>
                   <div class='status-indicator status-indicator-online'></div>
-                  <span class='text-cybertext-300 font-mono'>
-                    3 Servers · 24 Channels
-                  </span>
+                  <span class='font-mono'>3 Servers · 24 Channels</span>
                 </div>
 
                 {/* Mock Chat Interface Preview */}

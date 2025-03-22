@@ -86,10 +86,7 @@ export default function Register() {
 
         <form onSubmit={handleSubmit} class='space-y-3 sm:space-y-4'>
           <div>
-            <label
-              for='name'
-              class='text-cybertext-300 mb-1 block text-sm sm:mb-2 sm:text-base'
-            >
+            <label for='name' class='mb-1 block text-sm sm:mb-2 sm:text-base'>
               Username
             </label>
             <input
@@ -108,10 +105,7 @@ export default function Register() {
           </div>
 
           <div>
-            <label
-              for='email'
-              class='text-cybertext-300 mb-1 block text-sm sm:mb-2 sm:text-base'
-            >
+            <label for='email' class='mb-1 block text-sm sm:mb-2 sm:text-base'>
               Email
             </label>
             <input
@@ -132,7 +126,7 @@ export default function Register() {
           <div>
             <label
               for='password'
-              class='text-cybertext-300 mb-1 block text-sm sm:mb-2 sm:text-base'
+              class='mb-1 block text-sm sm:mb-2 sm:text-base'
             >
               Password
             </label>
@@ -154,7 +148,7 @@ export default function Register() {
           <div>
             <label
               for='password_confirmation'
-              class='text-cybertext-300 mb-1 block text-sm sm:mb-2 sm:text-base'
+              class='mb-1 block text-sm sm:mb-2 sm:text-base'
             >
               Confirm Password
             </label>

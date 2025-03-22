@@ -1,6 +1,6 @@
 import { Icon } from '@iconify-icon/solid';
 import { Dialog } from '@kobalte/core/dialog';
-import { For, Show, createSignal } from 'solid-js';
+import { For, Show, createSignal, onCleanup } from 'solid-js';
 
 interface CommandsModalProps {
   isOpen: boolean;
@@ -18,6 +18,7 @@ interface Command {
 export default function CommandsModal(props: CommandsModalProps) {
   const [searchText, setSearchText] = createSignal('');
   const [selectedCategory, setSelectedCategory] = createSignal('all');
+  const [isExiting, setIsExiting] = createSignal(false);
 
   // Mock commands list - this would come from your actual commands system
   const commands: Command[] = [
@@ -48,13 +49,6 @@ export default function CommandsModal(props: CommandsModalProps) {
       usage: '/msg @user message',
       example: "/msg @kai Hey, how's it going?",
       category: 'messaging',
-    },
-    {
-      name: 'settheme',
-      description: 'Change UI theme',
-      usage: '/settheme theme_name',
-      example: '/settheme synthwave',
-      category: 'appearance',
     },
     {
       name: 'clear',
@@ -153,19 +147,54 @@ export default function CommandsModal(props: CommandsModalProps) {
     setSelectedCategory(category);
   };
 
-  return (
-    <Dialog open={props.isOpen} onOpenChange={props.onOpenChange}>
-      <Dialog.Portal>
-        <Dialog.Overlay class='fixed inset-0 z-40 bg-black/50' />
+  const handleClose = () => {
+    if (!props.isOpen || isExiting()) return;
 
-        <div class='fixed inset-0 z-50 flex items-center justify-center p-4'>
-          <Dialog.Content class='bg-midnight-800 flex max-h-[90vh] w-full max-w-4xl flex-col rounded-xs border border-gray-700 shadow-lg'>
-            <div class='bg-midnight-900 flex items-center justify-between border-b border-gray-700 px-4 py-3'>
-              <Dialog.Title class='text-cybertext-200 font-mono text-xl'>
-                <span class='text-primary-400'>/</span> Chat Commands
+    setIsExiting(true);
+
+    // Wait for animation to complete before actually closing
+    setTimeout(() => {
+      setIsExiting(false);
+      props.onOpenChange(false);
+    }, 200);
+  };
+
+  onCleanup(() => {
+    handleClose();
+  });
+
+  return (
+    <Dialog
+      open={props.isOpen}
+      onOpenChange={open => {
+        if (!open && !isExiting()) {
+          handleClose();
+          return;
+        }
+        props.onOpenChange(open);
+      }}
+    >
+      <Dialog.Portal>
+        <Dialog.Overlay
+          class={`modal-overlay ${isExiting() ? 'modal-exit' : 'animate-fade-in'}`}
+        />
+
+        <div class='modal-container'>
+          <Dialog.Content
+            class={`modal-content h-3/5 w-full max-w-4xl ${
+              isExiting() ? 'modal-content-exit' : 'animate-scale-in'
+            }`}
+          >
+            <div class='modal-header'>
+              <Dialog.Title class='modal-title'>
+                <span class='command-prefix'>/</span> Chat Commands
               </Dialog.Title>
-              <Dialog.CloseButton class='hover:text-cybertext-300 text-xl text-gray-500'>
-                <Icon icon='material-symbols:close' class='h-6 w-6' />
+
+              <Dialog.CloseButton
+                class='hover:text-cybertext-500 text-xl text-gray-300 hover:cursor-pointer'
+                onClick={handleClose}
+              >
+                <Icon icon='material-symbols:close' class='h-4 w-4' />
               </Dialog.CloseButton>
             </div>
 
@@ -175,7 +204,7 @@ export default function CommandsModal(props: CommandsModalProps) {
                 placeholder='Search commands...'
                 value={searchText()}
                 onInput={handleSearchChange}
-                class='bg-midnight-900 text-cybertext-300 w-full rounded-xs border border-gray-700 px-3 py-2'
+                class='text-input'
               />
             </div>
 
@@ -184,11 +213,11 @@ export default function CommandsModal(props: CommandsModalProps) {
                 {category => (
                   <button
                     onClick={() => handleCategoryChange(category)}
-                    class={`rounded-xs px-3 py-1 text-sm ${
+                    class={
                       selectedCategory() === category ?
-                        'bg-primary-700 text-primary-200'
-                      : 'bg-midnight-900 text-cybertext-400 hover:bg-midnight-700'
-                    }`}
+                        'filter-button filter-button-active'
+                      : 'filter-button filter-button-inactive'
+                    }
                   >
                     {category.charAt(0).toUpperCase() + category.slice(1)}
                   </button>
@@ -197,30 +226,24 @@ export default function CommandsModal(props: CommandsModalProps) {
             </div>
 
             <div class='flex-1 overflow-y-auto p-4'>
-              <div class='grid grid-cols-1 gap-3 md:grid-cols-2'>
+              <div class='stagger-children grid grid-cols-1 gap-3 md:grid-cols-2'>
                 <For each={filteredCommands()}>
                   {command => (
-                    <div class='bg-midnight-700 overflow-hidden rounded-xs border border-gray-700'>
-                      <div class='bg-midnight-800 flex items-center justify-between border-b border-gray-700 px-3 py-2'>
-                        <div class='text-primary-400 font-mono'>
-                          /{command.name}
-                        </div>
-                        <div class='bg-midnight-900 text-cybertext-500 rounded-xs px-2 py-0.5 text-xs capitalize'>
+                    <div class='command-card'>
+                      <div class='command-card-header'>
+                        <div class='command-prefix'>/{command.name}</div>
+                        <div class='command-category-tag'>
                           {command.category}
                         </div>
                       </div>
 
                       <div class='p-3'>
-                        <div class='text-cybertext-300 mb-2'>
-                          {command.description}
-                        </div>
+                        <div class='mb-2'>{command.description}</div>
                         <div class='text-cybertext-500 mb-1.5 text-xs'>
                           <span class='text-cybertext-400'>Usage:</span>{' '}
                           {command.usage}
                         </div>
-                        <div class='text-cybertext-500 bg-midnight-800 rounded-xs p-2 font-mono text-xs'>
-                          {command.example}
-                        </div>
+                        <div class='command-example'>{command.example}</div>
                       </div>
                     </div>
                   )}
@@ -228,8 +251,8 @@ export default function CommandsModal(props: CommandsModalProps) {
               </div>
 
               <Show when={filteredCommands().length === 0}>
-                <div class='bg-midnight-900 rounded-xs border border-gray-700 p-6 text-center'>
-                  <div class='text-cybertext-300 mb-2'>No commands found</div>
+                <div class='empty-state animate-fade-in'>
+                  <div class='mb-2'>No commands found</div>
                   <div class='text-cybertext-500 text-sm'>
                     Try a different search term or category
                   </div>
@@ -237,9 +260,9 @@ export default function CommandsModal(props: CommandsModalProps) {
               </Show>
             </div>
 
-            <div class='bg-midnight-900 text-cybertext-500 border-t border-gray-700 p-3 text-xs'>
+            <div class='modal-footer'>
               Tip: You can use{' '}
-              <span class='text-primary-400'>/help [command]</span> in chat to
+              <span class='command-prefix'>/help [command]</span> in chat to
               quickly see usage information
             </div>
           </Dialog.Content>

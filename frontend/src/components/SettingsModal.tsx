@@ -1,7 +1,8 @@
 import { Icon } from '@iconify-icon/solid';
 import { Dialog } from '@kobalte/core/dialog';
 import { Tabs } from '@kobalte/core/tabs';
-import { For, Show, createSignal } from 'solid-js';
+import { A } from '@solidjs/router';
+import { For, Show, createSignal, onCleanup } from 'solid-js';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -35,12 +36,6 @@ interface SettingsState {
   };
 }
 
-interface ThemeOption {
-  id: string;
-  name: string;
-  description: string;
-}
-
 interface BlockedUser {
   id: number;
   username: string;
@@ -49,12 +44,12 @@ interface BlockedUser {
 export default function SettingsModal(props: SettingsModalProps) {
   const [hasChanges, setHasChanges] = createSignal<boolean>(false);
   const [activeTab, setActiveTab] = createSignal<string>('appearance');
+  const [isExiting, setIsExiting] = createSignal(false);
   const [blockedUsers, setBlockedUsers] = createSignal<BlockedUser[]>([
     { id: 501, username: 'spammer123' },
     { id: 502, username: 'annoyinguser' },
   ]);
 
-  // Settings state
   const [settings, setSettings] = createSignal<SettingsState>({
     appearance: {
       theme: 'midnight',
@@ -81,30 +76,6 @@ export default function SettingsModal(props: SettingsModalProps) {
     },
   });
 
-  const availableThemes: ThemeOption[] = [
-    {
-      id: 'midnight',
-      name: 'Midnight',
-      description: 'Dark blue cyberpunk theme (default)',
-    },
-    {
-      id: 'synthwave',
-      name: 'Synthwave',
-      description: 'Purple and pink retro vibes',
-    },
-    {
-      id: 'terminal',
-      name: 'Terminal',
-      description: 'Classic green on black terminal look',
-    },
-    {
-      id: 'hacker',
-      name: 'Hacker',
-      description: 'Matrix-inspired green theme',
-    },
-    { id: 'light', name: 'Light', description: 'Light mode for daytime use' },
-  ];
-
   const handleSettingChange = <T,>(
     category: keyof SettingsState,
     setting: string,
@@ -125,7 +96,6 @@ export default function SettingsModal(props: SettingsModalProps) {
   };
 
   const handleSaveSettings = () => {
-    // Save settings logic would go here
     setHasChanges(false);
     if (props.onClose) props.onClose();
   };
@@ -135,19 +105,50 @@ export default function SettingsModal(props: SettingsModalProps) {
     setHasChanges(true);
   };
 
-  return (
-    <Dialog open={props.isOpen} onOpenChange={props.onOpenChange}>
-      <Dialog.Portal>
-        <Dialog.Overlay class='fixed inset-0 z-40 bg-black/50' />
+  const handleClose = () => {
+    if (!props.isOpen || isExiting()) return;
 
-        <Dialog.Content class='fixed inset-0 z-50 flex items-center justify-center p-4'>
-          <div class='bg-midnight-800 z-10 flex max-h-[90vh] w-full max-w-4xl flex-col rounded-xs border border-gray-700 shadow-lg'>
-            <div class='bg-midnight-900 flex items-center justify-between border-b border-gray-700 px-4 py-3'>
-              <Dialog.Title class='text-cybertext-200 font-mono text-xl'>
-                Settings
-              </Dialog.Title>
-              <Dialog.CloseButton class='hover:text-cybertext-300 text-gray-500'>
-                <Icon icon='material-symbols:close' class='h-6 w-6' />
+    setIsExiting(true);
+
+    setTimeout(() => {
+      setIsExiting(false);
+      props.onOpenChange(false);
+    }, 200);
+  };
+
+  onCleanup(() => {
+    handleClose();
+  });
+
+  return (
+    <Dialog
+      open={props.isOpen}
+      onOpenChange={open => {
+        if (!open && !isExiting()) {
+          handleClose();
+          return;
+        }
+        props.onOpenChange(open);
+      }}
+    >
+      <Dialog.Portal>
+        <Dialog.Overlay
+          class={`modal-overlay ${isExiting() ? 'modal-exit' : 'animate-fade-in'}`}
+        />
+
+        <div class='modal-container'>
+          <Dialog.Content
+            class={`modal-content h-3/5 w-full max-w-4xl ${
+              isExiting() ? 'modal-content-exit' : 'animate-scale-in'
+            }`}
+          >
+            <div class='modal-header'>
+              <Dialog.Title class='modal-title'>Settings</Dialog.Title>
+              <Dialog.CloseButton
+                class='hover:text-cybertext-500 text-xl text-gray-300 hover:cursor-pointer focus:outline-0'
+                onClick={handleClose}
+              >
+                <Icon icon='material-symbols:close' class='h-4 w-4' />
               </Dialog.CloseButton>
             </div>
 
@@ -162,19 +163,20 @@ export default function SettingsModal(props: SettingsModalProps) {
                   <Tabs.List class='flex flex-col'>
                     <Tabs.Trigger
                       value='appearance'
-                      class={`hover:bg-midnight-700 px-4 py-3 text-left ${
+                      class={`hover:bg-midnight-500 mt-1 px-4 py-3 text-left transition-colors duration-200 ${
                         activeTab() === 'appearance' ?
-                          'bg-midnight-700 text-primary-400 border-primary-400 border-l-2'
+                          'bg-midnight-500 text-primary-400'
                         : 'text-cybertext-400'
                       }`}
                     >
                       Appearance
                     </Tabs.Trigger>
+
                     <Tabs.Trigger
                       value='notifications'
-                      class={`hover:bg-midnight-700 px-4 py-3 text-left ${
+                      class={`hover:bg-midnight-500 mt-1 px-4 py-3 text-left transition-colors duration-200 ${
                         activeTab() === 'notifications' ?
-                          'bg-midnight-700 text-primary-400 border-primary-400 border-l-2'
+                          'bg-midnight-500 text-primary-400'
                         : 'text-cybertext-400'
                       }`}
                     >
@@ -182,9 +184,9 @@ export default function SettingsModal(props: SettingsModalProps) {
                     </Tabs.Trigger>
                     <Tabs.Trigger
                       value='privacy'
-                      class={`hover:bg-midnight-700 px-4 py-3 text-left ${
+                      class={`hover:bg-midnight-500 mt-1 px-4 py-3 text-left transition-colors duration-200 ${
                         activeTab() === 'privacy' ?
-                          'bg-midnight-700 text-primary-400 border-primary-400 border-l-2'
+                          'bg-midnight-500 text-primary-400'
                         : 'text-cybertext-400'
                       }`}
                     >
@@ -192,9 +194,9 @@ export default function SettingsModal(props: SettingsModalProps) {
                     </Tabs.Trigger>
                     <Tabs.Trigger
                       value='blocked'
-                      class={`hover:bg-midnight-700 px-4 py-3 text-left ${
+                      class={`hover:bg-midnight-500 mt-1 px-4 py-3 text-left transition-colors duration-200 ${
                         activeTab() === 'blocked' ?
-                          'bg-midnight-700 text-primary-400 border-primary-400 border-l-2'
+                          'bg-midnight-500 text-primary-400'
                         : 'text-cybertext-400'
                       }`}
                     >
@@ -202,9 +204,9 @@ export default function SettingsModal(props: SettingsModalProps) {
                     </Tabs.Trigger>
                     <Tabs.Trigger
                       value='accessibility'
-                      class={`hover:bg-midnight-700 px-4 py-3 text-left ${
+                      class={`hover:bg-midnight-500 mt-1 px-4 py-3 text-left transition-colors duration-200 ${
                         activeTab() === 'accessibility' ?
-                          'bg-midnight-700 text-primary-400 border-primary-400 border-l-2'
+                          'bg-midnight-500 text-primary-400'
                         : 'text-cybertext-400'
                       }`}
                     >
@@ -212,9 +214,9 @@ export default function SettingsModal(props: SettingsModalProps) {
                     </Tabs.Trigger>
                     <Tabs.Trigger
                       value='about'
-                      class={`hover:bg-midnight-700 px-4 py-3 text-left ${
+                      class={`hover:bg-midnight-500 mt-1 px-4 py-3 text-left transition-colors duration-200 ${
                         activeTab() === 'about' ?
-                          'bg-midnight-700 text-primary-400 border-primary-400 border-l-2'
+                          'bg-midnight-500 text-primary-400'
                         : 'text-cybertext-400'
                       }`}
                     >
@@ -233,37 +235,6 @@ export default function SettingsModal(props: SettingsModalProps) {
                     </h3>
 
                     <div class='mb-6'>
-                      <label class='text-cybertext-300 mb-2 block'>Theme</label>
-                      <div class='grid grid-cols-1 gap-3 md:grid-cols-2'>
-                        <For each={availableThemes}>
-                          {theme => (
-                            <div
-                              class={`cursor-pointer rounded-xs border p-3 ${
-                                settings().appearance.theme === theme.id ?
-                                  'border-primary-400 bg-midnight-700'
-                                : 'bg-midnight-800 hover:bg-midnight-700 border-gray-700'
-                              }`}
-                              onClick={() =>
-                                handleSettingChange(
-                                  'appearance',
-                                  'theme',
-                                  theme.id,
-                                )
-                              }
-                            >
-                              <div class='text-cybertext-200 font-mono'>
-                                {theme.name}
-                              </div>
-                              <div class='text-cybertext-500 text-xs'>
-                                {theme.description}
-                              </div>
-                            </div>
-                          )}
-                        </For>
-                      </div>
-                    </div>
-
-                    <div class='mb-6'>
                       <label class='text-cybertext-300 mb-2 block'>
                         Font Size
                       </label>
@@ -272,7 +243,7 @@ export default function SettingsModal(props: SettingsModalProps) {
                           class={`rounded-xs px-4 py-2 ${
                             settings().appearance.fontSize === 'small' ?
                               'bg-primary-700 text-cybertext-200'
-                            : 'bg-midnight-700 text-cybertext-400 hover:bg-midnight-600'
+                            : 'bg-midnight-500 text-cybertext-400 hover:bg-midnight-600'
                           }`}
                           onClick={() =>
                             handleSettingChange(
@@ -284,11 +255,12 @@ export default function SettingsModal(props: SettingsModalProps) {
                         >
                           Small
                         </button>
+
                         <button
                           class={`rounded-xs px-4 py-2 ${
                             settings().appearance.fontSize === 'medium' ?
                               'bg-primary-700 text-cybertext-200'
-                            : 'bg-midnight-700 text-cybertext-400 hover:bg-midnight-600'
+                            : 'bg-midnight-500 text-cybertext-400 hover:bg-midnight-600'
                           }`}
                           onClick={() =>
                             handleSettingChange(
@@ -300,11 +272,12 @@ export default function SettingsModal(props: SettingsModalProps) {
                         >
                           Medium
                         </button>
+
                         <button
                           class={`rounded-xs px-4 py-2 ${
                             settings().appearance.fontSize === 'large' ?
                               'bg-primary-700 text-cybertext-200'
-                            : 'bg-midnight-700 text-cybertext-400 hover:bg-midnight-600'
+                            : 'bg-midnight-500 text-cybertext-400 hover:bg-midnight-600'
                           }`}
                           onClick={() =>
                             handleSettingChange(
@@ -328,7 +301,7 @@ export default function SettingsModal(props: SettingsModalProps) {
                           class={`rounded-xs px-4 py-2 ${
                             settings().appearance.messageDensity === 'compact' ?
                               'bg-primary-700 text-cybertext-200'
-                            : 'bg-midnight-700 text-cybertext-400 hover:bg-midnight-600'
+                            : 'bg-midnight-500 text-cybertext-400 hover:bg-midnight-600'
                           }`}
                           onClick={() =>
                             handleSettingChange(
@@ -347,7 +320,7 @@ export default function SettingsModal(props: SettingsModalProps) {
                               'comfortable'
                             ) ?
                               'bg-primary-700 text-cybertext-200'
-                            : 'bg-midnight-700 text-cybertext-400 hover:bg-midnight-600'
+                            : 'bg-midnight-500 text-cybertext-400 hover:bg-midnight-600'
                           }`}
                           onClick={() =>
                             handleSettingChange(
@@ -374,35 +347,13 @@ export default function SettingsModal(props: SettingsModalProps) {
                             e.target.checked,
                           )
                         }
-                        class='bg-midnight-900 text-primary-600 focus:ring-primary-500 h-4 w-4 rounded-xs border-gray-700'
+                        class='bg-midnight-900 text-electric-600 h-4 w-4 rounded-xs border-gray-700'
                       />
                       <label
                         for='animations-toggle'
                         class='text-cybertext-300 ml-2'
                       >
                         Enable animations
-                      </label>
-                    </div>
-
-                    <div class='flex items-center'>
-                      <input
-                        type='checkbox'
-                        id='system-theme-toggle'
-                        checked={settings().appearance.useSystemTheme}
-                        onChange={e =>
-                          handleSettingChange(
-                            'appearance',
-                            'useSystemTheme',
-                            e.target.checked,
-                          )
-                        }
-                        class='bg-midnight-900 text-primary-600 focus:ring-primary-500 h-4 w-4 rounded-xs border-gray-700'
-                      />
-                      <label
-                        for='system-theme-toggle'
-                        class='text-cybertext-300 ml-2'
-                      >
-                        Use system theme when available
                       </label>
                     </div>
                   </Tabs.Content>
@@ -425,7 +376,7 @@ export default function SettingsModal(props: SettingsModalProps) {
                               e.target.checked,
                             )
                           }
-                          class='bg-midnight-900 text-primary-600 focus:ring-primary-500 h-4 w-4 rounded-xs border-gray-700'
+                          class='bg-midnight-900 text-electric-600 h-4 w-4 rounded-xs border-gray-700'
                         />
                       </div>
 
@@ -445,7 +396,7 @@ export default function SettingsModal(props: SettingsModalProps) {
                               e.target.checked,
                             )
                           }
-                          class='bg-midnight-900 text-primary-600 focus:ring-primary-500 h-4 w-4 rounded-xs border-gray-700'
+                          class='bg-midnight-900 text-electric-600 h-4 w-4 rounded-xs border-gray-700'
                         />
                       </div>
 
@@ -463,7 +414,7 @@ export default function SettingsModal(props: SettingsModalProps) {
                               e.target.checked,
                             )
                           }
-                          class='bg-midnight-900 text-primary-600 focus:ring-primary-500 h-4 w-4 rounded-xs border-gray-700'
+                          class='bg-midnight-900 text-electric-600 h-4 w-4 rounded-xs border-gray-700'
                         />
                       </div>
                     </div>
@@ -490,8 +441,8 @@ export default function SettingsModal(props: SettingsModalProps) {
                           <For each={settings().notifications.muteChannels}>
                             {channel => (
                               <div class='flex items-center justify-between py-1'>
-                                <span class='text-cybertext-400'>
-                                  #{channel}
+                                <span class='text-cybertext-400 channel-name'>
+                                  {channel}
                                 </span>
                                 <button
                                   class='hover:text-error-400 text-gray-500'
@@ -539,7 +490,7 @@ export default function SettingsModal(props: SettingsModalProps) {
                                 e.target.checked,
                               )
                             }
-                            class='bg-midnight-900 text-primary-600 focus:ring-primary-500 h-4 w-4 rounded-xs border-gray-700'
+                            class='bg-midnight-900 text-electric-600 h-4 w-4 rounded-xs border-gray-700'
                           />
                           <label
                             for='status-toggle'
@@ -590,7 +541,7 @@ export default function SettingsModal(props: SettingsModalProps) {
                                 e.target.checked,
                               )
                             }
-                            class='bg-midnight-900 text-primary-600 focus:ring-primary-500 h-4 w-4 rounded-xs border-gray-700'
+                            class='bg-midnight-900 text-electric-600 h-4 w-4 rounded-xs border-gray-700'
                           />
                           <label
                             for='activity-toggle'
@@ -622,26 +573,28 @@ export default function SettingsModal(props: SettingsModalProps) {
                           </div>
                         }
                       >
-                        <For each={blockedUsers()}>
-                          {user => (
-                            <div class='flex items-center justify-between border-b border-gray-800 p-3 last:border-b-0'>
-                              <div class='flex items-center'>
-                                <div class='mr-3 flex h-8 w-8 items-center justify-center rounded-xs bg-gray-800 text-xs'>
-                                  {user.username.charAt(0)}
+                        <div class='stagger-children'>
+                          <For each={blockedUsers()}>
+                            {user => (
+                              <div class='flex items-center justify-between border-b border-gray-800 p-3 last:border-b-0'>
+                                <div class='flex items-center'>
+                                  <div class='mr-3 flex h-8 w-8 items-center justify-center rounded-xs bg-gray-800 text-xs'>
+                                    {user.username.charAt(0)}
+                                  </div>
+                                  <span class='text-cybertext-400 user-name'>
+                                    {user.username}
+                                  </span>
                                 </div>
-                                <span class='text-cybertext-400'>
-                                  {user.username}
-                                </span>
+                                <button
+                                  onClick={() => unblockUser(user.id)}
+                                  class='bg-midnight-500 hover:bg-midnight-600 text-cybertext-300 rounded-xs px-3 py-1 text-sm'
+                                >
+                                  Unblock
+                                </button>
                               </div>
-                              <button
-                                onClick={() => unblockUser(user.id)}
-                                class='bg-midnight-700 hover:bg-midnight-600 text-cybertext-300 rounded-xs px-3 py-1 text-sm'
-                              >
-                                Unblock
-                              </button>
-                            </div>
-                          )}
-                        </For>
+                            )}
+                          </For>
+                        </div>
                       </Show>
                     </div>
                   </Tabs.Content>
@@ -664,7 +617,7 @@ export default function SettingsModal(props: SettingsModalProps) {
                               e.target.checked,
                             )
                           }
-                          class='bg-midnight-900 text-primary-600 focus:ring-primary-500 h-4 w-4 rounded-xs border-gray-700'
+                          class='bg-midnight-900 text-electric-600 h-4 w-4 rounded-xs border-gray-700'
                         />
                       </div>
 
@@ -682,7 +635,7 @@ export default function SettingsModal(props: SettingsModalProps) {
                               e.target.checked,
                             )
                           }
-                          class='bg-midnight-900 text-primary-600 focus:ring-primary-500 h-4 w-4 rounded-xs border-gray-700'
+                          class='bg-midnight-900 text-electric-600 h-4 w-4 rounded-xs border-gray-700'
                         />
                       </div>
 
@@ -702,7 +655,7 @@ export default function SettingsModal(props: SettingsModalProps) {
                               e.target.checked,
                             )
                           }
-                          class='bg-midnight-900 text-primary-600 focus:ring-primary-500 h-4 w-4 rounded-xs border-gray-700'
+                          class='bg-midnight-900 text-electric-600 h-4 w-4 rounded-xs border-gray-700'
                         />
                       </div>
                     </div>
@@ -714,8 +667,8 @@ export default function SettingsModal(props: SettingsModalProps) {
                     </h3>
 
                     <div class='space-y-4'>
-                      <div class='bg-midnight-900 rounded-xs border border-gray-700 p-4'>
-                        <div class='text-cybertext-300 mb-2 text-center font-mono text-xl'>
+                      <div class='bg-midnight-900 scanlines rounded-xs border border-gray-700 p-4'>
+                        <div class='text-cybertext-200 primary-glow mb-2 text-center font-mono text-xl'>
                           Vyre Chat
                         </div>
                         <div class='text-cybertext-500 mb-4 text-center'>
@@ -723,7 +676,7 @@ export default function SettingsModal(props: SettingsModalProps) {
                         </div>
 
                         <div class='mb-4 flex justify-center'>
-                          <div class='bg-primary-900/50 text-primary-400 rounded-xs px-3 py-1 text-sm'>
+                          <div class='bg-primary-900/50 text-primary-400 glitch-text rounded-xs px-3 py-1 text-sm'>
                             Development Build
                           </div>
                         </div>
@@ -740,26 +693,28 @@ export default function SettingsModal(props: SettingsModalProps) {
                       </div>
 
                       <div class='flex justify-center space-x-4'>
-                        <a
+                        <A
                           href='https://github.com/aileks/Vyre'
                           target='_blank'
                           rel='noopener noreferrer'
-                          class='bg-midnight-700 hover:bg-midnight-600 text-cybertext-300 rounded-xs px-4 py-2 text-sm'
+                          class='bg-midnight-500 hover:bg-midnight-600 text-cybertext-300 rounded-xs px-4 py-2 text-sm transition-colors duration-200'
                         >
                           GitHub
-                        </a>
-                        <a
+                        </A>
+
+                        <A
                           href='#'
-                          class='bg-midnight-700 hover:bg-midnight-600 text-cybertext-300 rounded-xs px-4 py-2 text-sm'
+                          class='bg-midnight-500 hover:bg-midnight-600 text-cybertext-300 rounded-xs px-4 py-2 text-sm transition-colors duration-200'
                         >
                           Website
-                        </a>
-                        <a
+                        </A>
+
+                        <A
                           href='#'
-                          class='bg-midnight-700 hover:bg-midnight-600 text-cybertext-300 rounded-xs px-4 py-2 text-sm'
+                          class='bg-midnight-500 hover:bg-midnight-600 text-cybertext-300 rounded-xs px-4 py-2 text-sm transition-colors duration-200'
                         >
                           Report Bug
-                        </a>
+                        </A>
                       </div>
                     </div>
                   </Tabs.Content>
@@ -788,7 +743,10 @@ export default function SettingsModal(props: SettingsModalProps) {
               </Show>
 
               <div class='space-x-3'>
-                <Dialog.CloseButton class='bg-midnight-700 hover:bg-midnight-600 text-cybertext-300 rounded-xs px-4 py-2'>
+                <Dialog.CloseButton
+                  class='bg-midnight-400 hover:bg-midnight-300 text-cybertext-300 rounded-xs px-4 py-2 transition-colors duration-200 hover:cursor-pointer'
+                  onClick={handleClose}
+                >
                   Cancel
                 </Dialog.CloseButton>
 
@@ -796,8 +754,8 @@ export default function SettingsModal(props: SettingsModalProps) {
                   onClick={handleSaveSettings}
                   class={`rounded-xs px-4 py-2 ${
                     hasChanges() ?
-                      'bg-primary-600 hover:bg-primary-500 text-cybertext-100'
-                    : 'bg-primary-800 text-cybertext-500 cursor-not-allowed'
+                      'bg-primary-600 hover:bg-primary-500 text-cybertext-200 transition-colors duration-200 hover:cursor-pointer'
+                    : 'bg-primary-800 cursor-not-allowed text-gray-500'
                   }`}
                   disabled={!hasChanges()}
                 >
@@ -805,8 +763,8 @@ export default function SettingsModal(props: SettingsModalProps) {
                 </button>
               </div>
             </div>
-          </div>
-        </Dialog.Content>
+          </Dialog.Content>
+        </div>
       </Dialog.Portal>
     </Dialog>
   );

@@ -33,7 +33,7 @@ const Friends: Component = () => {
               class={`rounded-xs px-4 py-2 ${
                 activeTab() === 'add' ?
                   'bg-primary-600 text-cybertext-100'
-                : 'bg-midnight-800 text-cybertext-300 hover:bg-midnight-600'
+                : 'bg-midnight-800 text- hover:bg-midnight-600'
               }`}
               onClick={() => setActiveTab('add')}
             >
@@ -86,23 +86,23 @@ const Friends: Component = () => {
 
         {/* Tab content panels */}
         <Tabs.Content value='online' class='flex h-full flex-col p-4'>
-          <div class='text-cybertext-300'>Online friends content</div>
+          <div>Online friends content</div>
         </Tabs.Content>
 
         <Tabs.Content value='all' class='flex h-full flex-col p-4'>
-          <div class='text-cybertext-300'>All friends content</div>
+          <div>All friends content</div>
         </Tabs.Content>
 
         <Tabs.Content value='pending' class='flex h-full flex-col p-4'>
-          <div class='text-cybertext-300'>Pending requests content</div>
+          <div>Pending requests content</div>
         </Tabs.Content>
 
         <Tabs.Content value='blocked' class='flex h-full flex-col p-4'>
-          <div class='text-cybertext-300'>Blocked users content</div>
+          <div>Blocked users content</div>
         </Tabs.Content>
 
         <Tabs.Content value='add' class='flex h-full flex-col p-4'>
-          <div class='text-cybertext-300'>Add friend content</div>
+          <div>Add friend content</div>
         </Tabs.Content>
       </Tabs>
     </div>

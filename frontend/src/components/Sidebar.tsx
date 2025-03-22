@@ -4,7 +4,14 @@ import { Component, For, Show, createSignal } from 'solid-js';
 
 import { useAppContext } from '../context/AppContext';
 
-interface Channel {
+interface DirectMessageUser {
+  id: number;
+  username: string;
+  status: 'online' | 'away' | 'offline' | 'busy';
+  unread: boolean;
+}
+
+interface ServerChannel {
   id: number;
   name: string;
   unread: boolean;
@@ -15,21 +22,22 @@ interface Server {
   id: number;
   name: string;
   icon?: string;
-  channels: Channel[];
+  channels: ServerChannel[];
 }
 
-interface DirectMessageUser {
-  id: number;
-  username: string;
-  status: 'online' | 'away' | 'offline' | 'busy';
-  unread: boolean;
-}
-
-const AppSidebar: Component = () => {
+const Sidebar: Component = () => {
   const location = useLocation();
-  const { openSettings, openCommands } = useAppContext();
+  const appContext = useAppContext();
 
   // Mock data - would come from your API/state management
+  const [directMessages, _setDirectMessages] = createSignal<
+    DirectMessageUser[]
+  >([
+    { id: 2, username: 'neo_coder', status: 'online', unread: true },
+    { id: 3, username: 'cyber_ghost', status: 'away', unread: false },
+    { id: 4, username: 'pixeldreamer', status: 'offline', unread: false },
+  ]);
+
   const [servers, _setServers] = createSignal<Server[]>([
     {
       id: 1,
@@ -51,43 +59,55 @@ const AppSidebar: Component = () => {
     },
   ]);
 
-  const [directMessages, _setDirectMessages] = createSignal<
-    DirectMessageUser[]
-  >([
-    { id: 2, username: 'neo_coder', status: 'online', unread: true },
-    { id: 3, username: 'cyber_ghost', status: 'away', unread: false },
-    { id: 4, username: 'pixeldreamer', status: 'offline', unread: false },
-  ]);
-
   // Sidebar sections expanded state
-  const [dmExpanded, setDmExpanded] = createSignal(true);
+  const [pmExpanded, setPmExpanded] = createSignal(true);
   const [serversExpanded, setServersExpanded] = createSignal(true);
 
   const isActive = (path: string) => {
     return location.pathname === path;
   };
 
+  // Handle opening settings modal
+  const handleOpenSettings = () => {
+    if (appContext && typeof appContext.openSettings === 'function') {
+      appContext.openSettings();
+    } else {
+      console.error('openSettings function not found in context');
+    }
+  };
+
+  // Handle opening commands modal
+  const handleOpenCommands = () => {
+    if (appContext && typeof appContext.openCommands === 'function') {
+      appContext.openCommands();
+    } else {
+      console.error('openCommands function not found in context');
+    }
+  };
+
   return (
     <div class='bg-midnight-800 flex h-full w-64 flex-col border-r border-gray-700'>
       {/* Header with user info */}
       <div class='bg-midnight-900 border-b border-gray-700 p-4'>
-        <div class='flex items-center'>
-          <div class='relative mr-3'>
-            <div class='bg-primary-600 flex h-10 w-10 items-center justify-center rounded-xs text-sm'>
-              Y
+        <div class='flex items-center justify-between'>
+          <div class='flex items-center'>
+            <div class='relative mr-3'>
+              <div class='bg-primary-600 flex h-10 w-10 items-center justify-center rounded-xs text-sm'>
+                Y
+              </div>
+              <div class='border-midnight-900 status-indicator-away absolute -right-0.5 -bottom-0.5 h-3 w-3 rounded-full border-2'></div>
             </div>
-            <div class='border-midnight-900 status-indicator-online absolute -right-0.5 -bottom-0.5 h-3 w-3 rounded-full border-2'></div>
-          </div>
-          <div>
-            <div class='text-cybertext-200 font-mono'>you</div>
-            <div class='text-cybertext-500 text-xs'>Connected</div>
+            <div>
+              <div class='text-cybertext-200 font-mono'>you</div>
+              <div class='text-cybertext-500 text-xs'>Connected</div>
+            </div>
           </div>
 
           {/* Settings button */}
           <button
-            onClick={openSettings}
-            class='text-cybertext-400 hover:text-cybertext-200 ml-auto'
-            aria-label='Settings'
+            onClick={handleOpenSettings}
+            class='text-cybertext-400 hover:text-cybertext-200 hover:bg-midnight-700 rounded-xs p-1'
+            aria-label='Open settings'
           >
             <Icon icon='material-symbols:settings' class='h-5 w-5' />
           </button>
@@ -96,15 +116,7 @@ const AppSidebar: Component = () => {
 
       {/* Navigation */}
       <div class='flex-1 overflow-y-auto p-2'>
-        {/* Main navigation */}
         <div class='mb-4 space-y-1'>
-          <A
-            href='/app/chat'
-            class={`flex items-center rounded-xs px-3 py-2 ${isActive('/app/chat') ? 'bg-primary-900 text-primary-300' : 'text-cybertext-400 hover:bg-midnight-700'}`}
-          >
-            <Icon icon='material-symbols:chat' class='mr-3 h-5 w-5' />
-            Chat
-          </A>
           <A
             href='/app/friends'
             class={`flex items-center rounded-xs px-3 py-2 ${location.pathname.startsWith('/app/friends') ? 'bg-primary-900 text-primary-300' : 'text-cybertext-400 hover:bg-midnight-700'}`}
@@ -114,18 +126,18 @@ const AppSidebar: Component = () => {
           </A>
         </div>
 
-        {/* Direct Messages */}
+        {/* Private Messages */}
         <div class='mb-4'>
           <div
             class='flex cursor-pointer items-center justify-between px-3 py-1 text-sm'
-            onClick={() => setDmExpanded(!dmExpanded())}
+            onClick={() => setPmExpanded(!pmExpanded())}
           >
             <span class='text-cybertext-500 font-mono text-xs uppercase'>
-              Direct Messages
+              Private Messages
             </span>
             <Icon
               icon={
-                dmExpanded() ?
+                pmExpanded() ?
                   'material-symbols:keyboard-arrow-down'
                 : 'material-symbols:keyboard-arrow-right'
               }
@@ -133,24 +145,25 @@ const AppSidebar: Component = () => {
             />
           </div>
 
-          <Show when={dmExpanded()}>
+          <Show when={pmExpanded()}>
             <div class='mt-1 space-y-1'>
               <For each={directMessages()}>
-                {dm => (
+                {pm => (
                   <A
-                    href={`/app/channels/${dm.id}`}
-                    class={`flex items-center rounded-xs px-3 py-2 ${isActive(`/app/channels/${dm.id}`) ? 'bg-primary-900 text-primary-300' : 'text-cybertext-400 hover:bg-midnight-700'}`}
+                    href={`/app/channels/${pm.id}`}
+                    class={`flex items-center rounded-xs px-3 py-2 ${isActive(`/app/channels/${pm.id}`) ? 'bg-primary-900 text-primary-300' : 'text-cybertext-400 hover:bg-midnight-700'}`}
                   >
                     <div class='relative mr-2'>
                       <div class='bg-electric-800 flex h-6 w-6 items-center justify-center rounded-xs text-xs'>
-                        {dm.username.charAt(0).toUpperCase()}
+                        {pm.username.charAt(0).toUpperCase()}
                       </div>
                       <div
-                        class={`border-midnight-800 absolute -right-0.5 -bottom-0.5 h-2 w-2 rounded-full border-2 status-indicator-${dm.status}`}
+                        class={`border-midnight-800 absolute -right-0.5 -bottom-0.5 h-2 w-2 rounded-full border-2 status-indicator-${pm.status}`}
                       ></div>
                     </div>
-                    <span>{dm.username}</span>
-                    <Show when={dm.unread}>
+
+                    <span>{pm.username}</span>
+                    <Show when={pm.unread}>
                       <div class='bg-primary-400 ml-auto h-2 w-2 rounded-full'></div>
                     </Show>
                   </A>
@@ -185,28 +198,28 @@ const AppSidebar: Component = () => {
                 {server => (
                   <div>
                     <div class='flex items-center px-3 py-1'>
-                      <span class='text-cybertext-300 font-mono text-sm'>
-                        {server.name}
-                      </span>
+                      <span class='text- font-mono text-sm'>{server.name}</span>
                     </div>
                     <div class='mt-1 ml-2 space-y-1'>
                       <For each={server.channels}>
                         {channel => (
-                          <a
+                          <A
                             href={`/app/channels/${server.id}-${channel.name}`}
                             class={`flex items-center rounded-xs px-3 py-1 ${isActive(`/app/channels/${server.id}-${channel.name}`) ? 'bg-primary-900 text-primary-300' : 'text-cybertext-400 hover:bg-midnight-700'}`}
                           >
                             <span class='text-cybertext-500 mr-1'>#</span>
                             <span>{channel.name}</span>
+
                             <Show when={channel.unread}>
                               <div class='bg-primary-400 ml-auto h-2 w-2 rounded-full'></div>
                             </Show>
+
                             <Show when={channel.mentions > 0}>
                               <div class='bg-error-600 text-error-200 ml-auto rounded-xs px-1.5 text-xs'>
                                 {channel.mentions}
                               </div>
                             </Show>
-                          </a>
+                          </A>
                         )}
                       </For>
                     </div>
@@ -218,17 +231,16 @@ const AppSidebar: Component = () => {
         </div>
       </div>
 
-      {/* Footer with commands */}
       <div class='bg-midnight-900 border-t border-gray-700 p-3'>
+        {/* Commands button */}
         <button
-          onClick={openCommands}
-          class='bg-midnight-700 text-cybertext-400 hover:bg-midnight-600 flex w-full items-center justify-between rounded-xs px-3 py-2'
+          onClick={handleOpenCommands}
+          class='bg-midnight-300 hover:bg-midnight-400 text-cybertext-400 hover:text-cybertext-200 flex w-full items-center rounded-xs px-3 py-2 duration-200'
+          aria-label='Open commands'
         >
-          <div class='flex items-center'>
-            <span class='text-primary-400 mr-2 font-mono'>/</span>
-            <span>Commands</span>
-          </div>
-          <kbd class='bg-midnight-800 text-cybertext-500 rounded-xs px-1.5 py-0.5 text-xs'>
+          <span class='text-primary-500 mr-2'>/</span>
+          <span>Commands</span>
+          <kbd class='bg-midnight-800 text-cybertext-500 ml-auto rounded-xs px-1.5 py-0.5 text-xs'>
             Ctrl+K
           </kbd>
         </button>
@@ -237,4 +249,4 @@ const AppSidebar: Component = () => {
   );
 };
 
-export default AppSidebar;
+export default Sidebar;

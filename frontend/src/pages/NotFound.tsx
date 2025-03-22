@@ -4,11 +4,17 @@ export default function NotFound() {
   return (
     <div class='bg-midnight-700 shadow-midnight-900/50 mx-auto mt-64 max-w-xl rounded-xs border border-gray-700 p-7 shadow-lg'>
       <div class='text-center'>
-        <div class='text-error-500 mb-3 font-mono text-5xl font-bold underline'>404</div>
-        <div class='text-error-600 mb-4 font-mono text-xl font-semibold tracking-wide'>Failure!</div>
+        <div class='text-error-500 mb-3 font-mono text-5xl font-bold underline'>
+          404
+        </div>
+        <div class='text-error-600 mb-4 font-mono text-xl font-semibold tracking-wide'>
+          Failure!
+        </div>
       </div>
 
-      <div class='text-cybertext-400 mb-6 text-center font-mono'>The requested channel or user does not exist.</div>
+      <div class='text-cybertext-400 mb-6 text-center font-mono'>
+        The requested channel or user does not exist.
+      </div>
 
       <div class='border-midnight-900 bg-midnight-800 mb-8 rounded-xs border p-4 font-mono'>
         <div class='flex items-start'>
@@ -29,9 +35,12 @@ export default function NotFound() {
             </svg>
           </div>
           <div>
-            <div class='text-error-400 mb-1 text-sm font-bold'>ERROR: Resource not found</div>
-            <code class='text-cybertext-300 block text-xs'>
-              [SERVER]: The requested resource could not be located on this server.
+            <div class='text-error-400 mb-1 text-sm font-bold'>
+              ERROR: Resource not found
+            </div>
+            <code class='block text-xs'>
+              [SERVER]: The requested resource could not be located on this
+              server.
               <br />
               [SERVER]: Error code: 404
               <br />
@@ -42,7 +51,7 @@ export default function NotFound() {
       </div>
 
       <A
-        href='/'
+        href='/app/friends'
         class='bg-primary-600 text-cybertext-100 hover:bg-primary-500 focus:ring-primary-500/50 border-primary-400 flex items-center justify-center rounded-xs border px-4 py-2.5 font-mono transition-all duration-200 focus:ring-2 focus:outline-none'
       >
         Go Back

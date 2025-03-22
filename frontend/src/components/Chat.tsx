@@ -1,5 +1,5 @@
 import { Icon } from '@iconify-icon/solid';
-import { DropdownMenu } from '@kobalte/core/dropdown-menu';
+import { ContextMenu } from '@kobalte/core/context-menu';
 import { Popover } from '@kobalte/core/popover';
 import {
   Component,
@@ -125,7 +125,7 @@ const UserAvatar: Component<{
         onClick={() => props.onClick(props.user.id)}
       >
         <div
-          class={`${props.user.avatarColor || 'bg-electric-800'} text-cybertext-100 flex h-10 w-10 items-center justify-center rounded-xs font-mono text-sm`}
+          class={`${props.user.avatarColor || 'bg-electric-800'} text-cybertext-100 flex h-10 w-10 items-center justify-center rounded-xs text-sm`}
         >
           {props.user.avatarInitial ||
             props.user.username.charAt(0).toUpperCase()}
@@ -141,13 +141,13 @@ const UserAvatar: Component<{
             <div class='border-b border-gray-700 p-4'>
               <div class='flex items-center'>
                 <div
-                  class={`${props.user.avatarColor || 'bg-electric-800'} text-cybertext-100 mr-3 flex h-14 w-14 items-center justify-center rounded-xs font-mono text-lg`}
+                  class={`${props.user.avatarColor || 'bg-electric-800'} text-cybertext-100 mr-3 flex h-14 w-14 items-center justify-center rounded-xs text-lg`}
                 >
                   {props.user.avatarInitial ||
                     props.user.username.charAt(0).toUpperCase()}
                 </div>
                 <div>
-                  <div class='text-cybertext-200 font-mono text-lg'>
+                  <div class='text-cybertext-200 text-lg'>
                     {props.user.username}
                   </div>
                   <div class='text-cybertext-500 flex items-center text-sm'>
@@ -159,18 +159,19 @@ const UserAvatar: Component<{
                 </div>
               </div>
             </div>
+
             <div class='p-4'>
               <div class='mb-4'>
                 <div class='text-cybertext-400 mb-1 text-xs'>About</div>
-                <div class='text-cybertext-300 text-sm'>
+                <div class='text- text-sm'>
                   {props.user.note || 'Vyre user'}
                 </div>
               </div>
               <div class='flex space-x-2'>
-                <button class='bg-midnight-700 hover:bg-midnight-600 text-cybertext-300 flex-1 rounded-xs py-1 text-sm'>
+                <button class='bg-midnight-700 hover:bg-midnight-600 text- flex-1 rounded-xs py-1 text-sm'>
                   Message
                 </button>
-                <button class='bg-midnight-700 hover:bg-midnight-600 text-cybertext-300 flex-1 rounded-xs py-1 text-sm'>
+                <button class='bg-midnight-700 hover:bg-midnight-600 text- flex-1 rounded-xs py-1 text-sm'>
                   Add Friend
                 </button>
               </div>
@@ -185,7 +186,6 @@ const UserAvatar: Component<{
 
 // Main Chat component
 const Chat = () => {
-  // State
   const [users] = createSignal<User[]>(mockUsers);
   const [messages, setMessages] = createSignal<Message[]>(mockMessages);
   const [currentUser, setCurrentUser] = createSignal<User>(mockUsers[0]); // First user is "you"
@@ -199,7 +199,6 @@ const Chat = () => {
   const [messagesEndRef, setMessagesEndRef] =
     createSignal<HTMLDivElement | null>(null);
 
-  // Available commands
   const commands: ChatCommand[] = [
     {
       name: 'help',
@@ -455,68 +454,71 @@ const Chat = () => {
               const isCurrentUser = user?.id === currentUser().id;
 
               return (
-                <div
-                  class={`mb-4 flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
-                >
-                  {/* Message content with context menu */}
-                  <DropdownMenu>
-                    <DropdownMenu.Trigger
-                      class={isCurrentUser ? 'order-2 ml-2' : 'order-1 mr-2'}
-                    >
-                      {message.isSystem ?
-                        <div class='chat-bubble-system relative mx-auto'>
-                          {message.content}
-                          <span class='text-cybertext-600 mt-1 block text-right text-xs'>
-                            {formatTimestamp(message.timestamp)}
-                          </span>
-                        </div>
-                      : isCurrentUser ?
-                        <div class='chat-bubble-sender relative'>
-                          <div class='text-primary-300 mb-1 font-mono text-xs'>
-                            {user?.username}
-                          </div>
-                          {message.content}
-                          <span class='text-cybertext-600 mt-1 block text-right text-xs'>
-                            {formatTimestamp(message.timestamp)}
-                          </span>
-                        </div>
-                      : <div class='chat-bubble-recipient relative'>
-                          <div class='text-cybertext-500 mb-1 font-mono text-xs'>
-                            {user?.username}
-                          </div>
-                          {message.content}
-                          <span class='text-cybertext-600 mt-1 block text-right text-xs'>
-                            {formatTimestamp(message.timestamp)}
-                          </span>
-                        </div>
-                      }
-                    </DropdownMenu.Trigger>
+                <div class='mb-4'>
+                  {/* System message */}
+                  <Show when={message.isSystem}>
+                    <div class='chat-bubble-system mx-auto'>
+                      {message.content}
+                      <span class='text-cybertext-600 mt-1 block text-right text-xs'>
+                        {formatTimestamp(message.timestamp)}
+                      </span>
+                    </div>
+                  </Show>
 
-                    <Show when={!message.isSystem}>
-                      <DropdownMenu.Portal>
-                        <DropdownMenu.Content class='bg-midnight-900 z-50 w-48 overflow-hidden rounded-xs border border-gray-700 shadow-lg'>
-                          <DropdownMenu.Item class='hover:bg-midnight-700 text-cybertext-300 cursor-pointer px-4 py-2 text-sm'>
-                            Copy Message
-                          </DropdownMenu.Item>
-                          <DropdownMenu.Item class='hover:bg-midnight-700 text-cybertext-300 cursor-pointer px-4 py-2 text-sm'>
-                            Reply
-                          </DropdownMenu.Item>
-                          <DropdownMenu.Item class='hover:bg-midnight-700 text-cybertext-300 cursor-pointer px-4 py-2 text-sm'>
-                            Add Reaction
-                          </DropdownMenu.Item>
-                          <DropdownMenu.Separator class='my-1 border-t border-gray-800' />
-                          <DropdownMenu.Item class='hover:bg-midnight-700 text-error-400 cursor-pointer px-4 py-2 text-sm'>
-                            Delete Message
-                          </DropdownMenu.Item>
-                        </DropdownMenu.Content>
-                      </DropdownMenu.Portal>
-                    </Show>
-                  </DropdownMenu>
+                  {/* User messages */}
+                  <Show when={!message.isSystem}>
+                    <div class='flex'>
+                      {/* Avatar */}
+                      <div class='mr-3 flex-shrink-0'>
+                        <Show when={user}>
+                          <UserAvatar user={user!} onClick={handleUserClick} />
+                        </Show>
+                      </div>
 
-                  {/* User avatar */}
-                  <Show when={!message.isSystem && user}>
-                    <div class={isCurrentUser ? 'order-1' : 'order-2'}>
-                      <UserAvatar user={user!} onClick={handleUserClick} />
+                      {/* Message content with context menu */}
+                      <ContextMenu>
+                        <ContextMenu.Trigger class='max-w-[80%]'>
+                          <div
+                            class={
+                              isCurrentUser ? 'chat-bubble-sender' : (
+                                'chat-bubble-recipient'
+                              )
+                            }
+                          >
+                            <div
+                              class={
+                                isCurrentUser ?
+                                  'text-primary-300 mb-1 text-xs'
+                                : 'text-cybertext-500 mb-1 text-xs'
+                              }
+                            >
+                              {user?.username}
+                            </div>
+                            {message.content}
+                            <span class='text-cybertext-600 mt-1 block text-right text-xs'>
+                              {formatTimestamp(message.timestamp)}
+                            </span>
+                          </div>
+                        </ContextMenu.Trigger>
+
+                        <ContextMenu.Portal>
+                          <ContextMenu.Content class='bg-midnight-900 z-50 w-48 overflow-hidden rounded-xs border border-gray-700 shadow-lg'>
+                            <ContextMenu.Item class='hover:bg-midnight-700 text- cursor-pointer px-4 py-2 text-sm'>
+                              Copy Message
+                            </ContextMenu.Item>
+                            <ContextMenu.Item class='hover:bg-midnight-700 text- cursor-pointer px-4 py-2 text-sm'>
+                              Reply
+                            </ContextMenu.Item>
+                            <ContextMenu.Item class='hover:bg-midnight-700 text- cursor-pointer px-4 py-2 text-sm'>
+                              Add Reaction
+                            </ContextMenu.Item>
+                            <ContextMenu.Separator class='my-1 border-t border-gray-800' />
+                            <ContextMenu.Item class='hover:bg-midnight-700 text-error-400 cursor-pointer px-4 py-2 text-sm'>
+                              Delete Message
+                            </ContextMenu.Item>
+                          </ContextMenu.Content>
+                        </ContextMenu.Portal>
+                      </ContextMenu>
                     </div>
                   </Show>
                 </div>
@@ -532,31 +534,29 @@ const Chat = () => {
       {/* Input area */}
       <div class='flex justify-center border-t border-gray-700 p-4'>
         <div class='relative w-full max-w-3xl'>
-          <div class='relative'>
-            <textarea
-              value={inputValue()}
-              onInput={e => {
-                setInputValue(e.target.value);
-                if (e.target.value.startsWith('/')) {
-                  setShowCommandMenu(true);
-                  setCommandInput(e.target.value.slice(1));
-                  setSelectedCommandIndex(0);
-                } else {
-                  setShowCommandMenu(false);
-                }
-              }}
-              onKeyDown={handleInputKeyDown}
-              placeholder='Type a message... (try typing / for commands)'
-              class='bg-midnight-800 text-cybertext-300 h-14 w-full resize-none rounded-xs border border-gray-700 px-4 py-3 pr-10 font-mono'
-            />
-            <button
-              onClick={handleSendMessage}
-              class='text-primary-400 hover:text-primary-300 absolute top-3 right-3'
-              aria-label='Send message'
-            >
-              <Icon icon='material-symbols:send' class='h-6 w-6' />
-            </button>
-          </div>
+          <textarea
+            value={inputValue()}
+            onInput={e => {
+              setInputValue(e.target.value);
+              if (e.target.value.startsWith('/')) {
+                setShowCommandMenu(true);
+                setCommandInput(e.target.value.slice(1));
+                setSelectedCommandIndex(0);
+              } else {
+                setShowCommandMenu(false);
+              }
+            }}
+            onKeyDown={handleInputKeyDown}
+            placeholder='Type a message... (try typing / for commands)'
+            class='bg-midnight-800 text- h-14 w-full resize-none rounded-xs border border-gray-700 px-4 py-3 pr-10'
+          />
+          <button
+            onClick={handleSendMessage}
+            class='text-primary-400 hover:text-primary-300 absolute top-3 right-3'
+            aria-label='Send message'
+          >
+            <Icon icon='lucide:send' class='h-6 w-6' />
+          </button>
 
           {/* Command menu */}
           <Show when={showCommandMenu()}>
@@ -576,6 +576,7 @@ const Chat = () => {
                   </div>
                 )}
               </For>
+
               <Show when={filteredCommands().length === 0}>
                 <div class='text-cybertext-500 p-3 text-center'>
                   No matching commands found

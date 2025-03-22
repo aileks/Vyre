@@ -1,7 +1,6 @@
 import { RouteDefinition, Router } from '@solidjs/router';
 import { lazy } from 'solid-js';
 
-import { AppContextProvider } from './context/AppContext';
 import AppLayout from './layouts/AppLayout';
 
 export type AppRouteDefinition = RouteDefinition & {
@@ -52,9 +51,5 @@ export const routes: AppRouteDefinition[] = [
 ];
 
 export default function AppRouter() {
-  return (
-    <AppContextProvider>
-      <Router>{routes}</Router>
-    </AppContextProvider>
-  );
+  return <Router>{routes}</Router>;
 }
